@@ -39,8 +39,7 @@ router.register(r'users', UserViewSet)
 urlpatterns = [
     path('admin/', admin.site.urls),
     # TODO: Could change this to a redirect view to the home page
-    path('', include(router.urls)),
-    path('home/', include('InstaTonneApp.urls')),
+    path('', include('InstaTonneApp.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('openapi', get_schema_view(
