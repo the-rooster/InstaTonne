@@ -1,17 +1,30 @@
 from django.db import models
+from rest_framework import serializers
 
 
 class Author(models.Model):
     url = models.TextField()
     host = models.TextField()
-    display_name = models.TextField()
+    displayName = models.TextField()
     github = models.TextField()
     profile_image = models.TextField()
 
     created_at = models.DateTimeField(auto_now_add=True)
 
-    followings = models.ManyToManyField('self', blank=True)
 
+class AuthorSerializer(serializers.Serializer):
+    url = serializers.CharField()
+    host = serializers.CharField()
+    displayName = serializers.CharField()
+    github = serializers.CharField()
+    profile_image = serializers.CharField()
+
+    created_at = serializers.DateTimeField()
+
+class Follows(models.Model):
+
+    author1Id = models.TextField()
+    author2Id = models.TextField()
 
 class Post(models.Model):
     url = models.TextField()
