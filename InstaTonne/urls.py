@@ -18,6 +18,8 @@ from django.urls import path, include
 from django.contrib.auth.models import User
 from rest_framework import routers, serializers, viewsets
 from rest_framework.schemas import get_schema_view
+from django.conf import settings
+from django.conf.urls.static import static
 
 # Serializers define the API representation.
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -36,7 +38,10 @@ router.register(r'users', UserViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # TODO: Could change this to a redirect view to the home page
     path('', include(router.urls)),
+    path('home/', include('InstaTonneApp.urls')),
+    path('accounts/', include('django.contrib.auth.urls')),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('openapi', get_schema_view(
         title="InstaTonne API",
@@ -45,7 +50,7 @@ urlpatterns = [
         # url='https://www.example.org/api/' <- if we want a custom url for a schema, add it here
         # urlconf=ROOT_URLCONF <- ROOT_URLCONF is default, so we probably won't need to add this
     ), name='openapi-schema'), 
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # schema_generator.get_schema() can be used to get a JSON object containing the same data, in case we need to export it:
 # (This JSON is identical to the one generated above with get_schema_view)
