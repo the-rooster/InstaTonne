@@ -4,6 +4,7 @@ from .auth_wrapper import checkAuthorization
 from django.db import models
 from ..models import Author, AuthorSerializer
 from rest_framework.renderers import JSONRenderer
+from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
 
 # @checkAuthorization
@@ -25,18 +26,45 @@ def page_all_authors(request : HttpRequest):
     result = paginator.get_page(page_num)
 
     serializer = AuthorSerializer(result,many=True)
+    
+    data = {"type" : "authors","items" : serializer.data}
+    
 
-    return HttpResponse(content=JSONRenderer().render(serializer.data),status=200)
+    return HttpResponse(content=JSONRenderer().render(data),status=200)
 
+@csrf_exempt
+def single_author(request : HttpRequest,id : str):
 
-def get_single_author(request : HttpRequest,id : str):
+    if request.method == "GET":
 
-    if request.method != "GET":
-        return HttpResponse(status=405)
+        author = Author.objects.get(pk=id)
 
-    author = Author.objects.get(pk=id)
+        serializer = AuthorSerializer(author)
 
-    serializer = AuthorSerializer(author)
+        data = serializer.data
+        data["type"] = "author"
 
-    return HttpResponse(content=JSONRenderer().render(serializer.data),status=200)
+        print("helooooo")
+        return HttpResponse(content=JSONRenderer().render(data),status=200)
 
+    elif request.method == "POST":
+
+        print("AAA")
+        try:
+            print(request.body)
+            body : dict = json.loads(request.body)
+        except Exception as e:
+            print(e)
+            return HttpResponse(status=400)
+        
+        author = Author.objects.filter(pk=id)
+
+        print('foeey')
+        if not author.exists():
+            return HttpResponse(status=400)
+
+        for k,v in body.items():
+            author.update()
+        author.save()
+
+    return HttpResponse(status=405)

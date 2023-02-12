@@ -27,5 +27,5 @@ router = routers.DefaultRouter()
 
 urlpatterns = [
     path("authors",page_all_authors),
-    path("authors/<str:id>/",get_single_author)
+    path("authors/<str:id>/",single_author)
 ]
