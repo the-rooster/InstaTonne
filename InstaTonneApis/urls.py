@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers, serializers, viewsets
 from rest_framework.schemas import get_schema_view
-
+from .endpoints.authors import *
 
 
 
@@ -26,5 +26,6 @@ router = routers.DefaultRouter()
 
 
 urlpatterns = [
-
+    path("authors",page_all_authors),
+    path("authors/<str:id>/",single_author)
 ]
