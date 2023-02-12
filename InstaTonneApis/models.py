@@ -3,28 +3,32 @@ from rest_framework import serializers
 
 
 class Author(models.Model):
+    type = models.TextField()
     url = models.TextField()
     host = models.TextField()
     displayName = models.TextField()
     github = models.TextField()
     profileImage = models.TextField()
 
-    published = models.DateTimeField(auto_now_add=True)
 
-
-class AuthorSerializer(serializers.Serializer):
-    url = serializers.CharField()
-    host = serializers.CharField()
-    displayName = serializers.CharField()
-    github = serializers.CharField()
-    profileImage = serializers.CharField()
-
-    published = serializers.DateTimeField()
+class AuthorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Author
+        fields = '__all__'
 
 
 class Follow(models.Model):
-    followerAuthorId = models.TextField()
-    followeeAuthorId = models.TextField()
+    followerAuthorId = models.ForeignKey(Author, related_name='followerAuthorId', on_delete=models.CASCADE)
+    followeeAuthorId = models.ForeignKey(Author, related_name='followeeAuthorId', on_delete=models.CASCADE)
+
+
+class FollowSerializer(serializers.ModelSerializer):
+    followerAuthorId = AuthorSerializer()
+    followeeAuthorId = AuthorSerializer()
+
+    class Meta:
+        model = Follow
+        fields = '__all__'
 
 
 class Post(models.Model):

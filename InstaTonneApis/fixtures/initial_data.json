@@ -14,32 +14,52 @@
       "model": "InstaTonneApis.Author",
       "pk": 1,
       "fields": {
+        "type" : "author",
         "url" : "url1",
         "host" : "host1",
         "displayName" : "displayName1",
         "github" : "github1",
-        "profileImage" : "profileImage1",
-        "published" : "2013-03-16T17:41:28+00:00"
+        "profileImage" : "profileImage1"
       }
     },
     {
         "model": "InstaTonneApis.Author",
         "pk": 2,
         "fields": {
+          "type" : "author",
           "url" : "url2",
           "host" : "host2",
           "displayName" : "displayName2",
           "github" : "github2",
-          "profileImage" : "profileImage2",
-          "published" : "2013-03-16T17:41:28+00:00"
+          "profileImage" : "profileImage2"
         }
+    },
+    {
+      "model": "InstaTonneApis.Author",
+      "pk": 3,
+      "fields": {
+        "type" : "author",
+        "url" : "url3",
+        "host" : "host3",
+        "displayName" : "displayName3",
+        "github" : "github3",
+        "profileImage" : "profileImage3"
+      }
     },
     {
       "model": "InstaTonneApis.Follow",
       "pk": 1,
       "fields": {
-        "followerAuthorId" : 1,
-        "followeeAuthorId" : 2
+        "followerAuthorId" : 2,
+        "followeeAuthorId" : 1
+      }
+    },
+    {
+      "model": "InstaTonneApis.Follow",
+      "pk": 2,
+      "fields": {
+        "followerAuthorId" : 3,
+        "followeeAuthorId" : 1
       }
     }
 ]
