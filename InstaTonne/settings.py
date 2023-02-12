@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     # New
     'rest_framework',
     'InstaTonneApp.apps.InstatonneappConfig',
+    'InstaTonneApis.apps.InstatonneapisConfig'
 ]
 
 MIDDLEWARE = [
