@@ -57,14 +57,27 @@ def single_author(request : HttpRequest,id : str):
             print(e)
             return HttpResponse(status=400)
         
-        author = Author.objects.filter(pk=id)
+        author = Author.objects.get(pk=id)
 
-        print('foeey')
-        if not author.exists():
+        
+        if not author:
             return HttpResponse(status=400)
 
-        for k,v in body.items():
-            author.update()
+        if "url" in body:
+            author.url = body["url"]
+        if "id" in body:
+            author.id = body["id"]
+        if "host" in body:
+            author.host = body["host"]
+        if "displayName" in body:
+            author.displayName = body["displayName"]
+        if "github" in body:
+            author.github = body["github"]
+        if "profileImage" in body:
+            author.profileImage = body["profileImage"]
+        
         author.save()
+
+        return HttpResponse(status=204)
 
     return HttpResponse(status=405)
