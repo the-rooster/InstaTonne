@@ -22,9 +22,9 @@ class AuthorSerializer(serializers.Serializer):
     published = serializers.DateTimeField()
 
 
-class Follows(models.Model):
-    author1Id = models.TextField()
-    author2Id = models.TextField()
+class Follow(models.Model):
+    followerAuthorId = models.TextField()
+    followeeAuthorId = models.TextField()
 
 
 class Post(models.Model):

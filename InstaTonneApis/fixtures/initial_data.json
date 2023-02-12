@@ -33,5 +33,13 @@
           "profileImage" : "profileImage2",
           "published" : "2013-03-16T17:41:28+00:00"
         }
+    },
+    {
+      "model": "InstaTonneApis.Follow",
+      "pk": 1,
+      "fields": {
+        "followerAuthorId" : 1,
+        "followeeAuthorId" : 2
       }
+    }
 ]
