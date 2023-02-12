@@ -18,6 +18,7 @@ from django.urls import path, include
 from django.contrib.auth.models import User
 from rest_framework import routers, serializers, viewsets
 from rest_framework.schemas import get_schema_view
+import views
 
 # Serializers define the API representation.
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -45,7 +46,14 @@ urlpatterns = [
         version="1.0.0" # We will probably not update this unless we make API changes later
         # url='https://www.example.org/api/' <- if we want a custom url for a schema, add it here
         # urlconf=ROOT_URLCONF <- ROOT_URLCONF is default, so we probably won't need to add this
-    ), name='openapi-schema'), 
+    ), name='openapi-schema'),
+    path('', views.index, name='index'),
+    path('profile/', views.profile, name='profile'),
+    path('user/<str:username>', views.user, name='user'),
+    path('post/<int:post_id>', views.post, name='post'),
+    path('post/<int:post_id>/edit', views.edit_post, name='edit_post'),
+    path('friends/', views.friends, name='friends'),
+    path('friends/requests', views.friend_requests, name='friend_requests'), 
 ]
 
 # schema_generator.get_schema() can be used to get a JSON object containing the same data, in case we need to export it:
