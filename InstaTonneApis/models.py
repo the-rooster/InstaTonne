@@ -7,7 +7,7 @@ class Author(models.Model):
     host = models.TextField()
     displayName = models.TextField()
     github = models.TextField()
-    profile_image = models.TextField()
+    profileImage = models.TextField()
 
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -17,7 +17,7 @@ class AuthorSerializer(serializers.Serializer):
     host = serializers.CharField()
     displayName = serializers.CharField()
     github = serializers.CharField()
-    profile_image = serializers.CharField()
+    profileImage = serializers.CharField()
 
     created_at = serializers.DateTimeField()
 
