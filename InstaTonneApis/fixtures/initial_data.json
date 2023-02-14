@@ -61,5 +61,74 @@
         "followerAuthorId" : 3,
         "followeeAuthorId" : 1
       }
+    },
+    {
+      "model": "InstaTonneApis.Post",
+      "pk": 1,
+      "fields": {
+        "url" : "url1",
+        "title" : "title1",
+        "source" : "source1",
+        "origin" : "origin1",
+        "description" : "description1",
+        "contentType" : "contentType1",
+        "content" : "content1",
+        "visibility" : "visibility1",
+    
+        "categories" : ["cat1", "cat2"],
+        "unlisted" : false,
+        "published" : "2022-01-01 00:00:01",
+    
+        "author" : 1
+      }
+    },
+    {
+      "model": "InstaTonneApis.Post",
+      "pk": 2,
+      "fields": {
+        "url" : "url2",
+        "title" : "title2",
+        "source" : "source2",
+        "origin" : "origin2",
+        "description" : "description2",
+        "contentType" : "contentType2",
+        "content" : "content2",
+        "visibility" : "visibility2",
+    
+        "categories" : ["cat3", "cat4"],
+        "unlisted" : false,
+        "published" : "2022-01-01 00:00:01",
+    
+        "author" : 1
+      }
+    },
+    {
+      "model": "InstaTonneApis.Comment",
+      "pk": 1,
+      "fields": {
+        "url" : "url1",
+        "contentType" : "contentType1",
+        "comment" : "comment1",
+
+        "published" : "2022-01-01 00:00:01",
+    
+        "author" : 1,
+        "post" : 1
+      }
+    },
+    {
+      "model": "InstaTonneApis.Comment",
+      "pk": 2,
+      "fields": {
+        "url" : "url2",
+        "contentType" : "contentType2",
+        "comment" : "comment2",
+
+        "published" : "2022-01-01 00:00:01",
+    
+        "author" : 1,
+        "post" : 1
+      }
     }
+    
 ]
