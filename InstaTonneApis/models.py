@@ -9,8 +9,7 @@ class Author(models.Model):
     displayName = models.TextField()
     github = models.TextField()
     profileImage = models.TextField()
-
-
+        
 class AuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Author
