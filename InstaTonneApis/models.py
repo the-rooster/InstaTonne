@@ -1,5 +1,6 @@
 from django.db import models
 from rest_framework import serializers
+import json
 
 
 class Author(models.Model):
@@ -9,9 +10,10 @@ class Author(models.Model):
     displayName = models.TextField()
     github = models.TextField()
     profileImage = models.TextField()
-    userID = models.TextField()
-    active = models.BooleanField()
-        
+    userID = models.TextField(default="0")
+    active = models.BooleanField(default=False)
+
+
 class AuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Author
@@ -42,11 +44,23 @@ class Post(models.Model):
     content = models.TextField()
     visibility = models.TextField()
 
-    catagories  = models.CharField(max_length=100)
+    categories  = models.CharField(max_length=100)
     unlisted = models.BooleanField(default=False)
     published = models.DateTimeField(auto_now_add=True)
 
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
+
+
+class PostSerializer(serializers.ModelSerializer):
+    author = AuthorSerializer()
+    categories = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Post
+        fields = '__all__'
+
+    def get_categories(self, instance):
+        return json.loads(instance.categories.replace("'", '"'))
 
 
 class Request(models.Model):
@@ -71,7 +85,7 @@ class Like(models.Model):
 class Comment(models.Model):
     url = models.TextField()
     contentType = models.TextField()
-    content = models.TextField()
+    comment = models.TextField()
 
     published = models.DateTimeField(auto_now_add=True)
 
