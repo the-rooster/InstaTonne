@@ -38,6 +38,8 @@ router.register(r'users', UserViewSet)
 urlpatterns = [
     path('service/',include("InstaTonneApis.urls")),
     path('admin/', admin.site.urls),
+    path('register/',views.register),
+    path('login/',views.login),
     path('accounts/', include('django.contrib.auth.urls')),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('openapi', get_schema_view(

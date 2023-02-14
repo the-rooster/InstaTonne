@@ -1,7 +1,17 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-
+from .forms import *
 # Create your views here.
+
+def register(request):
+
+    form = RegisterForm()
+    return render(request,'registration/registration.html',context={"form" : form})
+
+def login(request):
+
+    form = LoginForm()
+    return render(request,'registration/login.html',context={"form" : form})
 
 @login_required
 def index(request):

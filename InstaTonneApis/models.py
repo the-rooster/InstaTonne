@@ -9,6 +9,8 @@ class Author(models.Model):
     displayName = models.TextField()
     github = models.TextField()
     profileImage = models.TextField()
+    userID = models.TextField()
+    active = models.BooleanField()
         
 class AuthorSerializer(serializers.ModelSerializer):
     class Meta:
