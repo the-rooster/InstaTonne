@@ -2,6 +2,7 @@ from django.http import HttpRequest, HttpResponse
 import json
 from ..models import Post, PostSerializer, Comment, Author
 from django.views.decorators.csrf import csrf_exempt
+from django.core.paginator import Paginator
 
 
 @csrf_exempt
@@ -14,8 +15,13 @@ def single_author_posts(request: HttpRequest, author_id: int):
 
 
 def single_author_posts_get(request: HttpRequest, author_id: int):
-    posts = Post.objects.all().filter(author=author_id)
-    comment_count = Comment.objects.all().count()
+    posts = Post.objects.all().filter(author=author_id).order_by("published")
+    page_num = request.GET.get("page")
+    page_size = request.GET.get("size")
+
+    if page_num is not None and page_size is not None:
+        paginator = Paginator(posts, page_size)
+        posts = paginator.get_page(page_num)
 
     serialized_data = []
     for post in posts:
@@ -28,10 +34,10 @@ def single_author_posts_get(request: HttpRequest, author_id: int):
 
         serialized_data.append(serialized_post)
 
-    res = json.dumps([{
+    res = json.dumps({
         "type": "posts",
         "items": serialized_data
-    }])
+    })
 
     return HttpResponse(content=res, status=200)
 
