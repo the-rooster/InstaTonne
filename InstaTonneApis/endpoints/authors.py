@@ -49,7 +49,6 @@ def single_author(request : HttpRequest,id : str):
 
     elif request.method == "POST":
 
-        print("AAA")
         try:
             print(request.body)
             body : dict = json.loads(request.body)
