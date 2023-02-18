@@ -10,7 +10,7 @@ class Author(models.Model):
     displayName = models.TextField()
     github = models.TextField()
     profileImage = models.TextField()
-    userID = models.TextField(default="0")
+    userID = models.TextField()
     active = models.BooleanField(default=False)
 
 
@@ -35,6 +35,7 @@ class FollowSerializer(serializers.ModelSerializer):
 
 
 class Post(models.Model):
+    type = models.TextField()
     url = models.TextField()
     title = models.TextField()
     source = models.TextField()
@@ -73,6 +74,7 @@ class Request(models.Model):
 
 
 class Like(models.Model):
+    type = models.TextField()
     url = models.TextField()
     summary = models.TextField()
 
@@ -83,6 +85,7 @@ class Like(models.Model):
 
 
 class Comment(models.Model):
+    type = models.TextField()
     url = models.TextField()
     contentType = models.TextField()
     comment = models.TextField()
