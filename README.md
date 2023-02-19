@@ -19,7 +19,9 @@ Edit ESLint's settings.json file and add the following to auto lint Vue and JS f
 
 Files should now lint automatically when saved
 
-To run the frontend, open a terminal in "InstaTonne-FrontEnd" and enter "npm run dev" to launch on localhost
+To run the frontend, open a terminal in InstaTonne-FrontEnd:
+npm i
+npm run dev
 
 Note: eslint does not like debuggers. To use a debugger, be sure to disable the restriction:
 debugger; // eslint-disable-line no-debugger
