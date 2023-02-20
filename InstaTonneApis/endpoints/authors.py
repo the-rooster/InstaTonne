@@ -2,6 +2,7 @@ from django.http import HttpRequest, HttpResponse
 import json
 from ..models import Author, AuthorSerializer
 from django.core.paginator import Paginator
+from .utils import valid_requesting_user
 
 
 def authors(request: HttpRequest):
@@ -55,6 +56,9 @@ def single_author_get(request: HttpRequest, author_id: int):
 
 # update a single author
 def single_author_post(request: HttpRequest, author_id: int):
+    if not valid_requesting_user(request, author_id):
+        return HttpResponse(status=403)
+
     try:
         author: Author | None = Author.objects.all().filter(pk=author_id).first()
 
