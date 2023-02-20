@@ -1,21 +1,20 @@
 from django.http import HttpRequest, HttpResponse
 import json
 from ..models import Follow, FollowSerializer, Author
-from django.views.decorators.csrf import csrf_exempt
 
-"""
-endpoints for /authors/<id>/followers
-"""
-def single_author_followers(request: HttpRequest, id: int):
+
+# endpoints for /authors/<id>/followers
+def single_author_followers(request: HttpRequest, author_id: int):
     if request.method == "GET":
-        return single_author_followers_get(request,id)  
+        return single_author_followers_get(request, author_id)  
     elif request.method == "POST":
         return HttpResponse(status=405)
     return HttpResponse(status=405)
 
 
-def single_author_followers_get(request,id: str):
-    follows = Follow.objects.all().filter(followeeAuthorId=id)
+# get the followers of an author
+def single_author_followers_get(request: HttpRequest, author_id: int):
+    follows = Follow.objects.all().filter(followeeAuthorId=author_id)
 
     serialized_data = []
     for follow in follows:
@@ -29,21 +28,19 @@ def single_author_followers_get(request,id: str):
 
     return HttpResponse(content=res, status=200)
 
-"""
-endpoints for /authors/<id>/followers/<foreign id>
-"""
-def author_follower_foreign(request : HttpRequest, id : str,foreign_id : str):
 
+# endpoints for /authors/<id>/followers/<foreign id>
+def author_follower_foreign(request : HttpRequest, id : str,foreign_id : str):
     if request.method == "DELETE":
         return delete_author_follower(request,id,foreign_id)
     elif request.method == "PUT":
         return put_author_follower(request,id,foreign_id)
     elif request.method == "GET":
         return check_author_follower(request,id,foreign_id)
-    
     return HttpResponse(status=405)
 
-def delete_author_follower(request : HttpRequest,id : str, foreign_id : str):
+
+def delete_author_follower(request : HttpRequest, id : str, foreign_id : str):
 
     if not request.user.is_authenticated:
         #not authenticated

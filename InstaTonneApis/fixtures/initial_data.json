@@ -24,6 +24,7 @@
     "fields": {
       "userID" : "2",
       "type" : "author",
+      "id_url" : "id_url1",
       "url" : "url1",
       "host" : "host1",
       "displayName" : "displayName1",
@@ -37,6 +38,7 @@
       "pk": 2,
       "fields": {
         "type" : "author",
+        "id_url" : "id_url2",
         "url" : "url2",
         "host" : "host2",
         "displayName" : "displayName2",
@@ -49,6 +51,7 @@
     "pk": 3,
     "fields": {
       "type" : "author",
+      "id_url" : "id_url3",
       "url" : "url3",
       "host" : "host3",
       "displayName" : "displayName3",
