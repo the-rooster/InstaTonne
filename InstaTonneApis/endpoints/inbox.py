@@ -73,11 +73,10 @@ def post_inbox(request : HttpRequest, id : str):
 
     data = json.loads(data)
 
-
-
     author = Author.objects.filter(userID=id)
 
     if not author:
+        #author doesn't exist. cannot post to them.
         return HttpResponse(status=404)
     
     author = author[0]

@@ -1,9 +1,11 @@
 from django.db import models
 from rest_framework import serializers
 import json
+import uuid
 
 
 class Author(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     type = models.TextField()
     id_url = models.TextField()
     url = models.TextField()
@@ -37,6 +39,7 @@ class FollowSerializer(serializers.ModelSerializer):
 
 
 class Post(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     type = models.TextField()
     url = models.TextField()
     title = models.TextField()
@@ -71,11 +74,12 @@ class Request(models.Model):
 
     published = models.DateTimeField(auto_now_add=True)
 
-    requester = models.ForeignKey(Author, related_name='requester', on_delete=models.CASCADE)
-    requestee = models.ForeignKey(Author, related_name='requestee', on_delete=models.CASCADE)
+    actor = models.ForeignKey(Author, related_name='requester', on_delete=models.CASCADE)
+    object = models.ForeignKey(Author, related_name='requestee', on_delete=models.CASCADE)
 
 
 class Comment(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     type = models.TextField()
     url = models.TextField()
     contentType = models.TextField()
@@ -96,6 +100,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class Like(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     type = models.TextField()
     context = models.TextField()
     summary = models.TextField()
@@ -113,3 +118,12 @@ class LikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Like
         fields = ['type', 'context', 'summary', 'author', 'post', 'comment']
+
+
+class Inbox(models.Model):
+
+    ownerId = models.ForeignKey(Author,on_delete=models.CASCADE)
+    post = models.ForeignKey(Post,on_delete=models.CASCADE,null=True,blank=True)
+    comment = models.ForeignKey(Comment,on_delete=models.CASCADE,null=True,blank=True)
+    like = models.ForeignKey(Like,on_delete=models.CASCADE,null=True,blank=True)
+    request = models.ForeignKey(Request,on_delete=models.CASCADE,null=True,blank=True)
