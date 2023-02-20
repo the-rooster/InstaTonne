@@ -38,6 +38,7 @@
 import { ref } from 'vue'
 import HelloWorld from './HelloWorld.vue'
 import PostEditor from './PostEditor.vue'
+import ProfilePage from './ProfilePage.vue'
 
 class PageInfo {
     component = HelloWorld
@@ -51,7 +52,8 @@ class PageInfo {
 // import more pages and add them here!
 const pageList = [
   new PageInfo(HelloWorld, "Hello World!"),
-  new PageInfo(PostEditor, "Edit Posts")
+  new PageInfo(PostEditor, "Edit Posts"),
+  new PageInfo(ProfilePage, "Profile Page")
 ]
 
 const currentPage = ref(pageList[0])
