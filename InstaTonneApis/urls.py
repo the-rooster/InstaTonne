@@ -18,7 +18,7 @@ from django.urls import path, include
 from rest_framework import routers, serializers, viewsets
 from rest_framework.schemas import get_schema_view
 from .endpoints.authors import *
-from .endpoints.followers import single_author_followers
+from .endpoints.followers import single_author_followers, author_follower_foreign
 from .endpoints.register import register_author
 from .endpoints.login import login
 from .endpoints.posts import single_author_posts, single_author_post
@@ -31,7 +31,8 @@ router = routers.DefaultRouter()
 urlpatterns = [
     path("authors", page_all_authors),
     path("authors/<str:id>/", single_author),
-    path("authors/<int:id>/followers/", single_author_followers),
+    path("authors/<str:id>/followers/", single_author_followers),
+    path("authors/<str:id>/followers/<str:foreign_id>/", author_follower_foreign),
     path("register/",register_author),
     path("login/",login),
     path("authors/<int:author_id>/posts/", single_author_posts),
