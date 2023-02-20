@@ -1,6 +1,6 @@
 <template>
   <div class="viewBox">
-    <h1>{{ msg }}</h1>
+    <!-- <h1>{{ msg }}</h1> -->
 
     <div class="card">
       <button
@@ -39,7 +39,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-defineProps<{ msg: string }>()
+// defineProps<{ msg: string }>()
 
 const count = ref(0)
 </script>
