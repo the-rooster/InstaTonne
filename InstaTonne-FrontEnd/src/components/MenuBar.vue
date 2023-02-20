@@ -16,55 +16,44 @@
       This is super temporary but will work for now!
     </h2>
     <div
-      v-for="page in pageList"
-      :key="page.displayName"
+      v-for="route in routes"
+      :key="route.path"
       style="padding: 1em;"
     >
-      <button
-        type="button" 
-        @click="changePage(page)"
-      >
-        {{ page.displayName }}
-      </button>
+      <router-link :to="route.path">
+        {{ route.path }}
+      </router-link>
     </div>
-    <p>
-      currentPage: {{ currentPage.displayName }}
-    </p>
   </div>
-  <component :is="currentPage.component" />
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import HelloWorld from './HelloWorld.vue'
-import PostEditor from './PostEditor.vue'
-import FollowRequests from './FollowRequests.vue'
-import ProfilePage from './ProfilePage.vue'
-import UserSearch from './UserSearch.vue'
+import { routes } from '../main'
 
-class PageInfo {
-    component = HelloWorld
-    displayName = ""
-    constructor(component = HelloWorld, displayName = "error: forgot to set displayName") {
-      this.component = component; 
-      this.displayName = displayName; 
-    }
-}
+// class PageInfo {
+//     path = '/HelloWorld'
+//     displayName = ""
+//     constructor(path = '/HelloWorld', displayName = "error: forgot to set displayName") {
+//       this.path = path; 
+//       this.displayName = displayName; 
+//     }
+// }
 
 // import more pages and add them here!
-const pageList = [
-  new PageInfo(HelloWorld, "Hello World!"),
-  new PageInfo(PostEditor, "Edit Posts"),
-  new PageInfo(ProfilePage, "Profile Page"),
-  new PageInfo(UserSearch, "User Search"),
-  new PageInfo(FollowRequests, "Follow Requests"),
-]
+// const pageList = [
+//   new PageInfo('/HelloWorld', "Hello World!"),
+//   new PageInfo(PostEditor, "Edit Posts"),
+//   new PageInfo(ProfilePage, "Profile Page"),
+//   new PageInfo(UserSearch, "User Search"),
+//   new PageInfo(FollowRequests, "Follow Requests"),
+// ]
 
-const currentPage = ref(pageList[0])
+// const currentPage = ref(pageList[0])
 
-function changePage(pageInfo = new PageInfo()) {
-  currentPage.value = pageInfo
-}
+// function changePage(pageInfo = new PageInfo()) {
+//   currentPage.value = pageInfo
+// }
 
 </script>
 
