@@ -1,7 +1,6 @@
 from django.http import HttpRequest, HttpResponse
 import json
 from ..models import Post, PostSerializer, Comment, Author
-from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
 
 
@@ -79,6 +78,8 @@ def single_author_post_post(request: HttpRequest, author_id: int, post_id: int):
         body: dict = json.loads(request.body)
 
         post.title = body["title"]
+        post.source = body["source"]
+        post.origin = body["origin"]
         post.description = body["description"]
         post.contentType = body["contentType"]
         post.content = body["content"]
@@ -105,6 +106,8 @@ def single_author_posts_post(request: HttpRequest, author_id: int):
         post: Post = Post.objects.create(
             type = "post",
             title = body["title"],
+            source = body["source"],
+            origin = body["origin"],
             description = body["description"],
             contentType = body["contentType"],
             content = body["content"],
@@ -150,6 +153,8 @@ def single_author_post_put(request: HttpRequest, author_id: int, post_id: int):
             url = make_post_url(request.get_host(), author_id, post_id),
             type = "post",
             title = body["title"],
+            source = body["source"],
+            origin = body["origin"],
             description = body["description"],
             contentType = body["contentType"],
             content = body["content"],
