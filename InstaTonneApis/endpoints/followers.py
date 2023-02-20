@@ -56,7 +56,6 @@ def delete_author_follower(request : HttpRequest,id : str, foreign_id : str):
 
 def put_author_follower(request : HttpRequest,id : str, foreign_id : str):
 
-
     if not request.user.is_authenticated:
         print("not authenticated. woopsies!")
         return HttpResponse(status=403)
@@ -65,6 +64,9 @@ def put_author_follower(request : HttpRequest,id : str, foreign_id : str):
     if str(request.user.pk) != id:
         print("requesting someone thats not you. no bueno")
         return HttpResponse(status=403)
+    
+    if id == foreign_id:
+        return HttpResponse(status=403)  
     
     print("wahooo")
     
