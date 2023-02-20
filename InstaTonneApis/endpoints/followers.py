@@ -47,7 +47,17 @@ def delete_author_follower(request : HttpRequest,id : str, foreign_id : str):
 
     follows = Follow.objects.all().filter(followeeAuthorId=id,followerAuthorId=foreign_id)
 
+    if not request.user.is_authenticated:
+        #not authenticated
+        return HttpResponse(status=403)
+    
+
+    if str(request.user.pk) != id:
+        #requesting to delete followers from someone that is not you. no good
+        return HttpResponse(status=403)
+
     if len(follows) != 1:
+        #foreign_id follower does not exist!
         return HttpResponse(status=404)
     
     follows.delete()
@@ -57,18 +67,17 @@ def delete_author_follower(request : HttpRequest,id : str, foreign_id : str):
 def put_author_follower(request : HttpRequest,id : str, foreign_id : str):
 
     if not request.user.is_authenticated:
-        print("not authenticated. woopsies!")
+        #not authenticated. woopsies!
         return HttpResponse(status=403)
     
-    print(request.user.pk)
+    
     if str(request.user.pk) != id:
-        print("requesting someone thats not you. no bueno")
+        #requesting someone thats not you. no bueno
         return HttpResponse(status=403)
     
     if id == foreign_id:
         return HttpResponse(status=403)  
     
-    print("wahooo")
     
     followee = Author.objects.filter(userID=id)
 
