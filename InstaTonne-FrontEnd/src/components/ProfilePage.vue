@@ -8,13 +8,13 @@
     <div class="flex-container">
       <img src="../assets/pfp.png">
       <a
-        href="http://arkhana.fr/img/1.png"
+        href="https://www.google.com/"
         class="flex-content"
       >
         <span class="followers"><br><br>{{ jsonData["Followers"] }} <br>Followers</span>
       </a>
       <a
-        href="http://arkhana.fr/img/1.png"
+        href="https://www.google.com/"
         class="flex-content"
       >
         <span class="followers"><br><br>{{ jsonData["Friends"] }} <br>Friends</span>
