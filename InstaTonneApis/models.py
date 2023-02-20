@@ -5,11 +5,13 @@ import json
 
 class Author(models.Model):
     type = models.TextField()
+    id_url = models.TextField()
     url = models.TextField()
     host = models.TextField()
     displayName = models.TextField()
     github = models.TextField()
     profileImage = models.TextField()
+
     userID = models.TextField()
     active = models.BooleanField(default=False)
 
@@ -17,7 +19,7 @@ class Author(models.Model):
 class AuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Author
-        fields = '__all__'
+        fields = ['type', 'id_url', 'url', 'host', 'displayName', 'github', 'profileImage']
 
 
 class Follow(models.Model):
