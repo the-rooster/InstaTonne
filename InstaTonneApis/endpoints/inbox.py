@@ -1,6 +1,7 @@
 from django.http import HttpRequest, HttpResponse
 from ..models import Author, Post, Request, Comment, Like, Inbox, PostSerializer, CommentSerializer, LikeSerializer
 import json
+import uuid
 
 def inbox_endpoint(request : HttpRequest, author_id : str):
 
@@ -24,15 +25,22 @@ def get_inbox(request : HttpRequest, id : str):
         print('not authenticated')
         return HttpResponse(status=403)
     
-    if request.user.pk != id:
+    user = Author.objects.filter(pk=id)
+    if not user:
+        print("db corrupted probably. user exists but author does not.")
+        return HttpResponse(status=500)
+    
+    user = user[0]
+    if str(user.userID) != str(request.user.pk):
         print('requesting wrong user')
+        print(request.user.pk,user.userID)
         return HttpResponse(status=403)
     
     #user is now authenticated
     #get all posts from followers
 
     #get author object
-    user = Author.objects.get(userID=id)
+    
 
     if not user:
         #this shouldn't happen
@@ -51,9 +59,9 @@ def get_inbox(request : HttpRequest, id : str):
             data = CommentSerializer(item.comment).data
 
             #change object to just be the url and also call it id according to spec
-            temp = data["post"]
-            data["id"] = temp
-            del temp
+            # temp = data["post"]
+            # data["id"] = temp
+            # del temp
 
         elif item.like:
 
@@ -73,7 +81,7 @@ def post_inbox(request : HttpRequest, id : str):
 
     data = json.loads(data)
 
-    author = Author.objects.filter(userID=id)
+    author = Author.objects.filter(pk=id)
 
     if not author:
         #author doesn't exist. cannot post to them.
@@ -90,9 +98,10 @@ def post_inbox(request : HttpRequest, id : str):
             #need to create author object if it doesn't exist here
 
             author_id = data["author"]["id"]
-
-            check_author = Author.objects.filter(userID=author_id)
-
+            author_id = author_id.split("/")[-1]
+            print(author_id)
+            check_author = Author.objects.filter(pk=author_id)
+            print("test2")
             if not check_author:
                 author_id = Author.objects.create(**(data["author"]))
 
@@ -108,6 +117,17 @@ def post_inbox(request : HttpRequest, id : str):
             inbox = Inbox.objects.create(ownerId=author,request=new_request)
             inbox.save()
         elif data["type"] == "like":
+            author_id = data["author"]["id"]
+            author_id = author_id.split("/")[-1]
+
+            check_author = Author.objects.filter(pk=author_id)
+            
+            if not check_author:
+                author_id = Author.objects.create(**(data["author"]))
+
+            #need to create the post object here
+
+            data["author"] = author_id
             new_like = Like.objects.create(**data)
             new_like.save()
             inbox = Inbox.objects.create(ownerId=author,like=new_like)
@@ -115,8 +135,9 @@ def post_inbox(request : HttpRequest, id : str):
         elif data["type"] == "comment":
 
             author_id = data["author"]["id"]
+            author_id = author_id.split("/")[-1]
 
-            check_author = Author.objects.filter(userID=author_id)
+            check_author = Author.objects.filter(pk=author_id)
 
             if not check_author:
                 del data["author"]["id"]

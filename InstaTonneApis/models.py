@@ -5,7 +5,7 @@ import uuid
 
 
 class Author(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.TextField(primary_key=True, default=uuid.uuid4, editable=False)
     type = models.TextField()
     id_url = models.TextField()
     url = models.TextField()
@@ -89,7 +89,7 @@ class Comment(models.Model):
     published = models.DateTimeField(auto_now_add=True)
 
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE,null=True)
 
 
 class CommentSerializer(serializers.ModelSerializer):

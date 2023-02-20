@@ -22,7 +22,7 @@ def register_author(request : HttpRequest):
         return render(request,"registration/registration.html",context={"form" : form})
 
     user = User.objects.create_user(username=form.data["username"],password=form.data["password"])
-    Author.objects.create(displayName=form.data["username"],type="author",url="none",host="none",github="none",profileImage="none",userID=user.pk,active=False)
+    Author.objects.create(displayName=form.data["username"],type="author",url="none",host="none",github="none",profileImage="none",userID=user.pk,active=False,id_url="none")
 
 
     return redirect("/login/")
