@@ -94,3 +94,12 @@ class Comment(models.Model):
 
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = AuthorSerializer()
+
+    class Meta:
+        model = Comment
+        fields = ['type', 'url', 'contentType', 'comment', 'published', 'author']
+

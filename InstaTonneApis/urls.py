@@ -22,6 +22,7 @@ from .endpoints.followers import single_author_followers, author_follower_foreig
 from .endpoints.register import register_author
 from .endpoints.login import login
 from .endpoints.posts import single_author_posts, single_author_post
+from .endpoints.comments import single_post_comments
 
 
 # Routers provide an easy way of automatically determining the URL conf.
@@ -36,5 +37,6 @@ urlpatterns = [
     path("register/",register_author),
     path("login/",login),
     path("authors/<int:author_id>/posts/", single_author_posts),
-    path("authors/<int:author_id>/posts/<int:post_id>/", single_author_post)
+    path("authors/<int:author_id>/posts/<int:post_id>/", single_author_post),
+    path("authors/<int:author_id>/posts/<int:post_id>/comments/", single_post_comments)
 ]
