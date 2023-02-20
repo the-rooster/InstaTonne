@@ -23,6 +23,7 @@ from .endpoints.register import register_author
 from .endpoints.login import login
 from .endpoints.posts import single_author_posts, single_author_post
 from .endpoints.comments import single_post_comments
+from .endpoints.likes import single_comment_likes, single_post_likes, single_author_likes
 
 
 # Routers provide an easy way of automatically determining the URL conf.
@@ -38,5 +39,8 @@ urlpatterns = [
     path("login/",login),
     path("authors/<int:author_id>/posts/", single_author_posts),
     path("authors/<int:author_id>/posts/<int:post_id>/", single_author_post),
-    path("authors/<int:author_id>/posts/<int:post_id>/comments/", single_post_comments)
+    path("authors/<int:author_id>/posts/<int:post_id>/comments/", single_post_comments),
+    path("authors/<int:author_id>/posts/<int:post_id>/likes/", single_post_likes),
+    path("authors/<int:author_id>/posts/<int:post_id>/comments/<int:comment_id>/likes/", single_comment_likes),
+    path("authors/<int:author_id>/liked/", single_author_likes)
 ]

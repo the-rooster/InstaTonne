@@ -73,17 +73,6 @@ class Request(models.Model):
     requestee = models.ForeignKey(Author, related_name='requestee', on_delete=models.CASCADE)
 
 
-class Like(models.Model):
-    type = models.TextField()
-    url = models.TextField()
-    summary = models.TextField()
-
-    published = models.DateTimeField(auto_now_add=True)
-
-    author = models.ForeignKey(Author, on_delete=models.CASCADE)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
-
-
 class Comment(models.Model):
     type = models.TextField()
     url = models.TextField()
@@ -103,3 +92,22 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ['type', 'url', 'contentType', 'comment', 'published', 'author']
 
+
+class Like(models.Model):
+    type = models.TextField()
+    context = models.TextField()
+    summary = models.TextField()
+
+    published = models.DateTimeField(auto_now_add=True)
+
+    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True)
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, null=True)
+
+
+class LikeSerializer(serializers.ModelSerializer):
+    author = AuthorSerializer()
+
+    class Meta:
+        model = Like
+        fields = ['type', 'context', 'summary', 'author', 'post', 'comment']
