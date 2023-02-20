@@ -5,7 +5,21 @@
     <h3>
       InstaTonne Profile page
     </h3>
-    <img src="https://via.placeholder.com/150">
+    <div class="flex-container">
+      <img src="../assets/pfp.png">
+      <a
+        href="http://arkhana.fr/img/1.png"
+        class="flex-content"
+      >
+        <span class="followers"><br><br>{{ jsonData["Followers"] }} <br>Followers</span>
+      </a>
+      <a
+        href="http://arkhana.fr/img/1.png"
+        class="flex-content"
+      >
+        <span class="followers"><br><br>{{ jsonData["Friends"] }} <br>Friends</span>
+      </a>
+    </div>
     <br>
     {{ jsonData["Bio"] }}
     <br>
