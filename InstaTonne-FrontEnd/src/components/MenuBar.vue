@@ -38,6 +38,7 @@
 import { ref } from 'vue'
 import HelloWorld from './HelloWorld.vue'
 import PostEditor from './PostEditor.vue'
+import FollowRequests from './FollowRequests.vue'
 import ProfilePage from './ProfilePage.vue'
 import UserSearch from './UserSearch.vue'
 
@@ -55,7 +56,8 @@ const pageList = [
   new PageInfo(HelloWorld, "Hello World!"),
   new PageInfo(PostEditor, "Edit Posts"),
   new PageInfo(ProfilePage, "Profile Page"),
-  new PageInfo(UserSearch, "User Search")
+  new PageInfo(UserSearch, "User Search"),
+  new PageInfo(FollowRequests, "Follow Requests"),
 ]
 
 const currentPage = ref(pageList[0])
