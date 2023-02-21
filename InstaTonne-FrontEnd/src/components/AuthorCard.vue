@@ -5,16 +5,16 @@
   >
     <template #title>
       <a
-        :href="props.authorInfo.url"
+        :href="props.authorInfo?.url"
         style="font-size: 1.25em;"
       >
-        {{ props.authorInfo.displayName }}
+        {{ props.authorInfo?.displayName }}
       </a>
     </template>
     <v-card-item>
       <img
-        v-if="props.authorInfo.profileImage"
-        :src="props.authorInfo.profileImage"
+        v-if="props.authorInfo?.profileImage"
+        :src="props.authorInfo?.profileImage"
         class="pfp"
       >
       <img
@@ -25,7 +25,7 @@
     </v-card-item>
     <v-card-item>
       <a
-        :href="props.authorInfo.github"
+        :href="props.authorInfo?.github"
       >
         (github)
       </a>
