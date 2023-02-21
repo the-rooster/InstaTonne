@@ -2,66 +2,76 @@
   <div
     class="viewBox"
   >
-    <div style="display: flex;">
-      <AuthorCard :author-info="postData.author" />
-      <v-card>
-        <template #title>
-          Published On:
-        </template>
-        <v-card-item>
-          {{ postData.published }}
-        </v-card-item>
-      </v-card>
-      <v-card>
-        <template #title>
-          Visibility:
-        </template>
-        <v-card-item>
-          <v-radio-group v-model="postData.visibility">
-            <v-radio
-              label="public"
-              value="PUBLIC"
-            />
-            <v-radio
-              label="friends only"
-              value="FRIENDS"
-            />
-          </v-radio-group>
-        </v-card-item>
-      </v-card>
+    <v-progress-circular
+      v-if="loading"
+      indeterminate
+      width="20"
+      size="200"
+      style="margin: 10em;"
+    />
+    <div v-else>
+      <div style="display: flex;">
+        <AuthorCard :author-info="postData.author" />
+        <v-card>
+          <template #title>
+            Published On:
+          </template>
+          <v-card-item>
+            {{ postData.published }}
+          </v-card-item>
+        </v-card>
+        <v-card>
+          <template #title>
+            Visibility:
+          </template>
+          <v-card-item>
+            <v-radio-group v-model="postData.visibility">
+              <v-radio
+                label="public"
+                value="PUBLIC"
+              />
+              <v-radio
+                label="friends only"
+                value="FRIENDS"
+              />
+            </v-radio-group>
+          </v-card-item>
+        </v-card>
+      </div>
+      <v-textarea
+        v-model="postData.title"
+        clearable
+      />
+      <v-textarea
+        v-model="postData.description"
+        clearable
+      />
+      <v-textarea
+        v-model="postData.content"
+        clearable
+      />
+      <v-btn
+        @onclick="savePost"
+      >
+        SAVE
+      </v-btn>
     </div>
-    <v-textarea
-      v-model="postData.title"
-      clearable
-    />
-    <v-textarea
-      v-model="postData.description"
-      clearable
-    />
-    <v-textarea
-      v-model="postData.content"
-      clearable
-    />
-    <v-btn
-      @onclick="savePost"
-    >
-      SAVE
-    </v-btn>
   </div>
 </template>
   
 <script setup lang="ts">
-import { ref } from 'vue'
-import postJson from '../examplePost.json'
+import { ref, onBeforeMount } from 'vue'
 import AuthorCard from './AuthorCard.vue'
+import createHTTP from '../axiosCalls'
 
-//TODO: replace the logo above with a placeholder pfp
-
-// eventually this will be replaced by some sort of backend call
-const postData = ref(postJson);
-
-// const visibility = ref(postData.value.visibility);
-
+const loading = ref(true)
+const postData = ref({});
+onBeforeMount(async () => {
+  await createHTTP('authors/1/posts/1/').get().then((response: { data: object }) => {
+    postData.value = response.data;
+    loading.value = false;
+  });
+})
 
 function savePost() {
   // eventually this should do a backend call to push postData
