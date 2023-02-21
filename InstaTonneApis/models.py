@@ -82,6 +82,12 @@ class Request(models.Model):
     actor = models.ForeignKey(Author, related_name='requester', on_delete=models.CASCADE)
     object = models.ForeignKey(Author, related_name='requestee', on_delete=models.CASCADE)
 
+class RequestSerializer(serializers.ModelSerializer):
+    actor = AuthorSerializer()
+    object = AuthorSerializer()
+    class Meta:
+        model = Request
+        fields = ['type','summary','published','actor','object']
 
 class Comment(models.Model):
     id = models.TextField(primary_key=True, default=default_id_generator, editable=False)

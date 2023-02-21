@@ -1,5 +1,5 @@
 from django.http import HttpRequest, HttpResponse
-from ..models import Author, Post, Request, Comment, Like, Inbox, PostSerializer, CommentSerializer, LikeSerializer
+from ..models import Author, Post, Request, Comment, Like, Inbox, PostSerializer, CommentSerializer, LikeSerializer, RequestSerializer
 import json
 import uuid
 from InstaTonne.settings import HOSTNAME
@@ -71,8 +71,11 @@ def get_inbox(request : HttpRequest, id : str):
             #change object to just be the url to the post to match the spec
             #to do this, we must fetch the url from the post object
 
-            data["object"] = item.like.post.url
+            data["object"] = item.like.post.id_url
             del data["post"]
+        elif item.request:
+            data = RequestSerializer(item.request).data
+
 
         resp["items"].append(data)
 
@@ -104,6 +107,7 @@ def post_inbox(request : HttpRequest, id : str):
     
     #format type to be consistent
     data["type"] = str(data["type"]).lower()
+
     try:
         if data["type"] == "post":
             #need to create author object if it doesn't exist here
@@ -120,6 +124,9 @@ def post_inbox(request : HttpRequest, id : str):
                 creator = Author.objects.get(id=author_id)
 
             data["author"] = creator
+            data["id_url"] = data["id"]
+            del data["id"]
+            
 
             new_post = Post.objects.create(**data)
             new_post.save()
@@ -145,7 +152,7 @@ def post_inbox(request : HttpRequest, id : str):
                 actor = Author.objects.get(id=actor_id)
             data["actor"] = actor
 
-
+            print("request object being made!")
             new_request = Request.objects.create(**data)
             new_request.save()
             inbox = Inbox.objects.create(ownerId=author,request=new_request)
@@ -163,8 +170,9 @@ def post_inbox(request : HttpRequest, id : str):
             else:
                 creator = Author.objects.get(id=author_id)
 
+
             #need to create the post object here
-            post = Post.objects.create(type="post",url=data["object"])
+            post = Post.objects.create(type="post",id_url=data["object"])
 
             #object field is no longer needed, and not used in our db (it is the url in post)
             del data["object"]
@@ -193,7 +201,7 @@ def post_inbox(request : HttpRequest, id : str):
 
             #save id to url field. incoming ids are urls, and we make a custom id on our end for stuff
             temp = data["id"]
-            data["url"] = temp
+            data["id_url"] = temp
             del data["id"]
 
             #create a new comment object, and send to the receivers inbox
