@@ -9,6 +9,13 @@
           >
             <v-list>
               <v-list-item
+                v-if="loading"
+                prepend-avatar="./assets/EpicLogo.svg"
+                title="---"
+                subtitle="---"
+              />
+              <v-list-item
+                v-else
                 :prepend-avatar="postData.author.profileImage"
                 :title="postData.author.displayName"
                 :subtitle="postData.author.github"
@@ -24,7 +31,8 @@
               <v-list-item
                 v-for="route in routes"
                 :key="route.path"
-                prepend-icon="mdi-folder"
+                prepend-icon="./assets/EpicLogo.svg"
+                color="red"
                 :title="route.name"
                 :to="route.path"
               />
@@ -41,12 +49,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onBeforeMount } from 'vue'
 import { RouterView } from 'vue-router';
 import { routes } from "./main"
-import postJson from './examplePost.json'
+import createHTTP from './axiosCalls'
 
-const postData = ref(postJson);
+const loading = ref(true)
+const postData = ref({});
+onBeforeMount(async () => {
+  await createHTTP('authors/1/posts/1/').get().then((response: { data: object }) => {
+    postData.value = response.data;
+    loading.value = false;
+  });
+})
 </script>
 
 <style scoped>
