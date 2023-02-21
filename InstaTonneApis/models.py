@@ -3,9 +3,11 @@ from rest_framework import serializers
 import json
 import uuid
 
+def default_id_generator():
+    return ''.join(str(uuid.uuid4()).split("-"))
 
 class Author(models.Model):
-    id = models.TextField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.TextField(primary_key=True, default=default_id_generator, editable=False)
     type = models.TextField()
     id_url = models.TextField()
     url = models.TextField()
@@ -39,7 +41,7 @@ class FollowSerializer(serializers.ModelSerializer):
 
 
 class Post(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.TextField(primary_key=True, default=default_id_generator, editable=False)
     type = models.TextField()
     id_url = models.TextField()
     title = models.TextField()
@@ -49,7 +51,8 @@ class Post(models.Model):
     contentType = models.TextField()
     content = models.TextField()
     visibility = models.TextField()
-
+    comments = models.TextField()
+    
     categories  = models.CharField(max_length=100)
     unlisted = models.BooleanField(default=False)
     published = models.DateTimeField(auto_now_add=True)
@@ -71,6 +74,7 @@ class PostSerializer(serializers.ModelSerializer):
 
 
 class Request(models.Model):
+    type = models.TextField()
     summary = models.TextField()
 
     published = models.DateTimeField(auto_now_add=True)
@@ -80,7 +84,7 @@ class Request(models.Model):
 
 
 class Comment(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=default_id_generator, editable=False)
     type = models.TextField()
     id_url = models.TextField()
     contentType = models.TextField()
@@ -101,7 +105,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class Like(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.TextField(primary_key=True, default=default_id_generator, editable=False)
     type = models.TextField()
     context = models.TextField()
     summary = models.TextField()

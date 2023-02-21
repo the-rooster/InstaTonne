@@ -83,23 +83,27 @@ def get_inbox(request : HttpRequest, id : str):
 Post an item to a users inbox!
 """
 def post_inbox(request : HttpRequest, id : str):
-
+    
+    #parse request body
     data = request.body
-
     data = json.loads(data)
 
+    #receiver author object
     author = Author.objects.filter(pk=id)
 
     if not author:
         #author doesn't exist. cannot post to them.
         return HttpResponse(status=404)
-    
+    #should only be 1 author so just 0 index
     author = author[0]
+
 
     if "type" not in data.keys():
         print('here')
         return HttpResponse(status=400)
     
+    #format type to be consistent
+    data["type"] = str(data["type"]).lower()
     try:
         if data["type"] == "post":
             #need to create author object if it doesn't exist here
@@ -107,18 +111,41 @@ def post_inbox(request : HttpRequest, id : str):
             author_id = data["author"]["id"]
             author_id = author_id.split("/")[-1]
 
-            check_author = Author.objects.filter(pk=author_id)
+            check_author = Author.objects.filter(id=author_id)
 
             if not check_author:
-                author_id = Author.objects.create(**(data["author"]))
+                data["author"]["id"] = author_id
+                creator = Author.objects.create(**(data["author"]))
+            else:
+                creator = Author.objects.get(id=author_id)
 
-            data["author"] = author_id
+            data["author"] = creator
+
             new_post = Post.objects.create(**data)
             new_post.save()
 
             inbox = Inbox.objects.create(ownerId=author,post=new_post)
             inbox.save()
         elif data["type"] == "follow":
+            
+            actor_id = data["actor"]["id"]
+            actor_id = actor_id.split("/")[-1]
+
+            print(actor_id)
+            check_actor = Author.objects.filter(id=actor_id)
+            print(check_actor)
+
+            data["object"] = author
+
+            if not check_actor:
+                data["actor"]["id"] = actor_id
+                actor = Author.objects.create(**(data["actor"]))
+                print("here")
+            else:
+                actor = Author.objects.get(id=actor_id)
+            data["actor"] = actor
+
+
             new_request = Request.objects.create(**data)
             new_request.save()
             inbox = Inbox.objects.create(ownerId=author,request=new_request)
@@ -137,7 +164,6 @@ def post_inbox(request : HttpRequest, id : str):
                 creator = Author.objects.get(id=author_id)
 
             #need to create the post object here
-
             post = Post.objects.create(type="post",url=data["object"])
 
             #object field is no longer needed, and not used in our db (it is the url in post)
