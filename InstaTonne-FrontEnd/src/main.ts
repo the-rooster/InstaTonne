@@ -32,8 +32,8 @@ import UserSearch from './components/UserSearch.vue'
 const routes = [
   { path: '/', name: "Home", component: Home },
   { path: '/about', name: "About", component: About },
-  { path: '/HelloWorld', name: "HelloWorld",component: HelloWorld },
-  { path: '/PostEditor', name: "PostEditor",component: PostEditor },
+  { path: '/HelloWorld', name: "HelloWorld", component: HelloWorld },
+  { path: '/PostEditor', name: "PostEditor", component: PostEditor },
   { path: '/FollowRequests', name: "FollowRequests", component: FollowRequests },
   { path: '/ProfilePage', name: "ProfilePage", component: ProfilePage },
   { path: '/UserSearch', name: "UserSearch", component: UserSearch },
