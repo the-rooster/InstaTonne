@@ -106,9 +106,9 @@ def post_inbox(request : HttpRequest, id : str):
 
             author_id = data["author"]["id"]
             author_id = author_id.split("/")[-1]
-            print(author_id)
+
             check_author = Author.objects.filter(pk=author_id)
-            print("test2")
+
             if not check_author:
                 author_id = Author.objects.create(**(data["author"]))
 
@@ -128,11 +128,10 @@ def post_inbox(request : HttpRequest, id : str):
             author_id = author_id.split("/")[-1]
 
             check_author = Author.objects.filter(id=author_id)
-            print(author_id)
-            print(check_author)
+
             if not check_author:
                 data["author"]["id"] = author_id
-                print("creating new author for foreign post")
+
                 creator = Author.objects.create(**(data["author"]))
             else:
                 creator = Author.objects.get(id=author_id)
@@ -185,7 +184,6 @@ def post_inbox(request : HttpRequest, id : str):
     except Exception as e:
         #something in the request schema is broken
         print(e)
-        print("oooooo")
         return HttpResponse(status=400)
 
     return HttpResponse(status=200)
