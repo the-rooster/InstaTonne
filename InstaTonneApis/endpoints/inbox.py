@@ -141,16 +141,20 @@ def post_inbox(request : HttpRequest, id : str):
 
             post = Post.objects.create(type="post",url=data["object"])
 
+            #object field is no longer needed, and not used in our db (it is the url in post)
             del data["object"]
 
+            #format data for db
             data["author"] = creator
             data["post"] = post
+
+            #save to db
             new_like = Like.objects.create(**data)
             new_like.save()
             inbox = Inbox.objects.create(ownerId=author,like=new_like)
             inbox.save()
         elif data["type"] == "comment":
-
+            #parse incoming comment data
             author_id = data["author"]["id"]
             author_id = author_id.split("/")[-1]
 
@@ -162,11 +166,12 @@ def post_inbox(request : HttpRequest, id : str):
 
             data["author"] = author_id
 
+            #save id to url field. incoming ids are urls, and we make a custom id on our end for stuff
             temp = data["id"]
             data["url"] = temp
             del data["id"]
 
-            
+            #create a new comment object, and send to the receivers inbox
             new_comment = Comment.objects.create(**data)
             new_comment.save()
 
