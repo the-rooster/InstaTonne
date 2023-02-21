@@ -1,21 +1,21 @@
 from django.http import HttpRequest, HttpResponse
 import json
 from ..models import Follow, FollowSerializer, Author
-from django.views.decorators.csrf import csrf_exempt
+from .utils import valid_requesting_user
 
-"""
-endpoints for /authors/<id>/followers
-"""
-def single_author_followers(request: HttpRequest, id: int):
+
+# endpoints for /authors/<author_id>/followers
+def single_author_followers(request: HttpRequest, author_id: int):
     if request.method == "GET":
-        return single_author_followers_get(request,id)  
+        return single_author_followers_get(request, author_id)  
     elif request.method == "POST":
         return HttpResponse(status=405)
     return HttpResponse(status=405)
 
 
-def single_author_followers_get(request,id: str):
-    follows = Follow.objects.all().filter(followeeAuthorId=id)
+# get the followers of an author
+def single_author_followers_get(request: HttpRequest, author_id: int):
+    follows = Follow.objects.all().filter(followeeAuthorId=author_id)
 
     serialized_data = []
     for follow in follows:
@@ -29,81 +29,60 @@ def single_author_followers_get(request,id: str):
 
     return HttpResponse(content=res, status=200)
 
-"""
-endpoints for /authors/<id>/followers/<foreign id>
-"""
-def author_follower_foreign(request : HttpRequest, id : str,foreign_id : str):
 
+# endpoints for /authors/<author_id>/followers/<foreign_author_id>
+def single_author_follower(request: HttpRequest, author_id: int, foreign_author_id: int):
     if request.method == "DELETE":
-        return delete_author_follower(request,id,foreign_id)
+        return delete_author_follower(request, author_id, foreign_author_id)
     elif request.method == "PUT":
-        return put_author_follower(request,id,foreign_id)
+        return put_author_follower(request, author_id, foreign_author_id)
     elif request.method == "GET":
-        return check_author_follower(request,id,foreign_id)
-    
+        return check_author_follower(request, author_id, foreign_author_id)
     return HttpResponse(status=405)
 
-def delete_author_follower(request : HttpRequest,id : str, foreign_id : str):
 
-    if not request.user.is_authenticated:
-        #not authenticated
-        return HttpResponse(status=403)
-    
-
-    if str(request.user.pk) != id:
-        #requesting to delete followers from someone that is not you. no good
+# remove the follow where foreign_author follows author
+def delete_author_follower(request: HttpRequest, author_id: int, foreign_author_id: int):
+    if not valid_requesting_user(request, foreign_author_id):
         return HttpResponse(status=403)
 
-    followee = Author.objects.filter(userID=id)
-    follower = Author.objects.filter(userID=foreign_id)
+    follows = Follow.objects.all().filter(followeeAuthorId=author_id, followerAuthorId=foreign_author_id)
 
-    #make sure both users exist
-    if len(followee) == 0 or len(follower) == 0:
+    if len(follows) == 0:
         return HttpResponse(status=404)
     
-    #get follows relation and make sure it exists
-    follows = Follow.objects.all().filter(followeeAuthorId=followee[0],followerAuthorId=follower[0])
-
-    print(len(follows))
-    if len(follows) != 1:
-        #foreign_id follower does not exist!
-        return HttpResponse(status=404)
     follows.delete()
 
     return HttpResponse(status=204)
 
-def put_author_follower(request : HttpRequest,id : str, foreign_id : str):
 
-    if not request.user.is_authenticated:
-        #not authenticated. woopsies!
+# create a follow where foreign_author follows author
+def put_author_follower(request: HttpRequest, author_id: int, foreign_author_id: int):
+    if not valid_requesting_user(request, foreign_author_id):
         return HttpResponse(status=403)
     
-    print(request.user.pk)
-    if str(request.user.pk) != foreign_id:
-        #requesting someone thats not you. no bueno
-        print("test")
-        return HttpResponse(status=403)
-    
-    if id == foreign_id:
+    if author_id == foreign_author_id:
         return HttpResponse(status=403)  
     
+    followee: Author | None = Author.objects.all().filter(pk=author_id).first()
+    follower: Author | None = Author.objects.all().filter(pk=foreign_author_id).first()
+
+    if followee is None or follower is None:
+        return HttpResponse(status=404)
     
-    followee = Author.objects.filter(userID=id)
+    follows = Follow.objects.all().filter(followeeAuthorId=author_id, followerAuthorId=foreign_author_id)
 
-    follower = Author.objects.filter(userID=foreign_id)
-
-    if len(followee) != 1:
-        return HttpResponse(status=404,content="Author does not exist.")
+    if len(follows) != 0:
+        return HttpResponse(status=403)
     
-    new_follow = Follow.objects.create(followeeAuthorId=followee[0],followerAuthorId=follower[0])
-
-    new_follow.save()
+    Follow.objects.create(followeeAuthorId=followee, followerAuthorId=follower)
 
     return HttpResponse(status=204)
 
-def check_author_follower(request : HttpRequest,id : str, foreign_id : str):
 
-    follows = Follow.objects.all().filter(followeeAuthorId=id,followerAuthorId=foreign_id)
+# return success if foreign_author follows author
+def check_author_follower(request: HttpRequest, author_id: int, foreign_author_id: int):
+    follows = Follow.objects.all().filter(followeeAuthorId=author_id, followerAuthorId=foreign_author_id)
 
     if len(follows) != 0:
         return HttpResponse(status=204)

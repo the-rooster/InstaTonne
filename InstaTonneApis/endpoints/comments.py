@@ -2,6 +2,7 @@ from django.http import HttpRequest, HttpResponse
 import json
 from ..models import Post, PostSerializer, Comment, Author, CommentSerializer
 from django.core.paginator import Paginator
+from .utils import make_comment_url, make_comments_url
 
 
 def single_post_comments(request: HttpRequest, author_id: int, post_id: int):
@@ -14,7 +15,7 @@ def single_post_comments(request: HttpRequest, author_id: int, post_id: int):
 
 # get the comments from a post
 def single_post_comments_get(request: HttpRequest, author_id: int, post_id: int):
-    post_url = Post.objects.all().filter(pk=post_id).first().url #type: ignore
+    post_url = Post.objects.all().filter(pk=post_id).first().id_url #type: ignore
     comments = Comment.objects.all().filter(post=post_id).order_by("published")
     page_num = request.GET.get("page")
     page_size = request.GET.get("size")
@@ -25,12 +26,10 @@ def single_post_comments_get(request: HttpRequest, author_id: int, post_id: int)
 
     serialized_data = []
     for comment in comments:
-        comment_id = comment.id #type: ignore
-
         serialized_comment = CommentSerializer(comment).data
 
-        comment_url = make_comment_url(request.get_host(), author_id, post_id, comment_id)
-        serialized_comment["id"] = comment_url
+        serialized_comment["id"] = serialized_comment["id_url"]
+        del serialized_comment["id_url"]
 
         serialized_data.append(serialized_comment)
 
@@ -64,22 +63,10 @@ def single_post_comments_post(request: HttpRequest, author_id: int, post_id: int
         )
 
         comment_id = comment.id #type: ignore
-        comment.url = make_comment_url(request.get_host(), author_id, post_id, comment_id)
+        comment.id_url = make_comment_url(request.get_host(), author_id, post_id, comment_id)
         comment.save()
 
         return HttpResponse(status=204)
     except Exception as e:
         print(e)
         return HttpResponse(status=400)
-
-
-def make_post_url(request_host: str, author_id: int, post_id: int) -> str:
-    return "http://" + request_host + "/service/authors/" + str(author_id) + "/posts/" + str(post_id)
-
-
-def make_comments_url(request_host: str, author_id: int, post_id: int) -> str:
-    return make_post_url(request_host, author_id, post_id) + "/comments"
-
-
-def make_comment_url(request_host: str, author_id: int, post_id: int, comment_id: int) -> str:
-    return make_post_url(request_host, author_id, post_id) + "/comments/" + str(comment_id)
