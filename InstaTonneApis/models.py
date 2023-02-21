@@ -5,11 +5,13 @@ import json
 
 class Author(models.Model):
     type = models.TextField()
+    id_url = models.TextField()
     url = models.TextField()
     host = models.TextField()
     displayName = models.TextField()
     github = models.TextField()
     profileImage = models.TextField()
+
     userID = models.TextField()
     active = models.BooleanField(default=False)
 
@@ -17,7 +19,7 @@ class Author(models.Model):
 class AuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Author
-        fields = '__all__'
+        fields = ['type', 'id_url', 'url', 'host', 'displayName', 'github', 'profileImage']
 
 
 class Follow(models.Model):
@@ -36,7 +38,7 @@ class FollowSerializer(serializers.ModelSerializer):
 
 class Post(models.Model):
     type = models.TextField()
-    url = models.TextField()
+    id_url = models.TextField()
     title = models.TextField()
     source = models.TextField()
     origin = models.TextField()
@@ -58,7 +60,8 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = '__all__'
+        fields = ['type', 'title', 'id_url', 'source', 'origin', 'description', 'contentType',
+                  'content', 'author', 'categories', 'published', 'visibility', 'unlisted']
 
     def get_categories(self, instance):
         return json.loads(instance.categories.replace("'", '"'))
@@ -75,7 +78,7 @@ class Request(models.Model):
 
 class Comment(models.Model):
     type = models.TextField()
-    url = models.TextField()
+    id_url = models.TextField()
     contentType = models.TextField()
     comment = models.TextField()
 
@@ -90,7 +93,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ['type', 'url', 'contentType', 'comment', 'published', 'author']
+        fields = ['type', 'id_url', 'contentType', 'comment', 'published', 'author']
 
 
 class Like(models.Model):

@@ -2,6 +2,7 @@ from django.http import HttpRequest, HttpResponse
 import json
 from ..models import Post, PostSerializer, Comment, Author
 from django.core.paginator import Paginator
+from .utils import make_comments_url, make_post_url, valid_requesting_user
 
 
 def single_author_post(request: HttpRequest, author_id: int, post_id: int):
@@ -33,7 +34,11 @@ def single_author_post_get(request: HttpRequest, author_id: int, post_id: int):
 
     serialized_post = PostSerializer(post).data
     comments_url = make_comments_url(request.get_host(), author_id, post_id)
-    add_comments_to_post(serialized_post, post_id, comments_url)
+    comment_count = Comment.objects.all().filter(post=post_id).count()
+    serialized_post["count"] = comment_count
+    serialized_post["comments"] = comments_url
+    serialized_post["id"] = serialized_post["id_url"]
+    del serialized_post["id_url"]
 
     res = json.dumps(serialized_post)
     return HttpResponse(content=res, status=200)
@@ -55,7 +60,11 @@ def single_author_posts_get(request: HttpRequest, author_id: int):
 
         serialized_post = PostSerializer(post).data
         comments_url = make_comments_url(request.get_host(), author_id, post_id)
-        add_comments_to_post(serialized_post, post_id, comments_url)
+        comment_count = Comment.objects.all().filter(post=post_id).count()
+        serialized_post["count"] = comment_count
+        serialized_post["comments"] = comments_url
+        serialized_post["id"] = serialized_post["id_url"]
+        del serialized_post["id_url"]
 
         serialized_data.append(serialized_post)
 
@@ -69,6 +78,9 @@ def single_author_posts_get(request: HttpRequest, author_id: int):
 
 # update an existing post
 def single_author_post_post(request: HttpRequest, author_id: int, post_id: int):
+    if not valid_requesting_user(request, author_id):
+        return HttpResponse(status=403)
+
     try:
         post: Post | None = Post.objects.all().filter(author=author_id, pk=post_id).first()
 
@@ -77,15 +89,20 @@ def single_author_post_post(request: HttpRequest, author_id: int, post_id: int):
     
         body: dict = json.loads(request.body)
 
-        post.title = body["title"]
-        post.source = body["source"]
-        post.origin = body["origin"]
-        post.description = body["description"]
-        post.contentType = body["contentType"]
-        post.content = body["content"]
-        post.visibility = body["visibility"]
-        post.categories = body["categories"]
-        post.unlisted = body["unlisted"]
+        if "title" in body:
+            post.title = body["title"]
+        if "description" in body:
+            post.description = body["description"]
+        if "contentType" in body:
+            post.contentType = body["contentType"]
+        if "content" in body:
+            post.content = body["content"]
+        if "visibility" in body:
+            post.visibility = body["visibility"]
+        if "categories" in body:
+            post.categories = body["categories"]
+        if "unlisted" in body:
+            post.unlisted = body["unlisted"]
         post.save()
 
         return HttpResponse(status=204)
@@ -96,6 +113,9 @@ def single_author_post_post(request: HttpRequest, author_id: int, post_id: int):
 
 # create a new post without a specified post id
 def single_author_posts_post(request: HttpRequest, author_id: int):
+    if not valid_requesting_user(request, author_id):
+        return HttpResponse(status=403)
+
     try:
         author: Author | None = Author.objects.all().filter(pk=author_id).first()
 
@@ -118,7 +138,7 @@ def single_author_posts_post(request: HttpRequest, author_id: int):
         )
 
         post_id = post.id #type: ignore
-        post.url = make_post_url(request.get_host(), author_id, post_id)
+        post.id_url = make_post_url(request.get_host(), author_id, post_id)
         post.save()
 
         return HttpResponse(status=204)
@@ -129,6 +149,9 @@ def single_author_posts_post(request: HttpRequest, author_id: int):
 
 # delete a post
 def single_author_post_delete(request: HttpRequest, author_id: int, post_id: int):
+    if not valid_requesting_user(request, author_id):
+        return HttpResponse(status=403)
+
     post: Post | None = Post.objects.all().filter(author=author_id, pk=post_id).first()
 
     if post is None:
@@ -136,11 +159,14 @@ def single_author_post_delete(request: HttpRequest, author_id: int, post_id: int
     
     post.delete()
 
-    return HttpResponse(status=200)
+    return HttpResponse(status=204)
 
 
 # create a new post with a specified post id
 def single_author_post_put(request: HttpRequest, author_id: int, post_id: int):
+    if not valid_requesting_user(request, author_id):
+        return HttpResponse(status=403)
+
     try:
         author: Author | None = Author.objects.all().filter(pk=author_id).first()
 
@@ -150,7 +176,7 @@ def single_author_post_put(request: HttpRequest, author_id: int, post_id: int):
         body: dict = json.loads(request.body)
         Post.objects.create(
             id = post_id,
-            url = make_post_url(request.get_host(), author_id, post_id),
+            id_url = make_post_url(request.get_host(), author_id, post_id),
             type = "post",
             title = body["title"],
             source = body["source"],
@@ -168,17 +194,3 @@ def single_author_post_put(request: HttpRequest, author_id: int, post_id: int):
     except Exception as e:
         print(e)
         return HttpResponse(status=400)
-    
-
-def add_comments_to_post(serialized_post, post_id: int, comments_url: str) -> None:
-    comment_count = Comment.objects.all().filter(post=post_id).count()
-    serialized_post["count"] = comment_count
-    serialized_post["comments"] = comments_url
-
-
-def make_post_url(request_host: str, author_id: int, post_id: int) -> str:
-    return "http://" + request_host + "/service/authors/" + str(author_id) + "/posts/" + str(post_id)
-
-
-def make_comments_url(request_host: str, author_id: int, post_id: int) -> str:
-    return make_post_url(request_host, author_id, post_id) + "/comments"

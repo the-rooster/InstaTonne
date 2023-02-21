@@ -1,82 +1,81 @@
 from django.http import HttpRequest, HttpResponse
 import json
-from .auth_wrapper import checkAuthorization
-from django.db import models
 from ..models import Author, AuthorSerializer
-from rest_framework.renderers import JSONRenderer
-from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
+from .utils import valid_requesting_user
 
-# @checkAuthorization
-def page_all_authors(request : HttpRequest):
 
-    if request.method != "GET":
-        return HttpResponse(status=405)
+def authors(request: HttpRequest):
+    if request.method == "GET":
+        return authors_get(request)
+    return HttpResponse(status=405)
 
-    if "page" not in request.GET.keys() or "size" not in request.GET.keys():
-        return HttpResponse(status=400)
-    
+
+def single_author(request: HttpRequest, author_id: int):
+    if request.method == "GET":
+        return single_author_get(request, author_id)
+    if request.method == "POST":
+        return single_author_post(request, author_id)
+    return HttpResponse(status=405)
+
+
+# get all authors
+def authors_get(request : HttpRequest):
+    authors = Author.objects.all().order_by("id")
     page_num = request.GET.get("page")
     page_size = request.GET.get("size")
 
-    authors = Author.objects.all()
+    if page_num is not None and page_size is not None:
+        paginator = Paginator(authors, page_size)
+        authors = paginator.get_page(page_num)
 
-    paginator = Paginator(authors,page_size)
+    serialized_data = []
+    for author in authors:
+        serialized_author = AuthorSerializer(author).data
+
+        serialized_author["id"] = serialized_author["id_url"]
+        del serialized_author["id_url"]
+
+        serialized_data.append(serialized_author)
+
+    res = json.dumps({
+        "type": "authors",
+        "items": serialized_data
+    })
+
+    return HttpResponse(content=res, status=200)
+
+
+# get a single author
+def single_author_get(request: HttpRequest, author_id: int):
+    author = Author.objects.get(pk=author_id)
+    serialized_author = AuthorSerializer(author).data
+    res = json.dumps(serialized_author)
+    return HttpResponse(content=res ,status=200)
+
+
+# update a single author
+def single_author_post(request: HttpRequest, author_id: int):
+    if not valid_requesting_user(request, author_id):
+        return HttpResponse(status=403)
+
+    try:
+        author: Author | None = Author.objects.all().filter(pk=author_id).first()
+
+        if author is None:
+            return HttpResponse(status=404)
     
-    result = paginator.get_page(page_num)
+        body: dict = json.loads(request.body)
 
-    serializer = AuthorSerializer(result,many=True)
-    
-    data = {"type" : "authors","items" : serializer.data}
-    
-
-    return HttpResponse(content=JSONRenderer().render(data),status=200)
-
-@csrf_exempt
-def single_author(request : HttpRequest,id : str):
-
-    if request.method == "GET":
-
-        author = Author.objects.get(pk=id)
-
-        serializer = AuthorSerializer(author)
-
-        data = serializer.data
-        data["type"] = "author"
-
-        print("helooooo")
-        return HttpResponse(content=JSONRenderer().render(data),status=200)
-
-    elif request.method == "POST":
-
-        try:
-            print(request.body)
-            body : dict = json.loads(request.body)
-        except Exception as e:
-            print(e)
-            return HttpResponse(status=400)
-        
-        author = Author.objects.get(pk=id)
-
-        
-        if not author:
-            return HttpResponse(status=400)
-
-        if "url" in body:
-            author.url = body["url"]
-        if "id" in body:
-            author.id = body["id"]
-        if "host" in body:
-            author.host = body["host"]
         if "displayName" in body:
             author.displayName = body["displayName"]
         if "github" in body:
             author.github = body["github"]
         if "profileImage" in body:
             author.profileImage = body["profileImage"]
-        
         author.save()
 
         return HttpResponse(status=204)
-
-    return HttpResponse(status=405)
+    except Exception as e:
+        print(e)
+        return HttpResponse(status=400)

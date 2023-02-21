@@ -24,7 +24,7 @@ def single_author_likes(request: HttpRequest, author_id: int):
 
 # get the likes from a post
 def single_post_likes_get(request: HttpRequest, author_id: int, post_id: int):
-    post_url = Post.objects.all().filter(pk=post_id).first().url #type: ignore
+    post_url = Post.objects.all().filter(pk=post_id).first().id_url #type: ignore
     likes = Like.objects.all().filter(post=post_id).order_by("published")
 
     serialized_data = []
@@ -47,7 +47,7 @@ def single_post_likes_get(request: HttpRequest, author_id: int, post_id: int):
 
 # get the likes from a comment
 def single_comment_likes_get(request: HttpRequest, author_id: int, post_id: int, comment_id: int):
-    comment_url = Comment.objects.all().filter(pk=comment_id).first().url #type: ignore
+    comment_url = Comment.objects.all().filter(pk=comment_id).first().id_url #type: ignore
     likes = Like.objects.all().filter(post=post_id).order_by("published")
 
     serialized_data = []
@@ -77,9 +77,9 @@ def single_author_likes_get(request: HttpRequest, author_id: int):
         serialized_like = LikeSerializer(like).data
 
         if serialized_like["post"]:
-            serialized_like["object"] = Post.objects.all().filter(pk=serialized_like["post"]).first().url #type: ignore
+            serialized_like["object"] = Post.objects.all().filter(pk=serialized_like["post"]).first().id_url #type: ignore
         elif serialized_like["comment"]:
-            serialized_like["object"] = Comment.objects.all().filter(pk=serialized_like["comment"]).first().url #type: ignore
+            serialized_like["object"] = Comment.objects.all().filter(pk=serialized_like["comment"]).first().id_url #type: ignore
 
         del serialized_like["post"]
         del serialized_like["comment"]
