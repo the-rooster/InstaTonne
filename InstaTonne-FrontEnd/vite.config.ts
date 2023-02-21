@@ -9,5 +9,22 @@ export default defineConfig({
     alias: {
       vue: "vue/dist/vue.esm-bundler.js"
     }
+  },
+  server: {
+    proxy: {
+      '/service': {
+        target: 'http://localhost:8000/',
+        changeOrigin: true,
+        // rewrite: (path) => path.replace(/^\/service/, ''),
+        secure: false,
+        // ws: false
+      },
+    },
+    headers: {
+      
+    },
+    cors: {
+      origin: 'http://localhost:8000/'
+    }
   }
 })

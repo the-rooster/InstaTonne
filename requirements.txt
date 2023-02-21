@@ -3,3 +3,4 @@ Django==4.1.6
 sqlparse==0.4.3
 djangorestframework==3.14.0
 uritemplate==4.1.1
+django-cors-headers==3.13.0

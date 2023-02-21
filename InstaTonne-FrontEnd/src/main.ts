@@ -8,6 +8,9 @@ import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 
+import axios from 'axios'
+import VueAxios from 'vue-axios'
+
 const vuetify = createVuetify({
     components,
     directives,
@@ -51,6 +54,7 @@ const router = createRouter({
 // 5. Create and mount the root instance.
 // Make sure to _use_ the router instance to make the
 // whole app router-aware.
+
 const app = createApp(App)
 // const app = createApp({
 //   router: router,
@@ -58,6 +62,7 @@ const app = createApp(App)
 // })
 app.use(vuetify);
 app.use(router)
+app.use(VueAxios, axios)
 
 app.mount('#app')
 

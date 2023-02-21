@@ -1,15 +1,21 @@
 from django.db import models
 from rest_framework import serializers
 import json
+import uuid
 
+def default_id_generator():
+    return ''.join(str(uuid.uuid4()).split("-"))
 
 class Author(models.Model):
+    id = models.TextField(primary_key=True, default=default_id_generator, editable=False)
     type = models.TextField()
+    id_url = models.TextField()
     url = models.TextField()
     host = models.TextField()
     displayName = models.TextField()
     github = models.TextField()
     profileImage = models.TextField()
+
     userID = models.TextField()
     active = models.BooleanField(default=False)
 
@@ -17,7 +23,7 @@ class Author(models.Model):
 class AuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Author
-        fields = '__all__'
+        fields = ['type', 'id_url', 'url', 'host', 'displayName', 'github', 'profileImage']
 
 
 class Follow(models.Model):
@@ -35,8 +41,9 @@ class FollowSerializer(serializers.ModelSerializer):
 
 
 class Post(models.Model):
+    id = models.TextField(primary_key=True, default=default_id_generator, editable=False)
     type = models.TextField()
-    url = models.TextField()
+    id_url = models.TextField()
     title = models.TextField()
     source = models.TextField()
     origin = models.TextField()
@@ -44,12 +51,13 @@ class Post(models.Model):
     contentType = models.TextField()
     content = models.TextField()
     visibility = models.TextField()
-
+    comments = models.TextField()
+    
     categories  = models.CharField(max_length=100)
     unlisted = models.BooleanField(default=False)
     published = models.DateTimeField(auto_now_add=True)
 
-    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+    author = models.ForeignKey(Author, on_delete=models.CASCADE,blank=True,null=True)
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -58,42 +66,40 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = '__all__'
+        fields = ['type', 'title', 'id_url', 'source', 'origin', 'description', 'contentType',
+                  'content', 'author', 'categories', 'published', 'visibility', 'unlisted']
 
     def get_categories(self, instance):
         return json.loads(instance.categories.replace("'", '"'))
 
 
 class Request(models.Model):
-    summary = models.TextField()
-
-    published = models.DateTimeField(auto_now_add=True)
-
-    requester = models.ForeignKey(Author, related_name='requester', on_delete=models.CASCADE)
-    requestee = models.ForeignKey(Author, related_name='requestee', on_delete=models.CASCADE)
-
-
-class Like(models.Model):
     type = models.TextField()
-    url = models.TextField()
     summary = models.TextField()
 
     published = models.DateTimeField(auto_now_add=True)
 
-    author = models.ForeignKey(Author, on_delete=models.CASCADE)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    actor = models.ForeignKey(Author, related_name='requester', on_delete=models.CASCADE)
+    object = models.ForeignKey(Author, related_name='requestee', on_delete=models.CASCADE)
 
+class RequestSerializer(serializers.ModelSerializer):
+    actor = AuthorSerializer()
+    object = AuthorSerializer()
+    class Meta:
+        model = Request
+        fields = ['type','summary','published','actor','object']
 
 class Comment(models.Model):
+    id = models.TextField(primary_key=True, default=default_id_generator, editable=False)
     type = models.TextField()
-    url = models.TextField()
+    id_url = models.TextField()
     contentType = models.TextField()
     comment = models.TextField()
 
     published = models.DateTimeField(auto_now_add=True)
 
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE,null=True)
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -101,5 +107,34 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ['type', 'url', 'contentType', 'comment', 'published', 'author']
+        fields = ['type', 'id_url', 'contentType', 'comment', 'published', 'author']
 
+
+class Like(models.Model):
+    id = models.TextField(primary_key=True, default=default_id_generator, editable=False)
+    type = models.TextField()
+    context = models.TextField()
+    summary = models.TextField()
+
+    published = models.DateTimeField(auto_now_add=True)
+
+    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True)
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, null=True)
+
+
+class LikeSerializer(serializers.ModelSerializer):
+    author = AuthorSerializer()
+
+    class Meta:
+        model = Like
+        fields = ['type', 'context', 'summary', 'author', 'post', 'comment']
+
+
+class Inbox(models.Model):
+
+    ownerId = models.ForeignKey(Author,on_delete=models.CASCADE)
+    post = models.ForeignKey(Post,on_delete=models.CASCADE,null=True,blank=True)
+    comment = models.ForeignKey(Comment,on_delete=models.CASCADE,null=True,blank=True)
+    like = models.ForeignKey(Like,on_delete=models.CASCADE,null=True,blank=True)
+    request = models.ForeignKey(Request,on_delete=models.CASCADE,null=True,blank=True)
