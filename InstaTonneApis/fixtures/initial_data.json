@@ -22,6 +22,7 @@
     "model": "InstaTonneApis.Author",
     "pk": 1,
     "fields": {
+      "id" : "3faeb3dd446942f183f08470d4f750f5",
       "userID" : "2",
       "type" : "author",
       "id_url" : "id_url1",
@@ -35,8 +36,8 @@
   },
   {
       "model": "InstaTonneApis.Author",
-      "pk": 2,
       "fields": {
+        "id" : "3faeb3dd446942f183f08470d4f750f6",
         "type" : "author",
         "id_url" : "id_url2",
         "url" : "url2",
@@ -48,8 +49,8 @@
   },
   {
     "model": "InstaTonneApis.Author",
-    "pk": 3,
     "fields": {
+      "id" : "3faeb3dd446942f183f08470d4f750f7",
       "type" : "author",
       "id_url" : "id_url3",
       "url" : "url3",
@@ -63,22 +64,22 @@
     "model": "InstaTonneApis.Follow",
     "pk": 1,
     "fields": {
-      "followerAuthorId" : 2,
-      "followeeAuthorId" : 1
+      "followerAuthorId" : "3faeb3dd446942f183f08470d4f750f6",
+      "followeeAuthorId" : "3faeb3dd446942f183f08470d4f750f5"
     }
   },
   {
     "model": "InstaTonneApis.Follow",
     "pk": 2,
     "fields": {
-      "followerAuthorId" : 3,
-      "followeeAuthorId" : 1
+      "followerAuthorId" : "3faeb3dd446942f183f08470d4f750f7",
+      "followeeAuthorId" : "3faeb3dd446942f183f08470d4f750f5"
     }
   },
   {
     "model": "InstaTonneApis.Post",
-    "pk": 1,
     "fields": {
+      "id" : "3faeb3dd446942f183f08470d4f750aa",
       "type" : "post",
       "id_url" : "id_url1",
       "title" : "title1",
@@ -88,20 +89,21 @@
       "contentType" : "contentType1",
       "content" : "content1",
       "visibility" : "visibility1",
+      "comments" : "http://website/comments/stuff",
   
       "categories" : ["cat1", "cat2"],
       "unlisted" : false,
       "published" : "2022-01-01 00:00:01",
   
-      "author" : 1
+      "author" : "3faeb3dd446942f183f08470d4f750f5"
     }
   },
   {
     "model": "InstaTonneApis.Post",
-    "pk": 2,
     "fields": {
+      "id" : "3faeb3dd446942f183f08470d4f750ee",
       "type" : "post",
-      "id_url" : "id_url2",
+      "id_url" : "id_url1",
       "title" : "title2",
       "source" : "source2",
       "origin" : "origin2",
@@ -109,18 +111,19 @@
       "contentType" : "contentType2",
       "content" : "content2",
       "visibility" : "visibility2",
+      "comments" : "http://website/comments/stuff2",
   
       "categories" : ["cat3", "cat4"],
       "unlisted" : false,
       "published" : "2022-01-01 00:00:01",
   
-      "author" : 1
+      "author" : "3faeb3dd446942f183f08470d4f750f5"
     }
   },
   {
     "model": "InstaTonneApis.Comment",
-    "pk": 1,
     "fields": {
+      "id" : "3faeb3dd446942f183f08470d4f750bb",
       "type" : "comment",
       "id_url" : "id_url1",
       "contentType" : "contentType1",
@@ -128,14 +131,14 @@
 
       "published" : "2022-01-01 00:00:01",
   
-      "author" : 1,
-      "post" : 1
+      "author" : "3faeb3dd446942f183f08470d4f750f5",
+      "post" : "3faeb3dd446942f183f08470d4f750aa"
     }
   },
   {
     "model": "InstaTonneApis.Comment",
-    "pk": 2,
     "fields": {
+      "id" : "3faeb3dd446942f183f08470d4f750bc",
       "type" : "comment",
       "id_url" : "id_url2",
       "contentType" : "contentType2",
@@ -143,36 +146,36 @@
 
       "published" : "2022-01-01 00:00:01",
   
-      "author" : 1,
-      "post" : 1
+      "author" : "3faeb3dd446942f183f08470d4f750f5",
+      "post" : "3faeb3dd446942f183f08470d4f750aa"
     }
   },
   {
     "model": "InstaTonneApis.Like",
-    "pk": 1,
     "fields": {
+      "id" : "3faeb3dd446942f183f08470d4f75000",
       "type" : "like",
       "context" : "context1",
       "summary" : "summary1",
 
       "published" : "2022-01-01 00:00:01",
   
-      "author" : 1,
-      "post" : 1
+      "author" : "3faeb3dd446942f183f08470d4f750f5",
+      "post" : "3faeb3dd446942f183f08470d4f750aa"
     }
   },
   {
     "model": "InstaTonneApis.Like",
-    "pk": 2,
     "fields": {
+      "id" : "3faeb3dd446942f183f08470d4f750ee",
       "type" : "like",
       "context" : "context1",
       "summary" : "summary1",
 
       "published" : "2022-01-01 00:00:01",
   
-      "author" : 1,
-      "comment" : 1
+      "author" : "3faeb3dd446942f183f08470d4f750f5",
+      "post" : "3faeb3dd446942f183f08470d4f750aa"
     }
   }
 ]
