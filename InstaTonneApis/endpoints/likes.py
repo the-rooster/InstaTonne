@@ -4,26 +4,26 @@ from ..models import Post, PostSerializer, Comment, Author, CommentSerializer, L
 from django.core.paginator import Paginator
 
 
-def single_post_likes(request: HttpRequest, author_id: int, post_id: int):
+def single_post_likes(request: HttpRequest, author_id: str, post_id: str):
     if request.method == "GET":
         return single_post_likes_get(request, author_id, post_id)
     return HttpResponse(status=405)
 
 
-def single_comment_likes(request: HttpRequest, author_id: int, post_id: int, comment_id: int):
+def single_comment_likes(request: HttpRequest, author_id: str, post_id: str, comment_id: str):
     if request.method == "GET":
         return single_comment_likes_get(request, author_id, post_id, comment_id)
     return HttpResponse(status=405)
 
 
-def single_author_likes(request: HttpRequest, author_id: int):
+def single_author_likes(request: HttpRequest, author_id: str):
     if request.method == "GET":
         return single_author_likes_get(request, author_id)
     return HttpResponse(status=405)
 
 
 # get the likes from a post
-def single_post_likes_get(request: HttpRequest, author_id: int, post_id: int):
+def single_post_likes_get(request: HttpRequest, author_id: str, post_id: str):
     post_url = Post.objects.all().filter(pk=post_id).first().id_url #type: ignore
     likes = Like.objects.all().filter(post=post_id).order_by("published")
 
@@ -46,7 +46,7 @@ def single_post_likes_get(request: HttpRequest, author_id: int, post_id: int):
 
 
 # get the likes from a comment
-def single_comment_likes_get(request: HttpRequest, author_id: int, post_id: int, comment_id: int):
+def single_comment_likes_get(request: HttpRequest, author_id: str, post_id: str, comment_id: str):
     comment_url = Comment.objects.all().filter(pk=comment_id).first().id_url #type: ignore
     likes = Like.objects.all().filter(post=post_id).order_by("published")
 
@@ -69,7 +69,7 @@ def single_comment_likes_get(request: HttpRequest, author_id: int, post_id: int,
 
 
 # get the likes from an author
-def single_author_likes_get(request: HttpRequest, author_id: int):
+def single_author_likes_get(request: HttpRequest, author_id: str):
     likes = Like.objects.all().filter(author=author_id).order_by("published")
 
     serialized_data = []

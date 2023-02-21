@@ -11,7 +11,7 @@ def authors(request: HttpRequest):
     return HttpResponse(status=405)
 
 
-def single_author(request: HttpRequest, author_id: int):
+def single_author(request: HttpRequest, author_id: str):
     if request.method == "GET":
         return single_author_get(request, author_id)
     if request.method == "POST":
@@ -47,15 +47,17 @@ def authors_get(request : HttpRequest):
 
 
 # get a single author
-def single_author_get(request: HttpRequest, author_id: int):
+def single_author_get(request: HttpRequest, author_id: str):
     author = Author.objects.get(pk=author_id)
     serialized_author = AuthorSerializer(author).data
+    serialized_author["id"] = serialized_author["id_url"]
+    del serialized_author["id_url"]
     res = json.dumps(serialized_author)
     return HttpResponse(content=res ,status=200)
 
 
 # update a single author
-def single_author_post(request: HttpRequest, author_id: int):
+def single_author_post(request: HttpRequest, author_id: str):
     if not valid_requesting_user(request, author_id):
         return HttpResponse(status=403)
 

@@ -24,7 +24,7 @@ from .endpoints.login import login
 from .endpoints.posts import single_author_posts, single_author_post
 from .endpoints.comments import single_post_comments
 from .endpoints.likes import single_comment_likes, single_post_likes, single_author_likes
-
+from .endpoints.inbox import inbox_endpoint
 
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
@@ -32,15 +32,16 @@ router = routers.DefaultRouter()
 
 urlpatterns = [
     path("authors", authors),
-    path("authors/<int:author_id>/", single_author),
-    path("authors/<int:author_id>/followers/", single_author_followers),
-    path("authors/<int:author_id>/followers/<int:foreign_author_id>/", single_author_follower),
+    path("authors/<str:author_id>/", single_author),
+    path("authors/<str:author_id>/followers/", single_author_followers),
+    path("authors/<str:author_id>/followers/<str:foreign_author_id>/", single_author_follower),
     path("register/",register_author),
     path("login/",login),
-    path("authors/<int:author_id>/posts/", single_author_posts),
-    path("authors/<int:author_id>/posts/<int:post_id>/", single_author_post),
-    path("authors/<int:author_id>/posts/<int:post_id>/comments/", single_post_comments),
-    path("authors/<int:author_id>/posts/<int:post_id>/likes/", single_post_likes),
-    path("authors/<int:author_id>/posts/<int:post_id>/comments/<int:comment_id>/likes/", single_comment_likes),
-    path("authors/<int:author_id>/liked/", single_author_likes)
+    path("authors/<str:author_id>/posts/", single_author_posts),
+    path("authors/<str:author_id>/posts/<str:post_id>/", single_author_post),
+    path("authors/<str:author_id>/posts/<str:post_id>/comments/", single_post_comments),
+    path("authors/<str:author_id>/posts/<str:post_id>/likes/", single_post_likes),
+    path("authors/<str:author_id>/posts/<str:post_id>/comments/<str:comment_id>/likes/", single_comment_likes),
+    path("authors/<str:author_id>/liked/", single_author_likes),
+    path("authors/<str:author_id>/inbox/",inbox_endpoint)
 ]

@@ -5,7 +5,7 @@ from django.core.paginator import Paginator
 from .utils import make_comment_url, make_comments_url
 
 
-def single_post_comments(request: HttpRequest, author_id: int, post_id: int):
+def single_post_comments(request: HttpRequest, author_id: str, post_id: str):
     if request.method == "GET":
         return single_post_comments_get(request, author_id, post_id)
     elif request.method == "POST":
@@ -14,7 +14,7 @@ def single_post_comments(request: HttpRequest, author_id: int, post_id: int):
 
 
 # get the comments from a post
-def single_post_comments_get(request: HttpRequest, author_id: int, post_id: int):
+def single_post_comments_get(request: HttpRequest, author_id: str, post_id: str):
     post_url = Post.objects.all().filter(pk=post_id).first().id_url #type: ignore
     comments = Comment.objects.all().filter(post=post_id).order_by("published")
     page_num = request.GET.get("page")
@@ -46,7 +46,7 @@ def single_post_comments_get(request: HttpRequest, author_id: int, post_id: int)
 
 
 # add a comment to a post
-def single_post_comments_post(request: HttpRequest, author_id: int, post_id: int):
+def single_post_comments_post(request: HttpRequest, author_id: str, post_id: str):
     try:
         post: Post | None = Post.objects.all().filter(pk=post_id).first()
 

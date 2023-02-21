@@ -5,22 +5,23 @@ from .utils import valid_requesting_user
 
 
 # endpoints for /authors/<author_id>/followers
-def single_author_followers(request: HttpRequest, author_id: int):
+def single_author_followers(request: HttpRequest, author_id: str):
     if request.method == "GET":
         return single_author_followers_get(request, author_id)  
-    elif request.method == "POST":
-        return HttpResponse(status=405)
     return HttpResponse(status=405)
 
 
 # get the followers of an author
-def single_author_followers_get(request: HttpRequest, author_id: int):
+def single_author_followers_get(request: HttpRequest, author_id: str):
     follows = Follow.objects.all().filter(followeeAuthorId=author_id)
 
     serialized_data = []
     for follow in follows:
         serialized_follow = FollowSerializer(follow).data
-        serialized_data.append(serialized_follow['followerAuthorId'])
+        serialized_author = serialized_follow['followerAuthorId']
+        serialized_author["id"] = serialized_author["id_url"]
+        del serialized_author["id_url"]
+        serialized_data.append(serialized_author)
 
     res = json.dumps([{
         "type": "followers",
@@ -31,7 +32,7 @@ def single_author_followers_get(request: HttpRequest, author_id: int):
 
 
 # endpoints for /authors/<author_id>/followers/<foreign_author_id>
-def single_author_follower(request: HttpRequest, author_id: int, foreign_author_id: int):
+def single_author_follower(request: HttpRequest, author_id: str, foreign_author_id: str):
     if request.method == "DELETE":
         return delete_author_follower(request, author_id, foreign_author_id)
     elif request.method == "PUT":
@@ -42,7 +43,7 @@ def single_author_follower(request: HttpRequest, author_id: int, foreign_author_
 
 
 # remove the follow where foreign_author follows author
-def delete_author_follower(request: HttpRequest, author_id: int, foreign_author_id: int):
+def delete_author_follower(request: HttpRequest, author_id: str, foreign_author_id: str):
     if not valid_requesting_user(request, foreign_author_id):
         return HttpResponse(status=403)
 
@@ -57,7 +58,7 @@ def delete_author_follower(request: HttpRequest, author_id: int, foreign_author_
 
 
 # create a follow where foreign_author follows author
-def put_author_follower(request: HttpRequest, author_id: int, foreign_author_id: int):
+def put_author_follower(request: HttpRequest, author_id: str, foreign_author_id: str):
     if not valid_requesting_user(request, foreign_author_id):
         return HttpResponse(status=403)
     
@@ -81,7 +82,7 @@ def put_author_follower(request: HttpRequest, author_id: int, foreign_author_id:
 
 
 # return success if foreign_author follows author
-def check_author_follower(request: HttpRequest, author_id: int, foreign_author_id: int):
+def check_author_follower(request: HttpRequest, author_id: str, foreign_author_id: str):
     follows = Follow.objects.all().filter(followeeAuthorId=author_id, followerAuthorId=foreign_author_id)
 
     if len(follows) != 0:
