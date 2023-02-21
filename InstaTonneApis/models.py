@@ -84,7 +84,7 @@ class Request(models.Model):
 
 
 class Comment(models.Model):
-    id = models.UUIDField(primary_key=True, default=default_id_generator, editable=False)
+    id = models.TextField(primary_key=True, default=default_id_generator, editable=False)
     type = models.TextField()
     id_url = models.TextField()
     contentType = models.TextField()

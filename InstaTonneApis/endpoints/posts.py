@@ -5,7 +5,7 @@ from django.core.paginator import Paginator
 from .utils import make_comments_url, make_post_url, valid_requesting_user
 
 
-def single_author_post(request: HttpRequest, author_id: int, post_id: int):
+def single_author_post(request: HttpRequest, author_id: str, post_id: str):
     if request.method == "GET":
         return single_author_post_get(request, author_id, post_id)
     elif request.method == "POST":
@@ -17,7 +17,7 @@ def single_author_post(request: HttpRequest, author_id: int, post_id: int):
     return HttpResponse(status=405)
 
 
-def single_author_posts(request: HttpRequest, author_id: int):
+def single_author_posts(request: HttpRequest, author_id: str):
     if request.method == "GET":
         return single_author_posts_get(request, author_id)
     elif request.method == "POST":
@@ -26,7 +26,7 @@ def single_author_posts(request: HttpRequest, author_id: int):
 
 
 # get a single post
-def single_author_post_get(request: HttpRequest, author_id: int, post_id: int):
+def single_author_post_get(request: HttpRequest, author_id: str, post_id: str):
     post: Post | None = Post.objects.all().filter(author=author_id, pk=post_id).first()
 
     if post is None:
@@ -45,7 +45,7 @@ def single_author_post_get(request: HttpRequest, author_id: int, post_id: int):
 
 
 # get all the posts of an author
-def single_author_posts_get(request: HttpRequest, author_id: int):
+def single_author_posts_get(request: HttpRequest, author_id: str):
     posts = Post.objects.all().filter(author=author_id).order_by("published")
     page_num = request.GET.get("page")
     page_size = request.GET.get("size")
@@ -77,7 +77,7 @@ def single_author_posts_get(request: HttpRequest, author_id: int):
 
 
 # update an existing post
-def single_author_post_post(request: HttpRequest, author_id: int, post_id: int):
+def single_author_post_post(request: HttpRequest, author_id: str, post_id: str):
     if not valid_requesting_user(request, author_id):
         return HttpResponse(status=403)
 
@@ -112,7 +112,7 @@ def single_author_post_post(request: HttpRequest, author_id: int, post_id: int):
     
 
 # create a new post without a specified post id
-def single_author_posts_post(request: HttpRequest, author_id: int):
+def single_author_posts_post(request: HttpRequest, author_id: str):
     if not valid_requesting_user(request, author_id):
         return HttpResponse(status=403)
 
@@ -148,7 +148,7 @@ def single_author_posts_post(request: HttpRequest, author_id: int):
     
 
 # delete a post
-def single_author_post_delete(request: HttpRequest, author_id: int, post_id: int):
+def single_author_post_delete(request: HttpRequest, author_id: str, post_id: str):
     if not valid_requesting_user(request, author_id):
         return HttpResponse(status=403)
 
@@ -163,7 +163,7 @@ def single_author_post_delete(request: HttpRequest, author_id: int, post_id: int
 
 
 # create a new post with a specified post id
-def single_author_post_put(request: HttpRequest, author_id: int, post_id: int):
+def single_author_post_put(request: HttpRequest, author_id: str, post_id: str):
     if not valid_requesting_user(request, author_id):
         return HttpResponse(status=403)
 

@@ -20,9 +20,8 @@
   },
   {
     "model": "InstaTonneApis.Author",
-    "pk": 1,
     "fields": {
-      "id" : "3faeb3dd446942f183f08470d4f750f5",
+      "id" : "1",
       "userID" : "2",
       "type" : "author",
       "id_url" : "id_url1",
@@ -37,7 +36,7 @@
   {
       "model": "InstaTonneApis.Author",
       "fields": {
-        "id" : "3faeb3dd446942f183f08470d4f750f6",
+        "id" : "2",
         "type" : "author",
         "id_url" : "id_url2",
         "url" : "url2",
@@ -50,7 +49,7 @@
   {
     "model": "InstaTonneApis.Author",
     "fields": {
-      "id" : "3faeb3dd446942f183f08470d4f750f7",
+      "id" : "3",
       "type" : "author",
       "id_url" : "id_url3",
       "url" : "url3",
@@ -64,22 +63,22 @@
     "model": "InstaTonneApis.Follow",
     "pk": 1,
     "fields": {
-      "followerAuthorId" : "3faeb3dd446942f183f08470d4f750f6",
-      "followeeAuthorId" : "3faeb3dd446942f183f08470d4f750f5"
+      "followerAuthorId" : "2",
+      "followeeAuthorId" : "1"
     }
   },
   {
     "model": "InstaTonneApis.Follow",
     "pk": 2,
     "fields": {
-      "followerAuthorId" : "3faeb3dd446942f183f08470d4f750f7",
-      "followeeAuthorId" : "3faeb3dd446942f183f08470d4f750f5"
+      "followerAuthorId" : "3",
+      "followeeAuthorId" : "1"
     }
   },
   {
     "model": "InstaTonneApis.Post",
     "fields": {
-      "id" : "3faeb3dd446942f183f08470d4f750aa",
+      "id" : "1",
       "type" : "post",
       "id_url" : "id_url1",
       "title" : "title1",
@@ -95,13 +94,13 @@
       "unlisted" : false,
       "published" : "2022-01-01 00:00:01",
   
-      "author" : "3faeb3dd446942f183f08470d4f750f5"
+      "author" : "1"
     }
   },
   {
     "model": "InstaTonneApis.Post",
     "fields": {
-      "id" : "3faeb3dd446942f183f08470d4f750ee",
+      "id" : "2",
       "type" : "post",
       "id_url" : "id_url1",
       "title" : "title2",
@@ -117,13 +116,13 @@
       "unlisted" : false,
       "published" : "2022-01-01 00:00:01",
   
-      "author" : "3faeb3dd446942f183f08470d4f750f5"
+      "author" : "1"
     }
   },
   {
     "model": "InstaTonneApis.Comment",
     "fields": {
-      "id" : "3faeb3dd446942f183f08470d4f750bb",
+      "id" : "1",
       "type" : "comment",
       "id_url" : "id_url1",
       "contentType" : "contentType1",
@@ -131,14 +130,14 @@
 
       "published" : "2022-01-01 00:00:01",
   
-      "author" : "3faeb3dd446942f183f08470d4f750f5",
-      "post" : "3faeb3dd446942f183f08470d4f750aa"
+      "author" : "2",
+      "post" : "1"
     }
   },
   {
     "model": "InstaTonneApis.Comment",
     "fields": {
-      "id" : "3faeb3dd446942f183f08470d4f750bc",
+      "id" : "2",
       "type" : "comment",
       "id_url" : "id_url2",
       "contentType" : "contentType2",
@@ -146,36 +145,36 @@
 
       "published" : "2022-01-01 00:00:01",
   
-      "author" : "3faeb3dd446942f183f08470d4f750f5",
-      "post" : "3faeb3dd446942f183f08470d4f750aa"
+      "author" : "1",
+      "post" : "1"
     }
   },
   {
     "model": "InstaTonneApis.Like",
     "fields": {
-      "id" : "3faeb3dd446942f183f08470d4f75000",
+      "id" : "1",
       "type" : "like",
       "context" : "context1",
       "summary" : "summary1",
 
       "published" : "2022-01-01 00:00:01",
   
-      "author" : "3faeb3dd446942f183f08470d4f750f5",
-      "post" : "3faeb3dd446942f183f08470d4f750aa"
+      "author" : "1",
+      "post" : "1"
     }
   },
   {
     "model": "InstaTonneApis.Like",
     "fields": {
-      "id" : "3faeb3dd446942f183f08470d4f750ee",
+      "id" : "2",
       "type" : "like",
       "context" : "context1",
       "summary" : "summary1",
 
       "published" : "2022-01-01 00:00:01",
   
-      "author" : "3faeb3dd446942f183f08470d4f750f5",
-      "post" : "3faeb3dd446942f183f08470d4f750aa"
+      "author" : "2",
+      "post" : "1"
     }
   }
 ]
