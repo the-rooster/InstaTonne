@@ -2,6 +2,7 @@ from django.http import HttpRequest, HttpResponse
 from ..models import Author, Post, Request, Comment, Like, Inbox, PostSerializer, CommentSerializer, LikeSerializer
 import json
 import uuid
+from InstaTonne.settings import HOSTNAME
 
 def inbox_endpoint(request : HttpRequest, author_id : str):
 
@@ -66,15 +67,21 @@ def get_inbox(request : HttpRequest, id : str):
         elif item.like:
 
             data = LikeSerializer(item.like).data
-
+            print(data)
             #change object to just be the url to the post to match the spec
-            data["object"] = data["object"]["url"]
+            #to do this, we must fetch the url from the post object
+
+            data["object"] = item.like.post.url
+            del data["post"]
 
         resp["items"].append(data)
 
     print(resp)
     return HttpResponse(content=json.dumps(resp),status=200)
 
+"""
+Post an item to a users inbox!
+"""
 def post_inbox(request : HttpRequest, id : str):
 
     data = request.body
@@ -120,14 +127,24 @@ def post_inbox(request : HttpRequest, id : str):
             author_id = data["author"]["id"]
             author_id = author_id.split("/")[-1]
 
-            check_author = Author.objects.filter(pk=author_id)
-            
+            check_author = Author.objects.filter(id=author_id)
+            print(author_id)
+            print(check_author)
             if not check_author:
-                author_id = Author.objects.create(**(data["author"]))
+                data["author"]["id"] = author_id
+                print("creating new author for foreign post")
+                creator = Author.objects.create(**(data["author"]))
+            else:
+                creator = Author.objects.get(id=author_id)
 
             #need to create the post object here
 
-            data["author"] = author_id
+            post = Post.objects.create(type="post",url=data["object"])
+
+            del data["object"]
+
+            data["author"] = creator
+            data["post"] = post
             new_like = Like.objects.create(**data)
             new_like.save()
             inbox = Inbox.objects.create(ownerId=author,like=new_like)

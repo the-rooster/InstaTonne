@@ -54,7 +54,7 @@ class Post(models.Model):
     unlisted = models.BooleanField(default=False)
     published = models.DateTimeField(auto_now_add=True)
 
-    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+    author = models.ForeignKey(Author, on_delete=models.CASCADE,blank=True,null=True)
 
 
 class PostSerializer(serializers.ModelSerializer):
