@@ -1,13 +1,13 @@
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
-
+from django.views.decorators.csrf import csrf_exempt
 from ..models import Author
 from django.contrib.auth.models import User
 from InstaTonne.forms import LoginForm
 from django.contrib.auth import authenticate, login as auth_login
 
 
-
+@csrf_exempt
 def login(request : HttpRequest):
 
     if request.method != "POST":
