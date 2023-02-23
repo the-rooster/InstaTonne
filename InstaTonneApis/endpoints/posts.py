@@ -4,6 +4,9 @@ from ..models import Post, PostSerializer, Comment, Author
 from django.core.paginator import Paginator
 from .utils import make_comments_url, make_post_url, valid_requesting_user
 
+PNG_CONTENT_TYPE = "image/png;base64"
+JPEG_CONTENT_TYPE = "image/jpeg;base64"
+
 
 def single_author_post(request: HttpRequest, author_id: str, post_id: str):
     if request.method == "GET":
@@ -23,6 +26,28 @@ def single_author_posts(request: HttpRequest, author_id: str):
     elif request.method == "POST":
         return single_author_posts_post(request, author_id)
     return HttpResponse(status=405)
+
+
+def single_author_post_image(request: HttpRequest, author_id: str, post_id: str):
+    if request.method == "GET":
+        return single_author_post_image_get(request, author_id, post_id)
+    return HttpResponse(status=405)
+
+
+# get a the encoded image from a single post
+def single_author_post_image_get(request: HttpRequest, author_id: str, post_id: str):
+    post: Post | None = Post.objects.all().filter(author=author_id, pk=post_id).first()
+
+    if post is None:
+        return HttpResponse(status=404)
+
+    serialized_post = PostSerializer(post).data
+
+    if serialized_post["contentType"] != PNG_CONTENT_TYPE and serialized_post["contentType"] != JPEG_CONTENT_TYPE:
+        return HttpResponse(status=404)
+
+    res = json.dumps(serialized_post["content"])
+    return HttpResponse(content=res, status=200)
 
 
 # get a single post
