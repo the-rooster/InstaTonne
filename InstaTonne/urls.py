@@ -36,7 +36,7 @@ router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 
 urlpatterns = [
-    path('service/',include("InstaTonneApis.urls")),
+    path('', include("InstaTonneApis.urls")),
     path('admin/', admin.site.urls),
     path('register/',views.register),
     path('login/',views.login),

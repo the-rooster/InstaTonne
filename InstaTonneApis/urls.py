@@ -21,7 +21,7 @@ from .endpoints.authors import single_author, authors
 from .endpoints.followers import single_author_followers, single_author_follower
 from .endpoints.register import register_author
 from .endpoints.login import login
-from .endpoints.posts import single_author_posts, single_author_post
+from .endpoints.posts import single_author_posts, single_author_post, single_author_post_image
 from .endpoints.comments import single_post_comments
 from .endpoints.likes import single_comment_likes, single_post_likes, single_author_likes
 from .endpoints.inbox import inbox_endpoint
@@ -43,5 +43,6 @@ urlpatterns = [
     path("authors/<str:author_id>/posts/<str:post_id>/likes/", single_post_likes),
     path("authors/<str:author_id>/posts/<str:post_id>/comments/<str:comment_id>/likes/", single_comment_likes),
     path("authors/<str:author_id>/liked/", single_author_likes),
-    path("authors/<str:author_id>/inbox/",inbox_endpoint)
+    path("authors/<str:author_id>/inbox/",inbox_endpoint),
+    path("authors/<str:author_id>/posts/<str:post_id>/image", single_author_post_image)
 ]
