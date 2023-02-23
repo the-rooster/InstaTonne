@@ -3,7 +3,9 @@ from ..models import Author, Post, Request, Comment, Like, Inbox, PostSerializer
 import json
 import uuid
 from InstaTonne.settings import HOSTNAME
+from django.views.decorators.csrf import csrf_exempt
 
+@csrf_exempt
 def inbox_endpoint(request : HttpRequest, author_id : str):
 
     if request.method == "GET":
@@ -32,8 +34,9 @@ def get_inbox(request : HttpRequest, id : str):
         return HttpResponse(status=500)
     
     user = user[0]
+    print(user.userID,request.user.pk)
     if str(user.userID) != str(request.user.pk):
-        print('requesting wrong user')
+        print('requesting wrong user!!')
         print(request.user.pk,user.userID)
         return HttpResponse(status=403)
     
@@ -89,8 +92,12 @@ def post_inbox(request : HttpRequest, id : str):
     
     #parse request body
     data = request.body
-    data = json.loads(data)
 
+    try:
+        data = json.loads(data)
+    except Exception as e:
+        return HttpResponse(status=400)
+    
     #receiver author object
     author = Author.objects.filter(pk=id)
 
@@ -228,19 +235,19 @@ def delete_inbox(request : HttpRequest, id : str):
         print('not authenticated')
         return HttpResponse(status=403)
     
-    if request.user.pk != id:
+    user = Author.objects.filter(id=id)
+    if not user:
+        print("db corrupted probably. user exists but author does not.")
+        return HttpResponse(status=500)
+    user = user[0]
+
+    if str(request.user.pk) != str(user.userID):
         print('requesting wrong user')
         return HttpResponse(status=403)
     
     #user is now authenticated
     #get all posts from followers
 
-    #get author object
-    user = Author.objects.get(userID=id)
-
-    if not user:
-        #this shouldn't happen
-        return HttpResponse(status=500)
     
     #now clear the inbox
     print(id)
