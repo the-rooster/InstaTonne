@@ -20,7 +20,6 @@
         :key="user"
         class="flex-content"
         src="ProfilePage.vue"
-        @click="changePage(pageList[2])"
       >
         {{ user }}
       </div>
@@ -31,8 +30,8 @@
   <script setup lang="ts">
   import { ref } from 'vue'
   import postJson from '../exampleUsers.json'
-  import pageList from './MenuBar.vue'
-  import changePage from './MenuBar.vue'
+  // import pageList from './MenuBar.vue'
+  // import changePage from './MenuBar.vue'
   // eventually this will be replaced by some sort of backend call that grabs the profile info
   </script>
 
