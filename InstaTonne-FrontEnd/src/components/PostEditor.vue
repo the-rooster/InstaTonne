@@ -79,8 +79,6 @@ async function savePost() {
   loading.value = true;
   console.log("posting....")
   await createHTTP('authors/1/posts/1/').post(JSON.stringify(postData.value)).then((response: { data: object }) => {
-    console.log(response)
-    postData.value = response.data;
     loading.value = false;
   });
 }

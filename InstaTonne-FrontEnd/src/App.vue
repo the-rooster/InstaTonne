@@ -40,7 +40,11 @@
           </v-navigation-drawer>
 
           <v-main style="height: 100em;">
-            <router-view />
+            <router-view v-if="loggedIn" />
+            <login-page
+              v-else
+              @logged-in="() => loggedIn = true"
+            />
           </v-main>
         </v-layout>
       </v-card>
@@ -53,6 +57,10 @@ import { ref, onBeforeMount } from 'vue'
 import { RouterView } from 'vue-router';
 import { routes } from "./main"
 import createHTTP from './axiosCalls'
+import LoginPage from './components/LoginPage.vue'
+
+// TODO: Replace this with an actual auth check
+const loggedIn = ref(false)
 
 const loading = ref(true)
 const postData = ref({});

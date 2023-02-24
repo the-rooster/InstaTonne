@@ -104,8 +104,8 @@ def single_author_posts_get(request: HttpRequest, author_id: str):
 
 # update an existing post
 def single_author_post_post(request: HttpRequest, author_id: str, post_id: str):
-    if not valid_requesting_user(request, author_id):
-        return HttpResponse(status=403)
+    # if not valid_requesting_user(request, author_id):
+    #     return HttpResponse(status=403)
 
     try:
         post: Post | None = Post.objects.all().filter(author=author_id, pk=post_id).first()
