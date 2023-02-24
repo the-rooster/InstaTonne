@@ -62,6 +62,21 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173", # allow frontend
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173", # allow frontend
+]
+
+CORS_ALLOW_HEADERS = [
+    "X-CSRFToken",
+    "Cookie",
+]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173", # allow frontend
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
 ROOT_URLCONF = 'InstaTonne.urls'
 
 TEMPLATES = [

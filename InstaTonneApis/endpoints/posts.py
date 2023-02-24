@@ -3,11 +3,12 @@ import json
 from ..models import Post, PostSerializer, Comment, Author
 from django.core.paginator import Paginator
 from .utils import make_comments_url, make_post_url, valid_requesting_user
+from django.views.decorators.csrf import csrf_exempt
 
 PNG_CONTENT_TYPE = "image/png;base64"
 JPEG_CONTENT_TYPE = "image/jpeg;base64"
 
-
+@csrf_exempt
 def single_author_post(request: HttpRequest, author_id: str, post_id: str):
     if request.method == "GET":
         return single_author_post_get(request, author_id, post_id)
