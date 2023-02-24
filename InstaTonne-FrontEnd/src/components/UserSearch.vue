@@ -34,14 +34,14 @@
   import AuthorCard from './AuthorCard.vue'
   import createHTTP from '../axiosCalls'
 
-const loading = ref(true)
-const postData = ref({});
-onBeforeMount(async () => {
-  await createHTTP('authors?page=1&size=2').get().then((response: { data: object }) => {
-    postData.value = response.data;
-    loading.value = false;
-  });
-})
+  const loading = ref(true)
+  const postData = ref({});
+  onBeforeMount(async () => {
+    await createHTTP('authors?page=1&size=2').get().then((response: { data: object }) => {
+      postData.value = response.data;
+      loading.value = false;
+    });
+  })
   </script>
   
   <style scoped>
