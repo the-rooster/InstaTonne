@@ -10,6 +10,7 @@ from django.contrib.auth import authenticate, login as auth_login
 @csrf_exempt
 def login(request : HttpRequest):
 
+    
     if request.method != "POST":
         return HttpResponse(status=405)
 
@@ -18,14 +19,16 @@ def login(request : HttpRequest):
 
     if not form.is_valid():
         form.add_error("username","Form is invalid.")
-        return render(request,"registration/login.html",context= {"form" : form})
+        return HttpResponse(status=400)
+        # return render(request,"registration/login.html",context= {"form" : form})
 
 
     user = authenticate(request,username=form.data["username"],password=form.data["password"])
 
     if not user:
         form.add_error("username","Form is invalid.")
-        return render(request,"registration/login.html",context= {"form" : form})
+        return HttpResponse(status=404)
+        #return render(request,"registration/login.html",context= {"form" : form})
         
     authors = Author.objects.filter(userID=user.pk)
 
@@ -37,8 +40,8 @@ def login(request : HttpRequest):
 
     if not author.active:
         form.add_error("username","Admin has not approved of your account yet.")
-        return render(request,"registration/login.html",context= {"form" : form})
+        return HttpResponse(status=404)
     
     auth_login(request,user)
 
-    return redirect("/")
+    return HttpResponse(status=200)
