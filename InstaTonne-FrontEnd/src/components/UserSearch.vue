@@ -16,46 +16,32 @@
     <br>
     <div class="flex-container">
       <div
-        v-for="user in filteredUsers"
+        v-for="user in postData"
         :key="user"
         class="flex-content"
         src="ProfilePage.vue"
-        @click="changePage(pageList[2])"
       >
-        {{ user }}
+        <router-link to="/ProfilePage">
+          <AuthorCard :author-info="postData.author" />
+        </router-link>
       </div>
     </div>
   </div>
 </template>
   
   <script setup lang="ts">
-  import { ref } from 'vue'
-  import postJson from '../exampleUsers.json'
-  import pageList from './MenuBar.vue'
-  import changePage from './MenuBar.vue'
-  // eventually this will be replaced by some sort of backend call that grabs the profile info
-  </script>
+  import { ref, onBeforeMount } from 'vue'
+  import AuthorCard from './AuthorCard.vue'
+  import createHTTP from '../axiosCalls'
 
-  <script lang="ts">
-  const jsonData = ref(postJson);
-
-  export default {
-  data() {
-    return {
-      users:
-        jsonData.value["Users"]
-      ,
-      search: ""
-    };
-  },
-  computed: {
-    filteredUsers() {
-      return this.users.filter(u => {
-        return u.toLowerCase().indexOf(this.search.toLowerCase()) != -1;
-      });
-    }
-  }
-};
+const loading = ref(true)
+const postData = ref({});
+onBeforeMount(async () => {
+  await createHTTP('authors?page=1&size=2').get().then((response: { data: object }) => {
+    postData.value = response.data;
+    loading.value = false;
+  });
+})
   </script>
   
   <style scoped>
