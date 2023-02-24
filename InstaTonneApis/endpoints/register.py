@@ -15,14 +15,14 @@ def register_author(request : HttpRequest):
 
     if not form.is_valid():
         form.add_error("username","Form is invalid.")
-        return render(request,"registration/registration.html",context={"form" : form})
+        return HttpResponse(status=400)
 
     if len(User.objects.filter(username=form.data["username"])) != 0:
         form.add_error("username","User already exists!")
-        return render(request,"registration/registration.html",context={"form" : form})
+        return HttpResponse(status=400)
 
     user = User.objects.create_user(username=form.data["username"],password=form.data["password"])
     Author.objects.create(displayName=form.data["username"],type="author",url="none",host="none",github="none",profileImage="none",userID=user.pk,active=False,id_url="none")
 
 
-    return redirect("/login/")
+    return HttpResponse(status=200)

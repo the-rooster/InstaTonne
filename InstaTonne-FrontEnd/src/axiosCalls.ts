@@ -1,5 +1,5 @@
-import axios from 'axios'
-import Cookies from 'js-cookie'
+import axios from 'axios';
+import Cookies from 'js-cookie';
 
 // axios.defaults.headers.common['Cookie'] = `csrftoken=${Cookies.get('csrftoken')}`
 axios.defaults.headers.common['X-CSRFToken'] = Cookies.get('csrftoken')
