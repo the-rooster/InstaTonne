@@ -5,7 +5,7 @@ from ..models import Author
 from django.contrib.auth.models import User
 from InstaTonne.forms import LoginForm
 from django.contrib.auth import authenticate, login as auth_login
-
+import json
 
 @csrf_exempt
 def login(request : HttpRequest):
@@ -44,4 +44,8 @@ def login(request : HttpRequest):
     
     auth_login(request,user)
 
-    return HttpResponse(status=200)
+    res = json.dumps({
+        "authorId": author.userID
+    })
+
+    return HttpResponse(status=200, content=res)

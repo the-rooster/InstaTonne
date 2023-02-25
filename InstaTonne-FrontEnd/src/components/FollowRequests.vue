@@ -20,7 +20,7 @@
 <script setup lang="ts">
 import { ref, onBeforeMount } from 'vue'
 import AuthorCard from './AuthorCard.vue'
-import createHTTP from '../axiosCalls'
+import { createHTTP } from '../axiosCalls'
 
 const loading = ref(true)
 const postData = ref({});
