@@ -61,14 +61,27 @@
             {{ registerMode ? "Return To Login" : "Register" }}
           </v-btn>
         </div>
-        <div>Debug Info:</div>
-        <div>{{ responseData }}</div>
-        <v-btn
+        <v-snackbar
+          v-model="showError"
+        >
+          {{ errorMessage }}
+
+          <template #actions>
+            <v-btn
+              color="blue"
+              variant="text"
+              @click="errorMessage = ''"
+            >
+              Close
+            </v-btn>
+          </template>
+        </v-snackbar>
+        <!-- <v-btn
           class="button"
           @click="() => $emit('LoggedIn', true)"
         >
           FORCE LOGIN
-        </v-btn>
+        </v-btn> -->
       </div>
     </div>
   </div>
@@ -76,10 +89,10 @@
     
   <script setup lang="ts">
   import { ref, onBeforeMount, computed } from 'vue'
-//   import AuthorCard from './AuthorCard.vue'
-  import createHTTP from '../axiosCalls'
+  import Cookies from 'js-cookie';
+  import { createHTTP, createFormBody, USER_AUTHOR_ID_COOKIE } from '../axiosCalls'
 
-  defineEmits(["LoggedIn"])
+  const emits = defineEmits(["LoggedIn"])
 
   const username = ref("")
 
@@ -90,10 +103,11 @@
   const password = ref("")
   const confirmPassword = ref("")
 
-  const passwordsMatch = computed(() => password.value == confirmPassword.value)
+  const errorMessage = ref("")
 
-  //TEMP
-  const responseData = ref({})
+  const showError = computed(() => errorMessage.value.length > 0)
+
+  const passwordsMatch = computed(() => password.value == confirmPassword.value)
 
   const canLogin = computed(() => 
     (!registerMode.value || passwordsMatch.value) &&
@@ -101,30 +115,35 @@
 
   async function login() {
     loading.value = true;
-    // await createHTTP('login/').post('').then((response: { data: object }) => {
     const credentials = {
-        username: 'username1',
-        password: 'password1'
+        username: username.value,
+        password: password.value
     }
-    await createHTTP('login/').post(JSON.stringify(credentials)).then((response: { data: object }) => {
-        responseData.value = document.cookie;
+    
+    await createHTTP('login/').post(createFormBody(credentials)).then((response: { authorId: string }) => {
+      // login worked. Set cookies to show we are logged in
+      // We assume that the session got set, if it didn't then the user needs to log in again
+      // expire cookie in 12 hours
+      Cookies.set(USER_AUTHOR_ID_COOKIE, response.authorId, { expires: 0.5 })
+      emits("LoggedIn", response.authorId)
+      loading.value = false;
+    }).catch(() => {
+      errorMessage.value = "Login failed"
       loading.value = false;
     });
-    return
   }
 
   async function register() {
     loading.value = true;
     // await createHTTP('login/').post('').then((response: { data: object }) => {
-    await createHTTP('authors/1/posts/1/').get().then((response: { data: object }) => {
-        responseData.value = response.data;
+    // NOT WORKING YET
+      await createHTTP('authors/1/posts/1/').get().then(() => {
+        // responseData.value = response.data;
       loading.value = false;
     });
     return
   }
 
-
-  
   const loading = ref(true)
   const postData = ref({});
   onBeforeMount(async () => {
@@ -134,11 +153,11 @@
     });
   })
   
-  </script>
-  
-  <style scoped>
-  .button {
-    width: 50%;
-  }
-  </style>
+</script>
+
+<style scoped>
+.button {
+  width: 50%;
+}
+</style>
     
