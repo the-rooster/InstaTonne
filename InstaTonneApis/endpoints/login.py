@@ -40,7 +40,7 @@ def login(request : HttpRequest):
 
     if not author.active:
         form.add_error("username","Admin has not approved of your account yet.")
-        return HttpResponse(content="Admin has not approved of your account yet",status=200)
+        return HttpResponse(content="Admin has not approved of your account yet",status=403)
     
     auth_login(request,user)
 
