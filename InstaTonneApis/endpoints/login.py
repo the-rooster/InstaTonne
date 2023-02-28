@@ -45,7 +45,7 @@ def login(request : HttpRequest):
     auth_login(request,user)
 
     res = json.dumps({
-        "authorId": author.userID
+        "authorId": author.id
     })
 
     return HttpResponse(status=200, content=res)

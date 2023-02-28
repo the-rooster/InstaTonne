@@ -13,24 +13,18 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import PostFullCard from './stream_cards/PostFullCard.vue';
-
+import Cookies from 'js-cookie';
 // defineProps<{ msg: string }>()
 
-import {createHTTP} from '../axiosCalls';
+import {USER_AUTHOR_ID_COOKIE, createHTTP} from '../axiosCalls';
 
 let posts = ref({});
 let author_id = ref({"id" : 0});
 
-createHTTP("authors/id/").post("").then((data) => {
-    console.log(data);
-    author_id.value.id = data.id;
-}).then(() => {
-    //update posts from inbox here
-    createHTTP(`authors/${author_id.value.id}/inbox/`).get().then((response) => {
+createHTTP(`authors/${Cookies.get(USER_AUTHOR_ID_COOKIE)}/inbox/`).get().then((response) => {
         posts.value = response.data.items;
         console.log(response.data);
     })
-})
 
 
 </script>
