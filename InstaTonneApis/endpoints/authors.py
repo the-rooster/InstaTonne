@@ -5,6 +5,21 @@ from django.core.paginator import Paginator
 from .utils import valid_requesting_user
 
 
+def get_author_id(request : HttpRequest):
+    if request.method != "POST":
+        return HttpResponse(status=405)
+    
+    author = Author.objects.filter(userID=request.user.id)
+
+    if not author:
+        return HttpResponse(status=404)
+    
+    author = author[0]
+
+    res = {"id" : author.id}
+
+    return HttpResponse(content=json.dumps(res),status=200)
+
 def authors(request: HttpRequest):
     if request.method == "GET":
         return authors_get(request)
