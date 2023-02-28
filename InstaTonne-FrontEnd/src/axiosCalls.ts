@@ -1,9 +1,14 @@
 import axios from 'axios';
 
+
 const HTTP = axios.create({
   baseURL: 'http://localhost:8000/',
   withCredentials: true,
+  xsrfCookieName: "csrftoken",
+  xsrfHeaderName: "X-CSRFToken"
 })
+
+
 
 function createHTTP(url: string) {
   return {
@@ -35,6 +40,9 @@ function createHTTP(url: string) {
     //   }
   }
 }
+
+// create http request to retrieve csrf token
+createHTTP("csrf/").get();
 
 function createFormBody(credentials: any[]) {
   const formBody: string[] = [];
