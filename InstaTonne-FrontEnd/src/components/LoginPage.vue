@@ -91,6 +91,7 @@
   import { ref, onBeforeMount, computed } from 'vue'
   import Cookies from 'js-cookie';
   import { createHTTP, createFormBody, USER_AUTHOR_ID_COOKIE } from '../axiosCalls'
+  import {router} from "../main";
 
   const emits = defineEmits(["LoggedIn"])
 
@@ -127,8 +128,15 @@
       Cookies.set(USER_AUTHOR_ID_COOKIE, response.authorId, { expires: 0.5 })
       emits("LoggedIn", response.authorId)
       loading.value = false;
-    }).catch(() => {
-      errorMessage.value = "Login failed"
+    }).catch((response) => {
+      console.log(response);
+      if(response.status === 403){
+        errorMessage.value = "Admin has not approved of your account yet."
+      }
+      else{
+        errorMessage.value = "Login failed"
+      }
+
       loading.value = false;
     });
   }
@@ -137,10 +145,20 @@
     loading.value = true;
     // await createHTTP('login/').post('').then((response: { data: object }) => {
     // NOT WORKING YET
-      await createHTTP('authors/1/posts/1/').get().then(() => {
+    const credentials = {
+        username: username.value,
+        password: password.value,
+        check_password: confirmPassword.value
+    }
+      await createHTTP('register/').post(credentials).then((response) => {
         // responseData.value = response.data;
-      loading.value = false;
-    });
+        loading.value = false;
+        registerMode.value = false;
+        
+      }).catch(() => {
+        errorMessage.value = "Registration failed";
+        loading.value = false;
+      });
     return
   }
 

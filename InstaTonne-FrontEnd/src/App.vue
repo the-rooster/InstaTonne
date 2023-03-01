@@ -7,6 +7,7 @@
           rail
           absolute
           width="500"
+          v-if="loggedIn"
         >
           <v-list>
             <v-list-item
