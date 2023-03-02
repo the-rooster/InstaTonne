@@ -23,7 +23,10 @@ class Author(models.Model):
 class AuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Author
-        fields = ['type', 'id_url', 'url', 'host', 'displayName', 'github', 'profileImage', 'userID', 'active']
+        fields = ['type', 'id_url', 'url', 'host', 'displayName', 'github', 'profileImage'] # ??? userID and active not here, should they be?
+
+    def create(self, validated_data):
+        return Author.objects.create(**validated_data)
 
 
 class Follow(models.Model):
@@ -51,7 +54,7 @@ class Post(models.Model):
     contentType = models.TextField()
     content = models.TextField()
     visibility = models.TextField()
-    comments = models.TextField()
+    comments = models.TextField()  # ??? Should this be a FK for list of models.Comments?
     
     categories  = models.CharField(max_length=100)
     unlisted = models.BooleanField(default=False)
@@ -71,6 +74,9 @@ class PostSerializer(serializers.ModelSerializer):
 
     def get_categories(self, instance):
         return json.loads(instance.categories.replace("'", '"'))
+    
+    def create(self, validated_data):
+        return Post.objects.create(**validated_data)
 
 
 class Request(models.Model):
@@ -132,7 +138,6 @@ class LikeSerializer(serializers.ModelSerializer):
 
 
 class Inbox(models.Model):
-
     ownerId = models.ForeignKey(Author,on_delete=models.CASCADE)
     post = models.ForeignKey(Post,on_delete=models.CASCADE,null=True,blank=True)
     comment = models.ForeignKey(Comment,on_delete=models.CASCADE,null=True,blank=True)
