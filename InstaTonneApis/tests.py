@@ -1,7 +1,4 @@
 from django.test import TestCase
-from django.urls import reverse
-from rest_framework import status
-from rest_framework.test import APIClient
 from .models import Author, Follow, Post, Request, Comment, Like, Inbox, AuthorSerializer, FollowSerializer, PostSerializer, RequestSerializer, CommentSerializer, LikeSerializer
 
 def get_author_object(index: int):
@@ -30,14 +27,64 @@ def get_author_object(index: int):
             active=True
         )
     
-def get_post_object(index: int):
-    pass
+def get_post_object(author: Author):
+    return Post.objects.create(
+        type='post',
+        id_url='http://localhost:8000/posts/1/',
+        title='Test Post',
+        source='http://localhost:8000/posts/1/',
+        origin='http://localhost:8000/posts/1/',
+        description='This is a test post.',
+        contentType='text/plain',
+        content='Hello, world!',
+        visibility='PUBLIC',
+        comments='This is a comment.',
+        categories='test',
+        unlisted=False,
+        author=author
+    )
+
+def get_comment_object(author: Author, post: Post):
+    return Comment.objects.create(
+        type='comment',
+        id_url='http://localhost:8000/comments/1/',
+        comment='This is a comment.',
+        contentType='text/plain',
+        author=author,
+        post=post
+    )
+
+def get_like_object(author: Author, post: Post, comment: Comment):
+    return Like.objects.create(
+        type='like',
+        context='http://localhost:8000/posts/1/',
+        summary='John Doe likes Test Post',
+        author=author,
+        post=post,
+        comment=comment
+    )
+
+def get_request_object(actor: Author, object: Author):
+    return Request.objects.create(
+        type='follow',
+        summary='John Doe wants to follow Jane Doe',
+        actor=actor,
+        object=object
+    )
+
+def get_inbox_object(ownerId: Author, post: Post, comment: Comment, like: Like, request: Request):
+    return Inbox.objects.create(
+        ownerId=ownerId,
+        post=post,
+        comment=comment,
+        like=like,
+        request=request
+    )
+
 
 class AuthorTestCase(TestCase):
     def setUp(self):
         self.author1 = get_author_object(1)
-        self.author2 = get_author_object(2)
-
         self.valid_author_data = {
             'type': 'author',
             'id_url': 'http://localhost:8000/author/3/',
@@ -49,10 +96,7 @@ class AuthorTestCase(TestCase):
             'userID': 'alicesmith',
             'active': True
         }
-
-        self.invalid_author_data = {
-
-        }
+        self.invalid_author_data = { }
 
     def test_author_creation(self):
         self.assertEqual(self.author1.id.__str__(), self.author1.id)
@@ -85,28 +129,16 @@ class AuthorTestCase(TestCase):
         author_serializer = AuthorSerializer(data=self.invalid_author_data)
         self.assertFalse(author_serializer.is_valid())
 
+
 class FollowTestCase(TestCase):
     def setUp(self):
         self.author1 = get_author_object(1)
         self.author2 = get_author_object(2)
-
         self.follow = Follow.objects.create(
             followerAuthorId=self.author1,
             followeeAuthorId=self.author2
         )
-
-        self.valid_author_data = {
-            'type': 'author',
-            'id_url': 'http://localhost:8000/author/3/',
-            'url': 'http://localhost:8000/author/3/',
-            'host': 'http://localhost:8000/',
-            'displayName': 'Alice Smith',
-            'github': 'https://github.com/alicesmith',
-            'profileImage': 'https://example.com/alicesmith.jpg',
-            'userID': 'alicesmith',
-            'active': True
-        }
-
+        self.valid_author_data = self.author1.__dict__
         self.valid_author_data2 = {
             'type': 'author',
             'id_url': 'http://localhost:8000/author/4/',
@@ -118,12 +150,10 @@ class FollowTestCase(TestCase):
             'userID': 'bobsmith',
             'active': True
         }
-
         self.valid_follow_data = {
             'followerAuthorId': AuthorSerializer(self.valid_author_data),
             'followeeAuthorId': AuthorSerializer(self.valid_author_data2)
         }
-
         self.invalid_follow_data = { }
 
     def test_follow_creation(self):
@@ -150,9 +180,7 @@ class FollowTestCase(TestCase):
             followerAuthorId=follower,
             followeeAuthorId=followee
         )
-
         follower.delete()
-
         with self.assertRaises(Follow.DoesNotExist):
             follow.refresh_from_db()
 
@@ -163,32 +191,15 @@ class FollowTestCase(TestCase):
             followerAuthorId=follower,
             followeeAuthorId=followee
         )
-
         follower.delete()
-
         with self.assertRaises(Follow.DoesNotExist):
             follow.refresh_from_db()
+
 
 class PostTestCase(TestCase):
     def setUp(self):
         self.author = get_author_object(1)
-
-        self.post = Post.objects.create(
-            type='post',
-            id_url='http://localhost:8000/posts/1/',
-            title='Test Post',
-            source='http://localhost:8000/posts/1/',
-            origin='http://localhost:8000/posts/1/',
-            description='This is a test post.',
-            contentType='text/plain',
-            content='Hello, world!',
-            visibility='PUBLIC',
-            comments='This is a comment.',
-            categories='test',
-            unlisted=False,
-            author=self.author
-        )
-
+        self.post = get_post_object(self.author)
         self.valid_post_data = {
             'type': 'post',
             'id_url': 'http://localhost:8000/posts/2/',
@@ -204,7 +215,6 @@ class PostTestCase(TestCase):
             'unlisted': False,
             'author': self.author.id
         }
-
         self.invalid_post_data = { }
 
     def test_post_creation(self):
@@ -246,46 +256,23 @@ class PostTestCase(TestCase):
 
     def test_on_delete_author(self):
         author = get_author_object(1)
-        post = Post.objects.create(
-            type='post',
-            id_url='http://localhost:8000/posts/3/',
-            title='Test Post',
-            source='http://localhost:8000/posts/3/',
-            origin='http://localhost:8000/posts/3/',
-            description='This is a test post.',
-            contentType='text/plain',
-            content='Hello, world!',
-            visibility='PUBLIC',
-            comments='This is a comment.',
-            categories='test',
-            unlisted=False,
-            author=author
-        )
-
+        post = get_post_object(author)
         author.delete()
-
         with self.assertRaises(Post.DoesNotExist):
             post.refresh_from_db()
+
 
 class RequestTestCase(TestCase):
     def setUp(self):
         self.actor = get_author_object(1)
         self.object = get_author_object(2)
-        
-        self.request = Request.objects.create(
-            type='follow',
-            summary='John Doe wants to follow Jane Doe',
-            actor=self.actor,
-            object=self.object
-        )
-
+        self.request = get_request_object(self.actor, self.object)
         self.valid_request_data = {
             'type': 'follow',
             'summary': 'John Doe wants to follow Jane Doe',
             'actor': self.actor.id,
             'object': self.object.id
         }
-
         self.invalid_request_data = { }
 
     def test_request_creation(self):
@@ -311,29 +298,15 @@ class RequestTestCase(TestCase):
 
     def test_on_delete_actor(self):
         actor = get_author_object(1)
-        request = Request.objects.create(
-            type='follow',
-            summary='John Doe wants to follow Jane Doe',
-            actor=actor,
-            object=self.object
-        )
-
+        request = get_request_object(actor, self.object)
         actor.delete()
-
         with self.assertRaises(Request.DoesNotExist):
             request.refresh_from_db()
 
     def test_on_delete_object(self):
         object = get_author_object(2)
-        request = Request.objects.create(
-            type='follow',
-            summary='John Doe wants to follow Jane Doe',
-            actor=self.actor,
-            object=object
-        )
-
+        request = get_request_object(self.actor, object)
         object.delete()
-
         with self.assertRaises(Request.DoesNotExist):
             request.refresh_from_db()
 
@@ -341,40 +314,16 @@ class RequestTestCase(TestCase):
 class CommentTestCase(TestCase):
     def setUp(self):
         self.author = get_author_object(1)
-
-        self.post = Post.objects.create(
-            type='post',
-            id_url='http://localhost:8000/posts/1/',
-            title='Test Post',
-            source='http://localhost:8000/posts/1/',
-            origin='http://localhost:8000/posts/1/',
-            description='This is a test post.',
-            contentType='text/plain',
-            content='Hello, world!',
-            visibility='PUBLIC',
-            categories='test',
-            unlisted=False,
-            author=self.author
-        )
-
-        self.comment = Comment.objects.create(
-            type='comment',
-            id_url='http://localhost:8000/comments/1/',
-            contentType='text/plain',
-            comment='This is a test comment.',
-            author=self.author,
-            post=self.post
-        )
-
+        self.post = get_post_object(self.author)
+        self.comment = get_comment_object(self.author, self.post)
         self.valid_comment_data = {
             'type': 'comment',
             'id_url': 'http://localhost:8000/comments/2/',
             'contentType': 'text/plain',
-            'comment': 'This is another test comment.',
+            'comment': 'This is another comment.',
             'author': self.author.id,
             'post': self.post.id
         }
-
         self.invalid_comment_data = {
             'type': '',
             'id_url': '',
@@ -388,7 +337,7 @@ class CommentTestCase(TestCase):
         self.assertEqual(self.comment.type, 'comment')
         self.assertEqual(self.comment.id_url, 'http://localhost:8000/comments/1/')
         self.assertEqual(self.comment.contentType, 'text/plain')
-        self.assertEqual(self.comment.comment, 'This is a test comment.')
+        self.assertEqual(self.comment.comment, 'This is a comment.')
         self.assertEqual(self.comment.author, self.author)
         self.assertEqual(self.comment.post, self.post)
 
@@ -401,7 +350,7 @@ class CommentTestCase(TestCase):
         # self.assertEqual(comment.type, 'comment')
         # self.assertEqual(comment.id_url, 'http://localhost:8000/comments/2/')
         # self.assertEqual(comment.contentType, 'text/plain')
-        # self.assertEqual(comment.comment, 'This is another test comment.')
+        # self.assertEqual(comment.comment, 'This is another comment.')
         # self.assertEqual(comment.author, self.author)
         # self.assertEqual(comment.post, self.post)
 
@@ -409,54 +358,27 @@ class CommentTestCase(TestCase):
         comment_serializer = CommentSerializer(data=self.invalid_comment_data)
         self.assertFalse(comment_serializer.is_valid())
 
+    def test_on_delete_author(self):
+        author = get_author_object(1)
+        comment = get_comment_object(author, self.post)
+        author.delete()
+        with self.assertRaises(Comment.DoesNotExist):
+            comment.refresh_from_db()
+
+    def test_on_delete_post(self):
+        post = get_post_object(self.author)
+        comment = get_comment_object(self.author, post)
+        post.delete()
+        with self.assertRaises(Comment.DoesNotExist):
+            comment.refresh_from_db()
+
 
 class LikeTestCase(TestCase):
     def setUp(self):
-        self.author = Author.objects.create(
-            type='author',
-            id_url='http://localhost:8000/author/1/',
-            url='http://localhost:8000/author/1/',
-            host='http://localhost:8000/',
-            displayName='John Doe',
-            github='https://github.com/johndoe',
-            profileImage='https://example.com/johndoe.jpg',
-            userID='johndoe',
-            active=True
-        )
-
-        self.post = Post.objects.create(
-            type='post',
-            id_url='http://localhost:8000/posts/1/',
-            title='Test Post',
-            source='http://localhost:8000/posts/1/',
-            origin='http://localhost:8000/posts/1/',
-            description='This is a test post.',
-            contentType='text/plain',
-            content='Hello, world!',
-            visibility='PUBLIC',
-            categories='test',
-            unlisted=False,
-            author=self.author
-        )
-
-        self.comment = Comment.objects.create(
-            type='comment',
-            id_url='http://localhost:8000/comments/1/',
-            contentType='text/plain',
-            comment='This is a test comment.',
-            author=self.author,
-            post=self.post
-        )
-
-        self.like = Like.objects.create(
-            type='like',
-            context='http://localhost:8000/posts/1/',
-            summary='John Doe likes Test Post',
-            author=self.author,
-            post=self.post,
-            comment=self.comment
-        )
-
+        self.author = get_author_object(1)
+        self.post = get_post_object(self.author)
+        self.comment = get_comment_object(self.author, self.post)
+        self.like = get_like_object(self.author, self.post, self.comment)
         self.valid_like_data = {
             'type': 'like',
             'context': 'http://localhost:8000/posts/1/',
@@ -465,7 +387,6 @@ class LikeTestCase(TestCase):
             'post': self.post.id,
             'comment': self.comment.id
         }
-
         self.invalid_like_data = {
             'type': '',
             'context': '',
@@ -500,58 +421,37 @@ class LikeTestCase(TestCase):
         like_serializer = LikeSerializer(data=self.invalid_like_data)
         self.assertFalse(like_serializer.is_valid())
 
+    def test_on_delete_author(self):
+        author = get_author_object(1)
+        like = get_like_object(author, self.post, self.comment)
+        author.delete()
+        with self.assertRaises(Like.DoesNotExist):
+            like.refresh_from_db()
+
+    def test_on_delete_post(self):
+        post = get_post_object(self.author)
+        like = get_like_object(self.author, post, self.comment)
+        post.delete()
+        with self.assertRaises(Like.DoesNotExist):
+            like.refresh_from_db()
+
+    def test_on_delete_comment(self):
+        comment = get_comment_object(self.author, self.post)
+        like = get_like_object(self.author, self.post, comment)
+        comment.delete()
+        with self.assertRaises(Like.DoesNotExist):
+            like.refresh_from_db()
+
+
 class InboxTestCase(TestCase):
     def setUp(self):
         self.owner = get_author_object(1)
         self.author = get_author_object(2)
-
-        self.post = Post.objects.create(
-            type='post',
-            id_url='http://localhost:8000/posts/1/',
-            title='Test Post',
-            source='http://localhost:8000/posts/1/',
-            origin='http://localhost:8000/posts/1/',
-            description='This is a test post.',
-            contentType='text/plain',
-            content='Hello, world!',
-            visibility='PUBLIC',
-            categories='test',
-            unlisted=False,
-            author=self.author
-        )
-
-        self.comment = Comment.objects.create(
-            type='comment',
-            id_url='http://localhost:8000/comments/1/',
-            contentType='text/plain',
-            comment='This is a test comment.',
-            author=self.author,
-            post=self.post
-        )
-
-        self.like = Like.objects.create(
-            type='like',
-            context='http://localhost:8000/posts/1/',
-            summary='John Doe likes Test Post',
-            author=self.author,
-            post=self.post,
-            comment=self.comment
-        )
-
-        self.request = Request.objects.create(
-            type='follow',
-            summary='John Doe wants to follow Jane Doe',
-            actor=self.author,
-            object=self.owner
-        )
-
-        self.inbox = Inbox.objects.create(
-            ownerId=self.owner,
-            post=self.post,
-            comment=self.comment,
-            like=self.like,
-            request=self.request
-        )
+        self.post = get_post_object(self.author)
+        self.comment = get_comment_object(self.author, self.post)
+        self.like = get_like_object(self.author, self.post, self.comment)
+        self.request = get_request_object(self.author, self.owner)
+        self.inbox = get_inbox_object(self.owner, self.post, self.comment, self.like, self.request)
 
     def test_inbox_creation(self):
         self.assertEqual(self.inbox.ownerId, self.owner)
@@ -561,15 +461,44 @@ class InboxTestCase(TestCase):
         self.assertEqual(self.inbox.request, self.request)
 
     def test_inbox_with_null_values(self):
-        inbox = Inbox.objects.create(
-            ownerId=self.owner,
-            post=None,
-            comment=None,
-            like=None,
-            request=None
-        )
-
+        inbox = get_inbox_object(self.owner, None, None, None, None)
         self.assertEqual(inbox.post, None)
         self.assertEqual(inbox.comment, None)
         self.assertEqual(inbox.like, None)
         self.assertEqual(inbox.request, None)
+
+    def test_on_delete_owner(self):
+        owner = get_author_object(1)
+        inbox = get_inbox_object(owner, self.post, self.comment, self.like, self.request)
+        owner.delete()
+        with self.assertRaises(Inbox.DoesNotExist):
+            inbox.refresh_from_db()
+
+    def test_on_delete_post(self):
+        post = get_post_object(self.author)
+        inbox = get_inbox_object(self.owner, post, self.comment, self.like, self.request)
+        post.delete()
+        with self.assertRaises(Inbox.DoesNotExist):
+            inbox.refresh_from_db()
+
+    def test_on_delete_comment(self):
+        comment = get_comment_object(self.author, self.post)
+        inbox = get_inbox_object(self.owner, self.post, comment, self.like, self.request)
+        comment.delete()
+        with self.assertRaises(Inbox.DoesNotExist):
+            inbox.refresh_from_db()
+
+    def test_on_delete_like(self):
+        like = get_like_object(self.author, self.post, self.comment)
+        inbox = get_inbox_object(self.owner, self.post, self.comment, like, self.request)
+        like.delete()
+        with self.assertRaises(Inbox.DoesNotExist):
+            inbox.refresh_from_db()
+
+    def test_on_delete_request(self):
+        request = get_request_object(self.owner, self.author)
+        inbox = get_inbox_object(self.owner, self.post, self.comment, self.like, request)
+        request.delete()
+        with self.assertRaises(Inbox.DoesNotExist):
+            inbox.refresh_from_db()
+        
