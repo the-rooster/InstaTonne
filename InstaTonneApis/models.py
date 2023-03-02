@@ -23,7 +23,7 @@ class Author(models.Model):
 class AuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Author
-        fields = ['type', 'id_url', 'url', 'host', 'displayName', 'github', 'profileImage']
+        fields = ['type', 'id_url', 'url', 'host', 'displayName', 'github', 'profileImage', 'userID', 'active']
 
 
 class Follow(models.Model):
