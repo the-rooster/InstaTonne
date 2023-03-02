@@ -5,7 +5,7 @@ info:
 servers:
   - url: http://localhost:8000
 paths:
-  /authors/1/inbox/:
+  /authors/<author id>/inbox/:
     get:
       tags:
         - default
@@ -30,21 +30,21 @@ paths:
                 actor:
                   type: author
                   id: >-
-                    http://127.0.0.1:5454/authors/1d698d25ff008f7538453c120f581471
+                    http://<author id>27.0.0.1:5454/authors/<author id>d698d25ff008f7538453c120f581471
                   url: >-
-                    http://127.0.0.1:5454/authors/1d698d25ff008f7538453c120f581471
-                  host: http://127.0.0.1:5454/
+                    http://<author id>27.0.0.1:5454/authors/<author id>d698d25ff008f7538453c120f581471
+                  host: http://<author id>27.0.0.1:5454/
                   displayName: Greg Johnson
                   github: http://github.com/gjohnson
                   profileImage: https://i.imgur.com/k7XVwpB.jpeg
                 object:
                   type: author
                   id: >-
-                    http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e
-                  host: http://127.0.0.1:5454/
+                    http://<author id>27.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e
+                  host: http://<author id>27.0.0.1:5454/
                   displayName: Lara Croft
                   url: >-
-                    http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e
+                    http://<author id>27.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e
                   github: http://github.com/laracroft
                   profileImage: https://i.imgur.com/k7XVwpB.jpeg
       parameters:
@@ -61,7 +61,7 @@ paths:
     delete:
       tags:
         - default
-      summary: http://localhost:8000/service/authors/1/inbox/
+      summary: http://localhost:8000/service/authors/<author id>/inbox/
       parameters:
         - name: X-CSRFToken
           in: header
@@ -132,7 +132,7 @@ paths:
           description: Successful response
           content:
             application/json: {}
-  /authors/1:
+  /authors/<author id>:
     get:
       tags:
         - default
@@ -142,7 +142,7 @@ paths:
           description: Successful response
           content:
             application/json: {}
-  /authors/1/:
+  /authors/<author id>/:
     post:
       tags:
         - default
@@ -167,7 +167,7 @@ paths:
           description: Successful response
           content:
             application/json: {}
-  /authors/1/followers:
+  /authors/<author id>/followers:
     get:
       tags:
         - default
@@ -177,7 +177,7 @@ paths:
           description: Successful response
           content:
             application/json: {}
-  /authors/1/followers/2/:
+  /authors/<author id>/followers/<other author id>/:
     get:
       tags:
         - default
@@ -187,7 +187,7 @@ paths:
           description: Successful response
           content:
             application/json: {}
-  /authors/2/followers/1/:
+  /authors/<other author id>/followers/<author id>/:
     put:
       tags:
         - default
@@ -220,7 +220,7 @@ paths:
           description: Successful response
           content:
             application/json: {}
-  /authors/1/posts:
+  /authors/<author id>/posts:
     get:
       tags:
         - default
@@ -241,7 +241,7 @@ paths:
           description: Successful response
           content:
             application/json: {}
-  /authors/1/posts/:
+  /authors/<author id>/posts/:
     post:
       tags:
         - default
@@ -275,7 +275,7 @@ paths:
           description: Successful response
           content:
             application/json: {}
-  /authors/1/posts/1:
+  /authors/<author id>/posts/<author id>:
     get:
       tags:
         - default
@@ -285,7 +285,7 @@ paths:
           description: Successful response
           content:
             application/json: {}
-  /authors/1/posts/1/:
+  /authors/<author id>/posts/<author id>/:
     post:
       tags:
         - default
@@ -365,7 +365,7 @@ paths:
           description: Successful response
           content:
             application/json: {}
-  /authors/1/posts/1/comments:
+  /authors/<author id>/posts/<author id>/comments:
     get:
       tags:
         - default
@@ -386,7 +386,7 @@ paths:
           description: Successful response
           content:
             application/json: {}
-  /authors/1/posts/1/comments/:
+  /authors/<author id>/posts/<author id>/comments/:
     post:
       tags:
         - default
@@ -411,7 +411,7 @@ paths:
           description: Successful response
           content:
             application/json: {}
-  /authors/1/posts/1/comments/1/likes:
+  /authors/<author id>/posts/<author id>/comments/<author id>/likes:
     get:
       tags:
         - default
@@ -421,7 +421,7 @@ paths:
           description: Successful response
           content:
             application/json: {}
-  /authors/1/posts/1/likes:
+  /authors/<author id>/posts/<author id>/likes:
     get:
       tags:
         - default
@@ -431,7 +431,7 @@ paths:
           description: Successful response
           content:
             application/json: {}
-  /authors/1/liked:
+  /authors/<author id>/liked:
     get:
       tags:
         - default
@@ -441,7 +441,7 @@ paths:
           description: Successful response
           content:
             application/json: {}
-  /authors/1/posts/1/image:
+  /authors/<author id>/posts/<author id>/image:
     get:
       tags:
         - default
