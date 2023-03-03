@@ -40,7 +40,7 @@
   const loading = ref(true)
   const result : any[] = [];
   const postData = ref(result);
-  const search = ""
+  const search = ref("")
 
   onBeforeMount(async () => {
     await createHTTP('authors?page=1&size=2').get().then((response: { data: object }) => {
@@ -52,7 +52,7 @@
   const myVal = computed({
   get() {
     return postData.value.filter(u => {
-        return u.displayName.toLowerCase().indexOf(search.toLowerCase()) != -1;
+        return u.displayName.toLowerCase().indexOf(search.value.toLowerCase()) != -1;
       })
     // return postData.value
   },
