@@ -1,0 +1,453 @@
+openapi: 3.0.0
+info:
+  title: InstaTonne
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+paths:
+  /authors/1/inbox/:
+    get:
+      tags:
+        - default
+      summary: get inbox
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    post:
+      tags:
+        - default
+      summary: post follow request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                type: Follow
+                summary: Greg wants to follow Lara
+                actor:
+                  type: author
+                  id: >-
+                    http://127.0.0.1:5454/authors/1d698d25ff008f7538453c120f581471
+                  url: >-
+                    http://127.0.0.1:5454/authors/1d698d25ff008f7538453c120f581471
+                  host: http://127.0.0.1:5454/
+                  displayName: Greg Johnson
+                  github: http://github.com/gjohnson
+                  profileImage: https://i.imgur.com/k7XVwpB.jpeg
+                object:
+                  type: author
+                  id: >-
+                    http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e
+                  host: http://127.0.0.1:5454/
+                  displayName: Lara Croft
+                  url: >-
+                    http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e
+                  github: http://github.com/laracroft
+                  profileImage: https://i.imgur.com/k7XVwpB.jpeg
+      parameters:
+        - name: X-CSRFToken
+          in: header
+          schema:
+            type: string
+          example: f3gPbKMLdKXINBC9X3UZGz8fcnzFF8ml
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    delete:
+      tags:
+        - default
+      summary: http://localhost:8000/service/authors/1/inbox/
+      parameters:
+        - name: X-CSRFToken
+          in: header
+          schema:
+            type: string
+          example: f3gPbKMLdKXINBC9X3UZGz8fcnzFF8ml
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /accounts/logout:
+    get:
+      tags:
+        - default
+      summary: logout
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /login/:
+    post:
+      tags:
+        - default
+      summary: login
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: username1
+                password:
+                  type: string
+                  example: password1
+      parameters:
+        - name: X-CSRFToken
+          in: header
+          schema:
+            type: string
+          example: '{{csrftoken}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors:
+    get:
+      tags:
+        - default
+      summary: authors
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+          example: '1'
+        - name: size
+          in: query
+          schema:
+            type: integer
+          example: '2'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/1:
+    get:
+      tags:
+        - default
+      summary: author
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/1/:
+    post:
+      tags:
+        - default
+      summary: author
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                displayName: displayName1
+                github: github1
+                profileImage: profileImage1
+      parameters:
+        - name: X-CSRFToken
+          in: header
+          schema:
+            type: string
+          example: '{{csrftoken}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/1/followers:
+    get:
+      tags:
+        - default
+      summary: author followers
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/1/followers/2/:
+    get:
+      tags:
+        - default
+      summary: author follower
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/2/followers/1/:
+    put:
+      tags:
+        - default
+      summary: author follower
+      requestBody:
+        content: {}
+      parameters:
+        - name: X-CSRFToken
+          in: header
+          schema:
+            type: string
+          example: '{{csrftoken}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    delete:
+      tags:
+        - default
+      summary: author follower
+      parameters:
+        - name: X-CSRFToken
+          in: header
+          schema:
+            type: string
+          example: '{{csrftoken}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/1/posts:
+    get:
+      tags:
+        - default
+      summary: author posts
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+          example: '1'
+        - name: size
+          in: query
+          schema:
+            type: integer
+          example: '5'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/1/posts/:
+    post:
+      tags:
+        - default
+      summary: author posts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                title: title76.1
+                source: source76.1
+                origin: origin76.1
+                description: description76.1
+                contentType: contentType76.1
+                content: content76.1
+                visibility: visibility76.1
+                categories:
+                  - cat76.0
+                  - cat76.1
+                  - cat76.2
+                unlisted: false
+      parameters:
+        - name: X-CSRFToken
+          in: header
+          schema:
+            type: string
+          example: '{{csrftoken}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/1/posts/1:
+    get:
+      tags:
+        - default
+      summary: author post
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/1/posts/1/:
+    post:
+      tags:
+        - default
+      summary: author post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                title: title76.1
+                description: description76.1
+                contentType: contentType76.1
+                content: content76.1
+                visibility: visibility76.1
+                categories:
+                  - cat76.0
+                  - cat76.1
+                  - cat76.2
+                unlisted: false
+      parameters:
+        - name: X-CSRFToken
+          in: header
+          schema:
+            type: string
+          example: '{{csrftoken}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    delete:
+      tags:
+        - default
+      summary: author post
+      parameters:
+        - name: X-CSRFToken
+          in: header
+          schema:
+            type: string
+          example: '{{csrftoken}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    put:
+      tags:
+        - default
+      summary: post image
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                title: title76.1
+                source: source76.1
+                origin: origin76.1
+                description: description76.1
+                contentType: image/png;base64
+                content: >- base64encodedimage
+                visibility: visibility
+                categories:
+                  - cat76.0
+                  - cat76.1
+                  - cat76.2
+                unlisted: false
+      parameters:
+        - name: X-CSRFToken
+          in: header
+          schema:
+            type: string
+          example: '{{csrftoken}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/1/posts/1/comments:
+    get:
+      tags:
+        - default
+      summary: post comments
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+          example: '1'
+        - name: size
+          in: query
+          schema:
+            type: integer
+          example: '5'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/1/posts/1/comments/:
+    post:
+      tags:
+        - default
+      summary: post comments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                contentType: contentType76.1
+                comment: comment76.1
+                author: 1
+      parameters:
+        - name: X-CSRFToken
+          in: header
+          schema:
+            type: string
+          example: '{{csrftoken}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/1/posts/1/comments/1/likes:
+    get:
+      tags:
+        - default
+      summary: comment likes
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/1/posts/1/likes:
+    get:
+      tags:
+        - default
+      summary: post likes
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/1/liked:
+    get:
+      tags:
+        - default
+      summary: author likes
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/1/posts/1/image:
+    get:
+      tags:
+        - default
+      summary: post image
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}

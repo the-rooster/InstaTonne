@@ -71,6 +71,8 @@ CORS_ALLOW_HEADERS = [
     "Cookie",
 ]
 
+CSRF_COOKIE_HTTPONLY = False
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173", # allow frontend
 ]

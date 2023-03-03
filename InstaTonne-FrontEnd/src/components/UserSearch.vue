@@ -16,59 +16,88 @@
     <br>
     <div class="flex-container">
       <div
-        v-for="user in postData"
-        :key="user"
+        v-for="user in myVal"
+        :key="user.displayName"
         class="flex-content"
         src="ProfilePage.vue"
       >
         <router-link to="/ProfilePage">
-          <AuthorCard :author-info="postData.author" />
+          <AuthorCard
+            :author-info="user"
+            class="authorCard"
+          />
         </router-link>
       </div>
     </div>
   </div>
 </template>
   
-  <script setup lang="ts">
-  import { ref, onBeforeMount } from 'vue'
+<script setup lang="ts">
+  import { ref, onBeforeMount, computed } from 'vue'
   import AuthorCard from './AuthorCard.vue'
-  import createHTTP from '../axiosCalls'
+  import { createHTTP } from '../axiosCalls'
 
   const loading = ref(true)
-  const postData = ref({});
+  const result : any[] = [];
+  const postData = ref(result);
+  const search = ""
+
   onBeforeMount(async () => {
     await createHTTP('authors?page=1&size=2').get().then((response: { data: object }) => {
-      postData.value = response.data;
+      postData.value = response.data.items;
       loading.value = false;
     });
-  })
-  </script>
-  
-  <style scoped>
+  });
+
+  const myVal = computed({
+  get() {
+    return postData.value.filter(u => {
+        return u.displayName.toLowerCase().indexOf(search.toLowerCase()) != -1;
+      })
+    // return postData.value
+  },
+  set(val) {
+    return
+  }
+})
+
+  // function filteredUsers() {
+  //   // return postData.value.reduce((u: string) => {
+  //   //   return u.toLowerCase().indexOf(this.search.toLowerCase()) != -1;
+  //   // });
+  //   return postData
+  // }
+</script>
+
+<style scoped>
   .read-the-docs {
     color: #888;
   }
   .flex-container {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  flex-basis: 0;
-  max-width: 32em;
-}
-.flex-content{
-  width: 30em;
-  height: 2em;
-  padding: 1em;
-  border-style: solid;
-}
-.viewBox{
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-br {
-   display: block;
-   margin: 1em;
-}
-  </style>
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    flex-basis: 0;
+    max-width: 32em;
+  }
+  .flex-content{
+    width: 30em;
+    height: 18em;
+    padding: 1em;
+    /* border-style: solid; */
+  }
+  .viewBox{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  br {
+    display: block;
+    margin: 1em;
+  }
+  .authorCard {
+    width: 100%;
+    height: 100%
+  }
+</style>
   

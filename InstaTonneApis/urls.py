@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers, serializers, viewsets
 from rest_framework.schemas import get_schema_view
-from .endpoints.authors import single_author, authors
+from .endpoints.authors import single_author, authors, get_author_id
 from .endpoints.followers import single_author_followers, single_author_follower
 from .endpoints.register import register_author
 from .endpoints.login import login
@@ -25,13 +25,14 @@ from .endpoints.posts import single_author_posts, single_author_post, single_aut
 from .endpoints.comments import single_post_comments
 from .endpoints.likes import single_comment_likes, single_post_likes, single_author_likes
 from .endpoints.inbox import inbox_endpoint
-
+from .endpoints.csrf import get_csrf
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
 
 
 urlpatterns = [
     path("authors", authors),
+    path("authors/id/",get_author_id),
     path("authors/<str:author_id>/", single_author),
     path("authors/<str:author_id>/followers/", single_author_followers),
     path("authors/<str:author_id>/followers/<str:foreign_author_id>/", single_author_follower),
@@ -44,5 +45,6 @@ urlpatterns = [
     path("authors/<str:author_id>/posts/<str:post_id>/comments/<str:comment_id>/likes/", single_comment_likes),
     path("authors/<str:author_id>/liked/", single_author_likes),
     path("authors/<str:author_id>/inbox/",inbox_endpoint),
-    path("authors/<str:author_id>/posts/<str:post_id>/image", single_author_post_image)
+    path("authors/<str:author_id>/posts/<str:post_id>/image", single_author_post_image),
+    path("csrf/",get_csrf)
 ]
