@@ -16,34 +16,63 @@
     <br>
     <div class="flex-container">
       <div
-        v-for="user in filteredUsers"
-        :key="user"
+        v-for="user in myVal"
+        :key="user.displayName"
         class="flex-content"
         src="ProfilePage.vue"
       >
-        {{ user }}
+        <router-link to="/ProfilePage">
+          <AuthorCard
+            :author-info="user"
+            class="authorCard"
+          />
+        </router-link>
       </div>
     </div>
   </div>
 </template>
   
 <script setup lang="ts">
-  import { ref, computed } from 'vue'
-  import postJson from '../exampleUsers.json'
-  // eventually this will be replaced by some sort of backend call that grabs the profile info
+  import { ref, onBeforeMount, computed } from 'vue'
+  import AuthorCard from './AuthorCard.vue'
+  import { createHTTP } from '../axiosCalls'
 
-  const jsonData = ref(postJson);
-
-  const users = ref(jsonData.value["Users"])
-
+  const loading = ref(true)
+  const result : any[] = [];
+  const postData = ref(result);
   const search = ref("")
 
-  const filteredUsers = computed(() => 
-    users.value.filter(u => u.toLowerCase().indexOf(search.value.toLowerCase()) != -1))
+  onBeforeMount(async () => {
+    await createHTTP('authors?page=1&size=2').get().then((response: { data: object }) => {
+      postData.value = response.data.items;
+      loading.value = false;
+    });
+  });
 
+  const myVal = computed({
+  get() {
+    return postData.value.filter(u => {
+        return u.displayName.toLowerCase().indexOf(search.value.toLowerCase()) != -1;
+      })
+    // return postData.value
+  },
+  set(val) {
+    return
+  }
+})
+
+  // function filteredUsers() {
+  //   // return postData.value.reduce((u: string) => {
+  //   //   return u.toLowerCase().indexOf(this.search.toLowerCase()) != -1;
+  //   // });
+  //   return postData
+  // }
 </script>
 
 <style scoped>
+  .read-the-docs {
+    color: #888;
+  }
   .flex-container {
     display: flex;
     flex-wrap: wrap;
@@ -53,9 +82,9 @@
   }
   .flex-content{
     width: 30em;
-    height: 2em;
+    height: 18em;
     padding: 1em;
-    border-style: solid;
+    /* border-style: solid; */
   }
   .viewBox{
     display: flex;
@@ -65,6 +94,10 @@
   br {
     display: block;
     margin: 1em;
+  }
+  .authorCard {
+    width: 100%;
+    height: 100%
   }
 </style>
   
