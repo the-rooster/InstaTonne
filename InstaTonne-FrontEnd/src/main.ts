@@ -31,11 +31,25 @@ import PostEditor from "./components/PostEditor.vue";
 import FollowRequests from "./components/FollowRequests.vue";
 import ProfilePage from "./components/ProfilePage.vue";
 import UserSearch from "./components/UserSearch.vue";
-
+import UserPost from "./components/UserPost.vue";
 // 2. Define some routes
 // Each route should map to a component.
 // We'll talk about nested routes later.
 const routes = [
+  { path: "/", name: "Home", component: HomePage },
+  { path: "/about", name: "About", component: AboutPage },
+  { path: "/PostEditor", name: "PostEditor", component: PostEditor },
+  {
+    path: "/FollowRequests",
+    name: "FollowRequests",
+    component: FollowRequests,
+  },
+  { path: "/ProfilePage", name: "ProfilePage", component: ProfilePage },
+  { path: "/UserSearch", name: "UserSearch", component: UserSearch },
+  {path: "/authors/:id/posts/:postid",name : "UserPost", component: UserPost}
+];
+
+export const nav_bar_routes = [
   { path: "/", name: "Home", component: HomePage },
   { path: "/about", name: "About", component: AboutPage },
   { path: "/PostEditor", name: "PostEditor", component: PostEditor },
