@@ -95,26 +95,23 @@ const postData = ref({});
 
 let route = useRoute();
 
+const authorId = Cookies.get(USER_AUTHOR_ID_COOKIE);
+
 onBeforeMount(async () => {
-  if (Cookies.get(USER_AUTHOR_ID_COOKIE) != route.params.id) {
-    errorMessage.value = "403 Forbidden";
+  await createHTTP(`authors/${authorId}/posts/${route.params.postid}/`).get().then((response: { data: object }) => {
+    postData.value = response.data;
     loading.value = false;
-  } else {
-    await createHTTP(`authors/${route.params.id}/posts/${route.params.postid}/`).get().then((response: { data: object }) => {
-      postData.value = response.data;
-      loading.value = false;
-    }).catch(() => {
-      errorMessage.value = "404 Post Not Found"
-      loading.value = false;
-    });
-  }
+  }).catch(() => {
+    errorMessage.value = "404 Post Not Found"
+    loading.value = false;
+  });
 })
 
 async function savePost() {
   // eventually this should do a backend call to push postData
   // Note: since everything is binded, all the changes should be stored in postData already!
   loading.value = true;
-  await createHTTP(`authors/${route.params.id}/posts/${route.params.postid}/`).post(JSON.stringify(postData.value)).then((response: { data: object }) => {
+  await createHTTP(`authors/${authorId}/posts/${route.params.postid}/`).post(JSON.stringify(postData.value)).then((response: { data: object }) => {
     loading.value = false;
   });
 }
