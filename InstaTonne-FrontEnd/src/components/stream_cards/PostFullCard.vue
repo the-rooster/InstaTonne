@@ -22,10 +22,7 @@
         <template v-slot:append>
           <div class="justify-self-end">
             <v-icon class="me-1" icon="mdi-heart"></v-icon>
-            <span class="subheading me-2">256</span>
-            <span class="me-1">·</span>
             <v-icon class="me-1" icon="mdi-share-variant"></v-icon>
-            <span class="subheading">45</span>
           </div>
         </template>
       </v-list-item>
@@ -35,7 +32,6 @@
       <v-img v-if="isImage" :src="require('${ props.postData.content }')" />
       <v-card-text v-else>
         <span>{{ props.postData.content }}</span>
-        <span>{{ props.postData.comments }}</span>
       </v-card-text>
     </v-card>
 
@@ -75,7 +71,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import CommentCard from "./CommentCard.vue";
-import Cookies from "js-cookie";
 // defineProps<{ msg: string }>()
 
 import { USER_AUTHOR_ID_COOKIE, createHTTP } from "../../axiosCalls";
