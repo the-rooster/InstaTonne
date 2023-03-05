@@ -54,7 +54,7 @@
 <script setup lang="ts">
 import { ref, onBeforeMount, computed } from 'vue'
 import { RouterView } from 'vue-router';
-import { routes } from "./main"
+import { nav_bar_routes as routes } from "./main"
 import { createHTTP, USER_AUTHOR_ID_COOKIE } from './axiosCalls'
 import LoginPage from './components/LoginPage.vue'
 import Cookies from 'js-cookie';
