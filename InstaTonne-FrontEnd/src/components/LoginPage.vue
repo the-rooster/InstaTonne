@@ -91,7 +91,6 @@
   import { ref, onBeforeMount, computed } from 'vue'
   import Cookies from 'js-cookie';
   import { createHTTP, createFormBody, USER_AUTHOR_ID_COOKIE } from '../axiosCalls'
-  import {router} from "../main";
 
   const emits = defineEmits(["LoggedIn"])
 
