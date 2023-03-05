@@ -41,7 +41,7 @@ import { USER_AUTHOR_ID_COOKIE } from "./axiosCalls";
 const routes = [
   { path: "/", name: "Home", component: HomePage },
   { path: "/about", name: "About", component: AboutPage },
-  { path: "/PostEditor", name: "PostEditor", component: PostEditor },
+  { path: "/posteditor/:postid/", name: "PostEditor", component: PostEditor },
   {
     path: "/FollowRequests",
     name: "FollowRequests",
@@ -55,7 +55,6 @@ const routes = [
 export const nav_bar_routes = [
   { path: "/", name: "Home", component: HomePage },
   { path: "/about", name: "About", component: AboutPage },
-  { path: "/PostEditor", name: "PostEditor", component: PostEditor },
   {
     path: "/FollowRequests",
     name: "FollowRequests",
