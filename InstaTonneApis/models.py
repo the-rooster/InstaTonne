@@ -2,9 +2,12 @@ from django.db import models
 from rest_framework import serializers
 import json
 import uuid
+from InstaTonne.settings import HOSTNAME
 
 def default_id_generator():
     return ''.join(str(uuid.uuid4()).split("-"))
+
+
 
 class Author(models.Model):
     id = models.TextField(primary_key=True, default=default_id_generator, editable=False)
@@ -30,17 +33,19 @@ class AuthorSerializer(serializers.ModelSerializer):
 
 
 class Follow(models.Model):
-    followerAuthorId = models.ForeignKey(Author, related_name='followerAuthorId', on_delete=models.CASCADE)
-    followeeAuthorId = models.ForeignKey(Author, related_name='followeeAuthorId', on_delete=models.CASCADE)
+    id = models.TextField(primary_key=True, default=default_id_generator, editable=False)
+    object = models.ForeignKey(Author,on_delete=models.CASCADE)
+    follower_url = models.TextField()
+    summary = models.TextField()
+    accepted = models.BooleanField()
 
 
 class FollowSerializer(serializers.ModelSerializer):
-    followerAuthorId = AuthorSerializer()
-    followeeAuthorId = AuthorSerializer()
+    object = AuthorSerializer()
 
     class Meta:
         model = Follow
-        fields = '__all__'
+        fields = ['object','summary','accepted']
 
 
 class Post(models.Model):

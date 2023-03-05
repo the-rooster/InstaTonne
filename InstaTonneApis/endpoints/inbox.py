@@ -1,12 +1,14 @@
 from django.http import HttpRequest, HttpResponse
-from ..models import Author, Post, Request, Comment, Like, Inbox, PostSerializer, CommentSerializer, LikeSerializer, RequestSerializer
+from ..models import Author, Follow, Inbox
 import json
 import requests
 from InstaTonne.settings import HOSTNAME
 from django.views.decorators.csrf import csrf_exempt
-from .utils import check_authenticated, get_author
+from .utils import check_authenticated, get_author, get_all_urls
 import time
 from threading import Thread, Lock
+from InstaTonne.settings import HOSTNAME
+from urllib.parse import quote
 
 @csrf_exempt
 def inbox_endpoint(request : HttpRequest, author_id : str):
@@ -36,38 +38,39 @@ def get_inbox(request : HttpRequest, id : str):
 
     inbox = Inbox.objects.filter(author=user)
     
-    inbox_lock = Lock()
-    threads : list[Thread] = []
-    start = time.time()
-    for item in inbox:
+    urls = [item.url for item in inbox]
 
-        print(item.url)
-        try:
-            def get_item(url : str):
-                response : requests.Response = requests.get(url)
-                print("STATUS: ",response.status_code)
-                if response.status_code >= 200 and response.status_code < 300:
-                    print(response.text)
-                    inbox_lock.acquire()
-                    result['items'] += [json.loads(response.text)]
-                    inbox_lock.release()
-            thr = Thread(target=get_item,args=(item.url,),daemon=True)
-            thr.start()
-            threads.append(thr)
-        except Exception as e:
-            print(e)
-            print("requested server dead. oops")
-            continue
-
-
-    for thread in threads:
-        thread.join()
-
-    print("TIME: ",time.time() - start)
+    result['items'] = get_all_urls(urls)
         
     print(result)
     return HttpResponse(content=json.dumps(result),status=200,content_type="application/json")
 
+def parse_inbox_post(data : dict, user : Author):
+
+    if "type" not in data:
+        return None
+    
+    data_type = str(data["type"].lower())
+
+    if data_type == "follow":
+
+        return parse_inbox_follow_request(data,user)
+
+def parse_inbox_follow_request(data : dict, user: Author):
+        try:
+            #parse expected fields in follow request here
+            actor_id = data["actor"]["id"]
+            summary = data["summary"]
+        except Exception as e:
+            print("INBOX FOLLOW REQUEST BROKEN!")
+            print(e)
+            return None
+
+        obj = Follow.objects.create(object=user,follower_url=actor_id,accepted=False,summary=summary)
+
+        obj.save()
+
+        return HOSTNAME + "/authors/" + user.id + "/followers/" + quote(actor_id)
 """
 Post an item to a users inbox!
 """
@@ -75,14 +78,12 @@ def post_inbox(request : HttpRequest, id : str):
     
     #parse request body
     data = request.body
-
     try:
         data = json.loads(data)
     except Exception as e:
         return HttpResponse(content="expected json!",status=400)
     
-    if "id" not in data:
-        return HttpResponse(content="expected id field!",status=400)
+
     
     #receiver author object
     author = Author.objects.filter(pk=id)
@@ -93,12 +94,13 @@ def post_inbox(request : HttpRequest, id : str):
     #should only be 1 author so just 0 index
     author = author[0]
 
+    #parse inbox request
+    url = parse_inbox_post(data,author)
 
-    if "type" not in data.keys():
-        print('here')
+    if not url:
         return HttpResponse(status=400)
     
-    obj = Inbox.objects.create(author=author,url=data["id"])
+    obj = Inbox.objects.create(author=author,url=url)
 
     obj.save()
 
