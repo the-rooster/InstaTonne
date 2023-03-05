@@ -1,6 +1,34 @@
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse
 from ..models import Author
 
+def get_author(id : str):
+    user = Author.objects.filter(pk=id)
+    if not user:
+        print("db corrupted probably. user exists but author does not.")
+        return None
+    return user[0]
+
+# check if a user is authenticated
+def check_authenticated(request : HttpRequest, id : str):
+
+    if not request.user.is_authenticated:
+        print('not authenticated')
+        return None
+    
+    user = Author.objects.filter(pk=id)
+    if not user:
+        print("db corrupted probably. user exists but author does not.")
+        return None
+    
+    user = user[0]
+    print(user.userID,request.user.pk)
+    if str(user.userID) != str(request.user.pk):
+        print('requesting wrong user!!')
+        print(request.user.pk,user.userID)
+        return None
+    
+    return user
+    
 def valid_requesting_user(request: HttpRequest, required_author_id: str) -> bool:
     if not request.user.is_authenticated:
         return False
