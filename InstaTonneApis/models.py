@@ -138,8 +138,5 @@ class LikeSerializer(serializers.ModelSerializer):
 
 
 class Inbox(models.Model):
-    ownerId = models.ForeignKey(Author,on_delete=models.CASCADE)
-    post = models.ForeignKey(Post,on_delete=models.CASCADE,null=True,blank=True)
-    comment = models.ForeignKey(Comment,on_delete=models.CASCADE,null=True,blank=True)
-    like = models.ForeignKey(Like,on_delete=models.CASCADE,null=True,blank=True)
-    request = models.ForeignKey(Request,on_delete=models.CASCADE,null=True,blank=True)
+    author = models.ForeignKey(Author,on_delete=models.CASCADE)
+    url = models.TextField()
