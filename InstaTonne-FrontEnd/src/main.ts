@@ -38,7 +38,7 @@ import UserPost from "./components/UserPost.vue";
 const routes = [
   { path: "/", name: "Home", component: HomePage },
   { path: "/about", name: "About", component: AboutPage },
-  { path: "/PostEditor", name: "PostEditor", component: PostEditor },
+  { path: "/authors/:id/posteditor/:postid/", name: "PostEditor", component: PostEditor },
   {
     path: "/FollowRequests",
     name: "FollowRequests",
@@ -52,7 +52,6 @@ const routes = [
 export const nav_bar_routes = [
   { path: "/", name: "Home", component: HomePage },
   { path: "/about", name: "About", component: AboutPage },
-  { path: "/PostEditor", name: "PostEditor", component: PostEditor },
   {
     path: "/FollowRequests",
     name: "FollowRequests",

@@ -1,22 +1,19 @@
 <template>
-    <div class="viewBox">
-
-      <br />
-      <div>
-
-          <PostFullCard
-            v-bind:postData="post"
-            v-if="(post.type = 'post')"
-          ></PostFullCard>
-
-      </div>
-      <div id="app"></div>
+  <div class="viewBox">
+    <br>
+    <div>
+      <PostFullCard
+        v-if="(post.type = 'post')"
+        :post-data="post"
+      />
     </div>
-  </template>
+    <div id="app" />
+  </div>
+</template>
   
   <script setup lang="ts">
   import { ref } from "vue";
-  import {useRoute} from "vue-router";
+  import { useRoute } from "vue-router";
   import PostFullCard from "./stream_cards/PostFullCard.vue";
   import Cookies from "js-cookie";
   // defineProps<{ msg: string }>()
