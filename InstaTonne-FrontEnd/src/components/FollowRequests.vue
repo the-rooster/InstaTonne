@@ -8,6 +8,7 @@
       width="20"
       size="200"
       style="margin: 10em;"
+      class="loadingIcon"
     />
     <div v-else>
       <div style="display: flex;">

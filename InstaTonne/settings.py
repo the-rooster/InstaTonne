@@ -60,10 +60,12 @@ MIDDLEWARE = [
 # This will need to be updated to allow other groups to connect to us
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173", # allow frontend
+    "http://localhost:3000", # allow tests
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173", # allow frontend
+    "http://localhost:3000", # allow tests
 ]
 
 CORS_ALLOW_HEADERS = [
@@ -75,6 +77,7 @@ CSRF_COOKIE_HTTPONLY = False
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173", # allow frontend
+    "http://localhost:3000", # allow tests
 ]
 
 CORS_ALLOW_CREDENTIALS = True
