@@ -1,9 +1,12 @@
 from django.http import HttpRequest, HttpResponse
 from ..models import Author, Post, Request, Comment, Like, Inbox, PostSerializer, CommentSerializer, LikeSerializer, RequestSerializer
 import json
-import uuid
+import requests
 from InstaTonne.settings import HOSTNAME
 from django.views.decorators.csrf import csrf_exempt
+from .utils import check_authenticated, get_author
+import time
+from threading import Thread, Lock
 
 @csrf_exempt
 def inbox_endpoint(request : HttpRequest, author_id : str):
@@ -19,71 +22,51 @@ def inbox_endpoint(request : HttpRequest, author_id : str):
 
 def get_inbox(request : HttpRequest, id : str):
 
-    resp = {
+    result = {
         "type" : "inbox",
         "author" : "http://" + request.get_host() + "/authors/" + str(id) + "/",
         "items" : []
     }
-    if not request.user.is_authenticated:
-        print('not authenticated')
+    
+    # user = check_authenticated(request,id)
+    user = get_author(id)
+    if not user:
         return HttpResponse(status=403)
     
-    user = Author.objects.filter(pk=id)
-    if not user:
-        print("db corrupted probably. user exists but author does not.")
-        return HttpResponse(status=500)
-    
-    user = user[0]
-    print(user.userID,request.user.pk)
-    if str(user.userID) != str(request.user.pk):
-        print('requesting wrong user!!')
-        print(request.user.pk,user.userID)
-        return HttpResponse(status=403)
-    
-    #user is now authenticated
-    #get all posts from followers
 
-    #get author object
+    inbox = Inbox.objects.filter(author=user)
     
-
-    if not user:
-        #this shouldn't happen
-        return HttpResponse(status=500)
-    
-
-    inbox = Inbox.objects.filter(ownerId=user)
-
-    #TODO: do id and object fields correctly. use the url, not their object id in our local db
+    inbox_lock = Lock()
+    threads : list[Thread] = []
+    start = time.time()
     for item in inbox:
-        print(item)
-        data = None
-        if item.post:
-            data = PostSerializer(item.post).data
-        elif item.comment:
-            data = CommentSerializer(item.comment).data
 
-            #change object to just be the url and also call it id according to spec
-            # temp = data["post"]
-            # data["id"] = temp
-            # del temp
-
-        elif item.like:
-
-            data = LikeSerializer(item.like).data
-            print(data)
-            #change object to just be the url to the post to match the spec
-            #to do this, we must fetch the url from the post object
-
-            data["object"] = item.like.post.id_url
-            del data["post"]
-        elif item.request:
-            data = RequestSerializer(item.request).data
+        print(item.url)
+        try:
+            def get_item(url : str):
+                response : requests.Response = requests.get(url)
+                print("STATUS: ",response.status_code)
+                if response.status_code >= 200 and response.status_code < 300:
+                    print(response.text)
+                    inbox_lock.acquire()
+                    result['items'] += [json.loads(response.text)]
+                    inbox_lock.release()
+            thr = Thread(target=get_item,args=(item.url,),daemon=True)
+            thr.start()
+            threads.append(thr)
+        except Exception as e:
+            print(e)
+            print("requested server dead. oops")
+            continue
 
 
-        resp["items"].append(data)
+    for thread in threads:
+        thread.join()
 
-    print(resp)
-    return HttpResponse(content=json.dumps(resp),status=200)
+    print("TIME: ",time.time() - start)
+        
+    print(result)
+    return HttpResponse(content=json.dumps(result),status=200,content_type="application/json")
 
 """
 Post an item to a users inbox!
@@ -96,7 +79,10 @@ def post_inbox(request : HttpRequest, id : str):
     try:
         data = json.loads(data)
     except Exception as e:
-        return HttpResponse(status=400)
+        return HttpResponse(content="expected json!",status=400)
+    
+    if "id" not in data:
+        return HttpResponse(content="expected id field!",status=400)
     
     #receiver author object
     author = Author.objects.filter(pk=id)
@@ -112,138 +98,22 @@ def post_inbox(request : HttpRequest, id : str):
         print('here')
         return HttpResponse(status=400)
     
-    #format type to be consistent
-    data["type"] = str(data["type"]).lower()
+    obj = Inbox.objects.create(author=author,url=data["id"])
 
-    try:
-        if data["type"] == "post":
-            #need to create author object if it doesn't exist here
-
-            author_id = data["author"]["id"]
-            author_id = author_id.split("/")[-1]
-
-            check_author = Author.objects.filter(id=author_id)
-
-            if not check_author:
-                data["author"]["id"] = author_id
-                creator = Author.objects.create(**(data["author"]))
-            else:
-                creator = Author.objects.get(id=author_id)
-
-            data["author"] = creator
-            data["id_url"] = data["id"]
-            del data["id"]
-            
-
-            new_post = Post.objects.create(**data)
-            new_post.save()
-
-            inbox = Inbox.objects.create(ownerId=author,post=new_post)
-            inbox.save()
-        elif data["type"] == "follow":
-            
-            actor_id = data["actor"]["id"]
-            actor_id = actor_id.split("/")[-1]
-
-            print(actor_id)
-            check_actor = Author.objects.filter(id=actor_id)
-            print(check_actor)
-
-            data["object"] = author
-
-            if not check_actor:
-                data["actor"]["id"] = actor_id
-                actor = Author.objects.create(**(data["actor"]))
-                print("here")
-            else:
-                actor = Author.objects.get(id=actor_id)
-            data["actor"] = actor
-
-            print("request object being made!")
-            new_request = Request.objects.create(**data)
-            new_request.save()
-            inbox = Inbox.objects.create(ownerId=author,request=new_request)
-            inbox.save()
-        elif data["type"] == "like":
-            author_id = data["author"]["id"]
-            author_id = author_id.split("/")[-1]
-
-            check_author = Author.objects.filter(id=author_id)
-
-            if not check_author:
-                data["author"]["id"] = author_id
-
-                creator = Author.objects.create(**(data["author"]))
-            else:
-                creator = Author.objects.get(id=author_id)
-
-
-            #need to create the post object here
-            post = Post.objects.create(type="post",id_url=data["object"])
-
-            #object field is no longer needed, and not used in our db (it is the url in post)
-            del data["object"]
-
-            #format data for db
-            data["author"] = creator
-            data["post"] = post
-
-            #save to db
-            new_like = Like.objects.create(**data)
-            new_like.save()
-            inbox = Inbox.objects.create(ownerId=author,like=new_like)
-            inbox.save()
-        elif data["type"] == "comment":
-            #parse incoming comment data
-            author_id = data["author"]["id"]
-            author_id = author_id.split("/")[-1]
-
-            check_author = Author.objects.filter(pk=author_id)
-
-            if not check_author:
-                del data["author"]["id"]
-                author_id = Author.objects.create(**(data["author"]))
-
-            data["author"] = author_id
-
-            #save id to url field. incoming ids are urls, and we make a custom id on our end for stuff
-            temp = data["id"]
-            data["id_url"] = temp
-            del data["id"]
-
-            #create a new comment object, and send to the receivers inbox
-            new_comment = Comment.objects.create(**data)
-            new_comment.save()
-
-            inbox = Inbox.objects.create(ownerId=author,comment=new_comment)
-            inbox.save()
-        else:
-            #not a valid type
-            print("here")
-            return HttpResponse(status=400)
-
-    except Exception as e:
-        #something in the request schema is broken
-        print(e)
-        return HttpResponse(status=400)
+    obj.save()
 
     return HttpResponse(status=200)
 
 def delete_inbox(request : HttpRequest, id : str):
 
-    if not request.user.is_authenticated:
-        print('not authenticated')
-        return HttpResponse(status=403)
-    
-    user = Author.objects.filter(id=id)
-    if not user:
-        print("db corrupted probably. user exists but author does not.")
-        return HttpResponse(status=500)
-    user = user[0]
+    # user = check_authenticated(request,id)
+    user = get_author(id)
 
-    if str(request.user.pk) != str(user.userID):
-        print('requesting wrong user')
+    if not user:
+        print("test")
         return HttpResponse(status=403)
+
+
     
     #user is now authenticated
     #get all posts from followers
@@ -251,7 +121,7 @@ def delete_inbox(request : HttpRequest, id : str):
     
     #now clear the inbox
     print(id)
-    res = Inbox.objects.filter(ownerId=user).delete()
+    res = Inbox.objects.filter(author=user).delete()
     print(res)
     return HttpResponse(status=200)
 
