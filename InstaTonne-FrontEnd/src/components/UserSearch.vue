@@ -21,7 +21,7 @@
         class="flex-content"
         src="ProfilePage.vue"
       >
-        <router-link to="/ProfilePage">
+        <router-link v-bind:to="`ProfilePage/${encodeURIComponent(user.id)}/`">
           <AuthorCard
             :author-info="user"
             class="authorCard"
@@ -29,6 +29,14 @@
         </router-link>
       </div>
     </div>
+    <div class="arrows">
+      <v-icon icon="mdi-arrow-left-bold-outline" size="x-large" @click="previousPage"></v-icon> 
+      <div style="padding-left:2vw"/>
+      <p>Page {{pageNum.page}}</p>
+      <div style="padding-left:2vw"/>
+      <v-icon icon="mdi-arrow-right-bold-outline" size="x-large" @click="nextPage"></v-icon>
+    </div>
+    
   </div>
 </template>
   
@@ -36,17 +44,42 @@
   import { ref, onBeforeMount, computed } from 'vue'
   import AuthorCard from './AuthorCard.vue'
   import { createHTTP } from '../axiosCalls'
+import { reactive } from 'vue';
+import { onBeforeUpdate } from 'vue';
 
   const loading = ref(true)
   const result : any[] = [];
   const postData = ref(result);
   const search = ref("")
 
-  onBeforeMount(async () => {
-    await createHTTP('authors?page=1&size=2').get().then((response: { data: object }) => {
+  const pageSize = 5;
+  const pageNum = reactive({"page" : 1});
+
+  function nextPage(){
+
+    pageNum.page++;
+    fetchAuthors()
+  }
+
+  function previousPage(){
+
+    if (pageNum.page > 1){
+      pageNum.page--;
+      fetchAuthors()
+    }
+
+  }
+
+  async function fetchAuthors(){
+    await createHTTP(`authors?page=${pageNum.page}&size=${pageSize}`).get().then((response: { data: object }) => {
+      console.log("YUP");
+      console.log(response);
       postData.value = response.data.items;
       loading.value = false;
     });
+  }
+
+  onBeforeMount(() => {fetchAuthors()
   });
 
   const myVal = computed({
@@ -98,6 +131,10 @@
   .authorCard {
     width: 100%;
     height: 100%
+  }
+  .arrows {
+    display:flex;
+    flex-direction: row;
   }
 </style>
   

@@ -1,39 +1,30 @@
 <template>
-  <v-card
-    :elevation="10"
-    class="authorBox"
-  >
-    <template #title>
-      <a
-        :href="props.authorInfo?.url"
-        style="font-size: 1.25em;"
-      >
-        {{ props.authorInfo?.displayName }}
-      </a>
-    </template>
+
+<v-card
+  :elevation="10"
+  class="authorBox"
+>
+    {{ props.authorInfo?.displayName }}
+
     <v-card-item>
       <img
         v-if="props.authorInfo?.profileImage"
         :src="props.authorInfo?.profileImage"
-        class="pfp"
+        class="profile-picture"
       >
       <img
         v-else
-        class="pfp"
+        class="profile-picture"
         src="../assets/EpicLogo.svg"
       >
     </v-card-item>
-    <v-card-item>
-      <a
-        :href="props.authorInfo?.github"
-      >
-        (github)
-      </a>
-    </v-card-item>
-  </v-card>
+
+</v-card>
 </template>
     
 <script setup lang="ts">
+import { ref } from 'vue';
+
 
 const props = defineProps({
 authorInfo: {
@@ -42,17 +33,19 @@ authorInfo: {
 }
 })
 
+
 </script>
 
 <style scoped>
 .authorBox {
     width: 10em;
-    height: 15em;
-    background-color: aquamarine;
+    height: 10em;
+    background-color: rgb(214, 227, 222);
 }
-.pfp {
-    width: 7em;
-    height: 7em;
+.profile-picture {
+  width: 10vw;
+  height: 10vw;
+  border-radius: 100%;
 }
 </style>
     

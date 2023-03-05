@@ -14,6 +14,8 @@ import VueAxios from "vue-axios";
 import "material-design-icons-iconfont/dist/material-design-icons.css";
 import "@mdi/font/css/materialdesignicons.css";
 
+import Cookies from "js-cookie";
+
 const vuetify = createVuetify({
   components,
   directives,
@@ -32,6 +34,7 @@ import FollowRequests from "./components/FollowRequests.vue";
 import ProfilePage from "./components/ProfilePage.vue";
 import UserSearch from "./components/UserSearch.vue";
 import UserPost from "./components/UserPost.vue";
+import { USER_AUTHOR_ID_COOKIE } from "./axiosCalls";
 // 2. Define some routes
 // Each route should map to a component.
 // We'll talk about nested routes later.
@@ -44,7 +47,7 @@ const routes = [
     name: "FollowRequests",
     component: FollowRequests,
   },
-  { path: "/ProfilePage", name: "ProfilePage", component: ProfilePage },
+  { path: "/ProfilePage/:id", name: "ProfilePage", component: ProfilePage },
   { path: "/UserSearch", name: "UserSearch", component: UserSearch },
   {path: "/authors/:id/posts/:postid",name : "UserPost", component: UserPost}
 ];
@@ -58,7 +61,7 @@ export const nav_bar_routes = [
     name: "FollowRequests",
     component: FollowRequests,
   },
-  { path: "/ProfilePage", name: "ProfilePage", component: ProfilePage },
+  { path: `/ProfilePage/${Cookies.get(USER_AUTHOR_ID_COOKIE)}`, name: "ProfilePage", component: ProfilePage },
   { path: "/UserSearch", name: "UserSearch", component: UserSearch },
 ];
 
