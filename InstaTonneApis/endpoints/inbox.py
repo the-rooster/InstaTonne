@@ -56,7 +56,9 @@ def parse_inbox_post(data : dict, user : Author):
 
         return parse_inbox_follow_request(data,user)
 
+
 def parse_inbox_follow_request(data : dict, user: Author):
+        
         try:
             #parse expected fields in follow request here
             actor_id = data["actor"]["id"]
