@@ -24,7 +24,7 @@
       "id" : "1",
       "userID" : "1",
       "type" : "author",
-      "id_url" : "http://localhost:8000/authors/1/",
+      "id_url" : "http://localhost:8000/authors/1",
       "url" : "url1",
       "host" : "host1",
       "displayName" : "displayName1",
@@ -39,7 +39,7 @@
         "id" : "2",
 	"userID" : "2",
         "type" : "author",
-        "id_url" : "http://localhost:8000/authors/2/",
+        "id_url" : "http://localhost:8000/authors/2",
         "url" : "url2",
         "host" : "host2",
         "displayName" : "displayName2",
@@ -53,7 +53,7 @@
       "id" : "3",
       "userID" : "3",
       "type" : "author",
-      "id_url" : "http://localhost:8000/authors/3/",
+      "id_url" : "http://localhost:8000/authors/3",
       "url" : "url3",
       "host" : "host3",
       "displayName" : "displayName3",
@@ -68,7 +68,7 @@
       "object" : "1",
       "follower_url" : "http://localhost:8000/authors/2/",
       "summary" : "user2 wants to follow user1",
-      "accepted" : false
+      "accepted" : true
     }
   },
   {
@@ -78,7 +78,17 @@
       "object" : "2",
       "follower_url" : "http://localhost:8000/authors/1/",
       "summary" : "user1 wants to follow user2",
-      "accepted" : false
+      "accepted" : true
+    }
+  },
+  {
+    "model" : "InstaTonneApis.Follow",
+    "fields": {
+      "id" : "6",
+      "object" : "1",
+      "follower_url" : "http://localhost:8001/authors/1",
+      "summary" : "user1 wants to follow user2",
+      "accepted" : true
     }
   },
   {

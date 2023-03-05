@@ -64,9 +64,9 @@
     "fields": {
       "id" : "4",
       "object" : "1",
-      "follower_url" : "http://localhost:8000/authors/2",
+      "follower_url" : "http://localhost:8000/authors/1",
       "summary" : "user2 wants to follow user1",
-      "accepted" : false
+      "accepted" : true
     }
   },
   {
@@ -74,9 +74,9 @@
     "fields": {
       "id" : "5",
       "object" : "2",
-      "follower_url" : "http://localhost:8000/authors/1",
+      "follower_url" : "http://localhost:8001/authors/1",
       "summary" : "user1 wants to follow user2",
-      "accepted" : false
+      "accepted" : true
     }
   },
   {

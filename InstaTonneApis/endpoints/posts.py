@@ -2,7 +2,7 @@ from django.http import HttpRequest, HttpResponse
 import json
 from ..models import Post, PostSerializer, Comment, Author
 from django.core.paginator import Paginator
-from .utils import make_comments_url, make_post_url, valid_requesting_user, get_all_urls, get_one_url
+from .utils import make_comments_url, make_post_url, valid_requesting_user, get_all_urls, get_one_url, send_to_inboxes
 import re
 
 
@@ -11,7 +11,7 @@ JPEG_CONTENT_TYPE = "image/jpeg;base64"
 
 
 def single_author_post(request: HttpRequest):
-    matched = re.search(r"^\/authors\/(.*?)\/posts\/(.*)\/?$", request.path)
+    matched = re.search(r"^\/authors\/(.*?)\/posts\/(.*?)\/?$", request.path)
     if matched:
         author_id: str = matched.group(1)
         post_id: str = matched.group(2)
@@ -34,7 +34,7 @@ def single_author_post(request: HttpRequest):
 
 
 def single_author_posts(request: HttpRequest):
-    matched = re.search(r"^\/authors\/(.*)\/posts\/?$", request.path)
+    matched = re.search(r"^\/authors\/(.*?)\/posts\/?$", request.path)
     if matched:
         author_id: str = matched.group(1)
     else:
@@ -244,7 +244,7 @@ def single_author_post_put(request: HttpRequest, author_id: str, post_id: str):
             return HttpResponse(status=404)
         
         body: dict = json.loads(request.body)
-        Post.objects.create(
+        post: Post = Post.objects.create(
             id = post_id,
             id_url = make_post_url(request.get_host(), author_id, post_id),
             type = "post",
@@ -259,6 +259,8 @@ def single_author_post_put(request: HttpRequest, author_id: str, post_id: str):
             unlisted = body["unlisted"],
             author = author
         )
+
+        send_to_inboxes(author_id, author.id_url, post_id, body["visibility"])
 
         return HttpResponse(status=204)
     except Exception as e:

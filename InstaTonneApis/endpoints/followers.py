@@ -1,13 +1,41 @@
 from django.http import HttpRequest, HttpResponse
 import json
 from ..models import Follow, FollowSerializer, Author
-from .utils import valid_requesting_user, get_all_urls
+from .utils import valid_requesting_user, get_all_urls, get_one_url
 from urllib.parse import unquote
+import re
 
-# endpoints for /authors/<author_id>/followers
-def single_author_followers(request: HttpRequest, author_id: str):
-    if request.method == "GET":
+
+def single_author_followers(request: HttpRequest):
+    matched = re.search(r"^\/authors\/(.*?)\/followers\/?$", request.path)
+    if matched:
+        author_id: str = matched.group(1)
+    else:
+        return HttpResponse(status=405)
+
+    if "/" in author_id and request.method == "GET":
+        return single_author_followers_get_remote(request, author_id)
+    elif "/" in author_id:
+        return HttpResponse(status=405)
+    elif request.method == "GET":
         return single_author_followers_get(request, author_id)  
+    return HttpResponse(status=405)
+
+
+def single_author_follower(request: HttpRequest):
+    matched = re.search(r"^\/authors\/(.*?)\/follower\/(.*?)\/?$", request.path)
+    if matched:
+        author_id: str = matched.group(1)
+        foreign_author_id: str = matched.group(2)
+    else:
+        return HttpResponse(status=405)
+
+    if request.method == "DELETE":
+        return delete_author_follower(request, author_id, foreign_author_id)
+    elif request.method == "PUT":
+        return put_author_follower(request, author_id, foreign_author_id)
+    elif request.method == "GET":
+        return check_author_follower(request, author_id, foreign_author_id)
     return HttpResponse(status=405)
 
 
@@ -26,25 +54,11 @@ def single_author_followers_get(request: HttpRequest, author_id: str):
     return HttpResponse(content=res, status=200)
 
 
-# endpoints for /authors/<author_id>/followers/<foreign_author_id>
-def single_author_follower(request: HttpRequest):
-    #parse author_id and foreign_author_id from request url since we gotta use re_path here
-    author_id: str = request.get_full_path().split("/")[2]
-    foreign_author_id: str = "/".join(request.get_full_path().split("/")[4:])
-
-    print("AUTHOR_ID : ",author_id)
-    print("FOREIGN AUTHOR ID: ",foreign_author_id)
-
-    #remove urlencoding on foreign_author_id
-    foreign_author_id = unquote(foreign_author_id)
-
-    if request.method == "DELETE":
-        return delete_author_follower(request, author_id, foreign_author_id)
-    elif request.method == "PUT":
-        return put_author_follower(request, author_id, foreign_author_id)
-    elif request.method == "GET":
-        return check_author_follower(request, author_id, foreign_author_id)
-    return HttpResponse(status=405)
+# get the followers of a remote author
+def single_author_followers_get_remote(request: HttpRequest, author_id: str):
+    remote_url = author_id + '/followers/'
+    status_code, text = get_one_url(remote_url)
+    return HttpResponse(status=status_code, content=text)
 
 
 # remove the follow where foreign_author follows author
