@@ -3,8 +3,9 @@ from ..models import Author
 from threading import Thread, Lock
 import json
 import requests
+from typing import Tuple
 
-def get_all_urls(urls):
+def get_all_urls(urls: list[str]):
     inbox_lock = Lock()
     threads : list[Thread] = []
     result = []
@@ -36,6 +37,14 @@ def get_all_urls(urls):
         thread.join()
     
     return result
+
+def get_one_url(url: str) -> Tuple[int, str]:
+    try:
+        response : requests.Response = requests.get(url)
+        return (response.status_code, response.text)
+    except Exception as e:
+        return (500, str(e))
+
 def get_author(id : str):
     user = Author.objects.filter(pk=id)
     if not user:

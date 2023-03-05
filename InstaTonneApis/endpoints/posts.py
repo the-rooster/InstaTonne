@@ -2,8 +2,9 @@ from django.http import HttpRequest, HttpResponse
 import json
 from ..models import Post, PostSerializer, Comment, Author
 from django.core.paginator import Paginator
-from .utils import make_comments_url, make_post_url, valid_requesting_user
+from .utils import make_comments_url, make_post_url, valid_requesting_user, get_all_urls, get_one_url
 from django.views.decorators.csrf import csrf_exempt
+import re
 
 PNG_CONTENT_TYPE = "image/png;base64"
 JPEG_CONTENT_TYPE = "image/jpeg;base64"
@@ -21,7 +22,15 @@ def single_author_post(request: HttpRequest, author_id: str, post_id: str):
     return HttpResponse(status=405)
 
 
-def single_author_posts(request: HttpRequest, author_id: str):
+def single_author_posts(request: HttpRequest):
+    matched = re.search(r"authors\/(.*)\/posts\/", request.path)
+    if matched:
+        author_id: str = matched.group(1)
+    else:
+        return HttpResponse(status=405)
+    
+    if "http://" in author_id and request.method == "GET":
+        return single_author_posts_get_remote(request, author_id)
     if request.method == "GET":
         return single_author_posts_get(request, author_id)
     elif request.method == "POST":
@@ -72,6 +81,11 @@ def single_author_post_get(request: HttpRequest, author_id: str, post_id: str):
 
 # get all the posts of an author
 def single_author_posts_get(request: HttpRequest, author_id: str):
+    author: Author | None = Author.objects.all().filter(pk=author_id).first()
+
+    if author is None:
+        return HttpResponse(status=404)
+
     posts = Post.objects.all().filter(author=author_id).order_by("published")
     page_num = request.GET.get("page")
     page_size = request.GET.get("size")
@@ -100,6 +114,16 @@ def single_author_posts_get(request: HttpRequest, author_id: str):
     })
 
     return HttpResponse(content=res, status=200)
+
+
+# get all the posts of a remote author
+def single_author_posts_get_remote(request: HttpRequest, author_id: str):
+    query = request.META.get('QUERY_STRING', '')
+    if query:
+        query = '?' + query
+    remote_url = author_id + '/posts' + query
+    status_code, text = get_one_url(remote_url)
+    return HttpResponse(status=status_code, content=text)
 
 
 # update an existing post
