@@ -1,6 +1,41 @@
 from django.http import HttpRequest, HttpResponse
 from ..models import Author
+from threading import Thread, Lock
+import json
+import requests
 
+def get_all_urls(urls : list[str]):
+    inbox_lock = Lock()
+    threads : list[Thread] = []
+    result = []
+    for url in urls:
+
+        print(url)
+
+        def get_item(url : str):
+            try:
+                response : requests.Response = requests.get(url)
+                print("STATUS: ",response.status_code)
+                if response.status_code >= 200 and response.status_code < 300:
+                    print(response.text)
+                    inbox_lock.acquire()
+                    print(response.text)
+                    result.append(json.loads(response.text))
+                    inbox_lock.release()
+            except Exception as e:
+                print("REQUEST ERROR: ",e)
+                inbox_lock.acquire()
+                result.append({"error" : "url down"})
+                inbox_lock.release()
+        thr = Thread(target=get_item,args=(url,),daemon=True)
+
+        thr.start()
+        threads.append(thr)
+
+    for thread in threads:
+        thread.join()
+    
+    return result
 def get_author(id : str):
     user = Author.objects.filter(pk=id)
     if not user:

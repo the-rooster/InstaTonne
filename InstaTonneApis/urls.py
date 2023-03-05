@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from rest_framework import routers, serializers, viewsets
 from rest_framework.schemas import get_schema_view
 from .endpoints.authors import single_author, authors, get_author_id
@@ -35,7 +35,7 @@ urlpatterns = [
     path("authors/id/",get_author_id),
     path("authors/<str:author_id>/", single_author),
     path("authors/<str:author_id>/followers/", single_author_followers),
-    path("authors/<str:author_id>/followers/<str:foreign_author_id>/", single_author_follower),
+    re_path(r"authors\/.*\/followers\/.*", single_author_follower),
     path("register/",register_author),
     path("login/",login),
     path("authors/<str:author_id>/posts/", single_author_posts),
