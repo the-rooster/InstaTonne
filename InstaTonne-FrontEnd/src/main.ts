@@ -14,6 +14,8 @@ import VueAxios from "vue-axios";
 import "material-design-icons-iconfont/dist/material-design-icons.css";
 import "@mdi/font/css/materialdesignicons.css";
 
+import Cookies from "js-cookie";
+
 const vuetify = createVuetify({
   components,
   directives,
@@ -26,25 +28,23 @@ const vuetify = createVuetify({
 // These can be imported from other files
 import HomePage from "./components/HomePage.vue";
 import AboutPage from "./components/AboutPage.vue";
-import HelloWorld from "./components/HelloWorld.vue";
-import PostEditor from "./components/PostEditor.vue";
-import FollowRequests from "./components/FollowRequests.vue";
+import EditPostPage from "./components/EditPostPage.vue";
+import FollowRequestsPage from "./components/FollowRequestsPage.vue"
+import CreatePostPage from "./components/CreatePostPage.vue";
 import ProfilePage from "./components/ProfilePage.vue";
 import UserSearch from "./components/UserSearch.vue";
 import UserPost from "./components/UserPost.vue";
+import { USER_AUTHOR_ID_COOKIE } from "./axiosCalls";
 // 2. Define some routes
 // Each route should map to a component.
 // We'll talk about nested routes later.
 const routes = [
   { path: "/", name: "Home", component: HomePage },
   { path: "/about", name: "About", component: AboutPage },
-  { path: "/PostEditor", name: "PostEditor", component: PostEditor },
-  {
-    path: "/FollowRequests",
-    name: "FollowRequests",
-    component: FollowRequests,
-  },
-  { path: "/ProfilePage", name: "ProfilePage", component: ProfilePage },
+  { path: "/editPost/:postid/", name: "EditPost", component: EditPostPage },
+  { path: "/FollowRequests", name: "FollowRequests", component: FollowRequestsPage },
+  { path: "/CreatePost", name: "Create New Post", component: CreatePostPage },
+  { path: "/ProfilePage/:id", name: "ProfilePage", component: ProfilePage },
   { path: "/UserSearch", name: "UserSearch", component: UserSearch },
   {path: "/authors/:id/posts/:postid",name : "UserPost", component: UserPost}
 ];
@@ -52,13 +52,9 @@ const routes = [
 export const nav_bar_routes = [
   { path: "/", name: "Home", component: HomePage },
   { path: "/about", name: "About", component: AboutPage },
-  { path: "/PostEditor", name: "PostEditor", component: PostEditor },
-  {
-    path: "/FollowRequests",
-    name: "FollowRequests",
-    component: FollowRequests,
-  },
-  { path: "/ProfilePage", name: "ProfilePage", component: ProfilePage },
+  { path: "/FollowRequests", name: "FollowRequests", component: FollowRequestsPage },
+  { path: "/CreatePost", name: "Create New Post", component: CreatePostPage },
+  { path: `/ProfilePage/${Cookies.get(USER_AUTHOR_ID_COOKIE)}`, name: "ProfilePage", component: ProfilePage },
   { path: "/UserSearch", name: "UserSearch", component: UserSearch },
 ];
 

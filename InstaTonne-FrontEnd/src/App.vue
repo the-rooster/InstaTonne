@@ -18,9 +18,9 @@
             />
             <v-list-item
               v-else
-              :prepend-avatar="postData.author.profileImage"
-              :title="postData.author.displayName"
-              :subtitle="postData.author.github"
+              :prepend-avatar="authorData.profileImage"
+              :title="authorData.displayName"
+              :subtitle="authorData.github"
             />
           </v-list>
 
@@ -58,18 +58,21 @@ import { nav_bar_routes as routes } from "./main"
 import { createHTTP, USER_AUTHOR_ID_COOKIE } from './axiosCalls'
 import LoginPage from './components/LoginPage.vue'
 import Cookies from 'js-cookie';
+import { reactive } from 'vue';
 
 const loading = ref(true)
-const postData = ref({});
+const authorData = ref({});
 const activeUserId = ref("")
 
 const loggedIn = computed(() => activeUserId.value != undefined);
 
 onBeforeMount(async () => {
   activeUserId.value = Cookies.get(USER_AUTHOR_ID_COOKIE)
-  await createHTTP('authors/1/posts/1/').get().then((response: { data: object }) => {
-    postData.value = response.data;
+  await createHTTP(`authors/${activeUserId.value}`).get().then((response: { data: object }) => {
+    authorData.value = response.data;
     loading.value = false;
+    console.log(response.data);
+    console.log("GOT AUTHOR DATA!");
   });
 })
 </script>

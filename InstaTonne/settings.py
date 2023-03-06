@@ -17,7 +17,7 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 #Configure this before deployment
-HOSTNAME = "localhost:8000"
+HOSTNAME = "http://127.0.0.1:8000"
 
 
 # Quick-start development settings - unsuitable for production
@@ -51,7 +51,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -60,10 +60,12 @@ MIDDLEWARE = [
 # This will need to be updated to allow other groups to connect to us
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173", # allow frontend
+    "http://localhost:3000", # allow tests
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173", # allow frontend
+    "http://localhost:3000", # allow tests
 ]
 
 CORS_ALLOW_HEADERS = [
@@ -75,6 +77,7 @@ CSRF_COOKIE_HTTPONLY = False
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173", # allow frontend
+    "http://localhost:3000", # allow tests
 ]
 
 CORS_ALLOW_CREDENTIALS = True

@@ -25,3 +25,5 @@ npm run dev
 
 Note: eslint does not like debuggers. To use a debugger, be sure to disable the restriction:
 debugger; // eslint-disable-line no-debugger
+
+Frontend tests: npm run test. Runs tests in watch mode.

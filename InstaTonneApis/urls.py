@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from rest_framework import routers, serializers, viewsets
 from rest_framework.schemas import get_schema_view
 from .endpoints.authors import single_author, authors, get_author_id
@@ -31,20 +31,21 @@ router = routers.DefaultRouter()
 
 
 urlpatterns = [
-    path("authors", authors),
-    path("authors/id/",get_author_id),
-    path("authors/<str:author_id>/", single_author),
-    path("authors/<str:author_id>/followers/", single_author_followers),
-    path("authors/<str:author_id>/followers/<str:foreign_author_id>/", single_author_follower),
     path("register/",register_author),
     path("login/",login),
-    path("authors/<str:author_id>/posts/", single_author_posts),
-    path("authors/<str:author_id>/posts/<str:post_id>/", single_author_post),
-    path("authors/<str:author_id>/posts/<str:post_id>/comments/", single_post_comments),
-    path("authors/<str:author_id>/posts/<str:post_id>/likes/", single_post_likes),
-    path("authors/<str:author_id>/posts/<str:post_id>/comments/<str:comment_id>/likes/", single_comment_likes),
-    path("authors/<str:author_id>/liked/", single_author_likes),
-    path("authors/<str:author_id>/inbox/",inbox_endpoint),
+    path("authors/id/",get_author_id),
+
+    re_path(r"^authors\/.+?\/liked\/?$", single_author_likes),
+    re_path(r"^authors\/.+?\/posts\/.+?\/comments\/.+?\/likes\/?$", single_comment_likes),
+    re_path(r"^authors\/.+?\/posts\/.+?\/comments\/?$", single_post_comments),
+    re_path(r"^authors\/.+?\/posts\/.+?\/likes\/?$", single_post_likes),
+    re_path(r"^authors\/.+?\/posts\/.+?\/?$", single_author_post),
+    re_path(r"^authors\/.+?\/posts\/?$", single_author_posts),
+    re_path(r"^authors\/.+?\/inbox\/?$",inbox_endpoint),
+    re_path(r"^authors\/.+?\/followers\/.+?\/?$", single_author_follower),
+    re_path(r"^authors\/.+?\/followers\/?$", single_author_followers),
+    re_path(r"^authors\/.+?\/?$", single_author),
+    re_path(r"^authors\/?$", authors),
     path("authors/<str:author_id>/posts/<str:post_id>/image", single_author_post_image),
-    path("csrf/",get_csrf)
+    path("csrf/", get_csrf)
 ]
