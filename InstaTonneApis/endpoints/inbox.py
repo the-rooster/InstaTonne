@@ -9,10 +9,17 @@ import time
 from threading import Thread, Lock
 from InstaTonne.settings import HOSTNAME
 from urllib.parse import quote
+import re
 
 @csrf_exempt
-def inbox_endpoint(request : HttpRequest, author_id : str):
+def inbox_endpoint(request : HttpRequest):
 
+    matched = re.search(r"^\/authors\/(.*?)\/inbox\/?$", request.path)
+    if matched:
+        author_id: str = matched.group(1)
+    else:
+        return HttpResponse(status=405)
+    
     if request.method == "GET":
         return get_inbox(request,author_id)
     elif request.method == "POST":
@@ -40,6 +47,8 @@ def get_inbox(request : HttpRequest, id : str):
     
     urls = [item.url for item in inbox]
 
+    print(urls)
+
     result['items'] = get_all_urls(urls)
         
     print(result)
@@ -55,6 +64,7 @@ def parse_inbox_post(data : dict, user : Author):
     if data_type == "follow":
 
         return parse_inbox_follow_request(data,user)
+    
 
 
 def parse_inbox_follow_request(data : dict, user: Author):

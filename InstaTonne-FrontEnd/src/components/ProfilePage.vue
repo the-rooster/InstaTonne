@@ -28,7 +28,7 @@
         :key="post.id"
         class="post-tiny"
       >
-      <a v-bind:href="`authors/${encodeURIComponent(profileData.id)}/posts/${encodeURIComponent(post.id)}`">
+      <a v-bind:href="`/authors/${encodeURIComponent(profileData.id)}/posts/${encodeURIComponent(post.id)}/`">
       <div class="post-tiny">
         <h1 style="text-overflow:ellipsis;white-space:nowrap;max-width:100%;overflow:hidden">{{post.title}}</h1>
         <span style="text-overflow:ellipsis;white-space:nowrap;max-width:100%;overflow:hidden" >{{post.description}}</span>

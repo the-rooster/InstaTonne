@@ -73,7 +73,7 @@
     "fields": {
       "id" : "1",
       "type" : "post",
-      "id_url" : "http://localhost:8000/authors/1/posts/1",
+      "id_url" : "http://127.0.0.1:8000/authors/1/posts/1",
       "title" : "title1",
       "source" : "source1",
       "origin" : "origin1",
@@ -93,7 +93,7 @@
     "fields": {
       "id" : "2",
       "type" : "post",
-      "id_url" : "http://localhost:8000/authors/1/posts/2",
+      "id_url" : "http://127.0.0.1:8000/authors/1/posts/2",
       "title" : "title2",
       "source" : "source2",
       "origin" : "origin2",
