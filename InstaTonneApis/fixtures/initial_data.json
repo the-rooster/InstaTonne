@@ -75,8 +75,8 @@
     "model" : "InstaTonneApis.Follow",
     "fields": {
       "id" : "5",
-      "object" : "2",
-      "follower_url" : "http://localhost:8000/authors/1/",
+      "object" : "1",
+      "follower_url" : "http://localhost:8001/authors/1",
       "summary" : "user1 wants to follow user2",
       "accepted" : true
     }
@@ -86,7 +86,7 @@
     "fields": {
       "id" : "6",
       "object" : "1",
-      "follower_url" : "http://localhost:8001/authors/1",
+      "follower_url" : "http://localhost:8001/authors/2",
       "summary" : "user1 wants to follow user2",
       "accepted" : true
     }
@@ -103,7 +103,7 @@
       "description" : "description1",
       "contentType" : "contentType1",
       "content" : "content1",
-      "visibility" : "visibility1",
+      "visibility" : "PUBLIC",
       "comments" : "http://website/comments/stuff",
   
       "categories" : ["cat1", "cat2"],
@@ -125,7 +125,7 @@
       "description" : "description2",
       "contentType" : "contentType2",
       "content" : "content2",
-      "visibility" : "visibility2",
+      "visibility" : "PUBLIC",
       "comments" : "http://website/comments/stuff2",
   
       "categories" : ["cat3", "cat4"],

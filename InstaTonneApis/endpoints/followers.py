@@ -106,13 +106,9 @@ def put_author_follower(request: HttpRequest, author_id: str, foreign_author_id:
 
 # return success if foreign_author follows author
 def check_author_follower(request: HttpRequest, author_id: str, foreign_author_id: str):
-    
     user: Author | None = Author.objects.all().filter(pk=author_id).first()
     
-
-
     if user is None:
-        print('test')
         return HttpResponse(status=404)
     
     print(foreign_author_id)
@@ -120,7 +116,6 @@ def check_author_follower(request: HttpRequest, author_id: str, foreign_author_i
     follows = Follow.objects.all().filter(object=user, follower_url=foreign_author_id)
 
     if len(follows) == 0:
-        print('here!!!')
         return HttpResponse(status=404)
     
     follow = follows[0]
@@ -132,7 +127,5 @@ def check_author_follower(request: HttpRequest, author_id: str, foreign_author_i
 
     serialized_follow['actor'] = serialized_data
     serialized_follow['type'] = 'Follow'
-
-    print("SERIALIZED FOLLOW: ",serialized_follow)
 
     return HttpResponse(content = json.dumps(serialized_follow),status=200,content_type="application/json")
