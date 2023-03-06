@@ -210,7 +210,11 @@ def single_author_posts_post(request: HttpRequest, author_id: str):
         post.id_url = make_post_url(request.get_host(), author_id, post_id)
         post.save()
 
-        send_to_inboxes(author_id, author.id_url, post.id_url, body["visibility"])
+        data : dict = {
+            "id" : post.id_url
+        }
+
+        send_to_inboxes(author_id, author.id_url, data ,body["visibility"])
 
         return HttpResponse(status=204)
     except Exception as e:
@@ -262,7 +266,12 @@ def single_author_post_put(request: HttpRequest, author_id: str, post_id: str):
             author = author
         )
 
-        send_to_inboxes(author_id, author.id_url, post.id_url, body["visibility"])
+
+        data : dict = {
+            "id" : post.id_url
+        }
+
+        send_to_inboxes(author_id, author.id_url, data, body["visibility"])
 
         return HttpResponse(status=204)
     except Exception as e:

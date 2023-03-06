@@ -62,10 +62,33 @@ def parse_inbox_post(data : dict, user : Author):
     data_type = str(data["type"].lower())
 
     if data_type == "follow":
-
         return parse_inbox_follow_request(data,user)
-    
+    elif data_type == "post":
+        return parse_inbox_post_post(data,user)
+    elif data_type == "comment":
+        return parse_inbox_comment(data,user)
+    elif data_type == "like":
+        return parse_inbox_like(data,user)
 
+
+def parse_inbox_comment(data,user):
+
+    
+    pass
+
+def parse_inbox_like(data,user):
+    pass
+
+def parse_inbox_post_post(data,user):
+
+    if "id" not in data:
+        return None
+    
+    obj = Inbox.objects.create(user=user,url=data["id"])
+
+    obj.save()
+
+    return data["id"]
 
 def parse_inbox_follow_request(data : dict, user: Author):
         
