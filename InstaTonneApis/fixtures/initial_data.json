@@ -22,9 +22,9 @@
     "model": "InstaTonneApis.Author",
     "fields": {
       "id" : "1",
-      "userID" : "1",
+      "userID" : "2",
       "type" : "author",
-      "id_url" : "http://localhost:8000/authors/1",
+      "id_url" : "http://127.0.0.1:8000/authors/1",
       "url" : "url1",
       "host" : "host1",
       "displayName" : "displayName1",
@@ -37,9 +37,9 @@
       "model": "InstaTonneApis.Author",
       "fields": {
         "id" : "2",
-	"userID" : "2",
+	"userID" : "3",
         "type" : "author",
-        "id_url" : "http://localhost:8000/authors/2",
+        "id_url" : "http://127.0.0.1:8000/authors/2",
         "url" : "url2",
         "host" : "host2",
         "displayName" : "displayName2",
@@ -53,7 +53,7 @@
       "id" : "3",
       "userID" : "3",
       "type" : "author",
-      "id_url" : "http://localhost:8000/authors/3",
+      "id_url" : "http://127.0.0.1:8000/authors/3",
       "url" : "url3",
       "host" : "host3",
       "displayName" : "displayName3",
@@ -66,7 +66,7 @@
     "fields": {
       "id" : "4",
       "object" : "1",
-      "follower_url" : "http://localhost:8000/authors/2/",
+      "follower_url" : "http://127.0.0.1:8000/authors/2/",
       "summary" : "user2 wants to follow user1",
       "accepted" : true
     }
@@ -76,7 +76,7 @@
     "fields": {
       "id" : "5",
       "object" : "1",
-      "follower_url" : "http://localhost:8001/authors/1",
+      "follower_url" : "http://127.0.0.1:8001/authors/1",
       "summary" : "user1 wants to follow user2",
       "accepted" : true
     }
@@ -86,7 +86,7 @@
     "fields": {
       "id" : "6",
       "object" : "1",
-      "follower_url" : "http://localhost:8001/authors/2",
+      "follower_url" : "http://127.0.0.1:8001/authors/2",
       "summary" : "user1 wants to follow user2",
       "accepted" : true
     }
@@ -96,7 +96,7 @@
     "fields": {
       "id" : "1",
       "type" : "post",
-      "id_url" : "http://localhost:8000/authors/1/posts/1",
+      "id_url" : "http://127.0.0.1:8000/authors/1/posts/1",
       "title" : "title1",
       "source" : "source1",
       "origin" : "origin1",
@@ -118,7 +118,7 @@
     "fields": {
       "id" : "2",
       "type" : "post",
-      "id_url" : "http://localhost:8000/authors/1/posts/2",
+      "id_url" : "http://127.0.0.1:8000/authors/1/posts/2",
       "title" : "title2",
       "source" : "source2",
       "origin" : "origin2",

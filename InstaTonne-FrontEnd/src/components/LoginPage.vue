@@ -105,6 +105,7 @@ import {
 } from "../axiosCalls";
 import { router } from "../main";
 
+
 const emits = defineEmits(["LoggedIn"]);
 
 const username = ref("");
@@ -145,6 +146,7 @@ async function login() {
       Cookies.set(USER_AUTHOR_ID_COOKIE, response.authorId, { expires: 0.5 });
       emits("LoggedIn", response.authorId);
       loading.value = false;
+      router.go();
     })
     .catch((response) => {
       console.log(response);
