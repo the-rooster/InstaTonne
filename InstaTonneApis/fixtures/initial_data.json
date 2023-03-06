@@ -22,7 +22,7 @@
     "model": "InstaTonneApis.Author",
     "fields": {
       "id" : "1",
-      "userID" : "1",
+      "userID" : "2",
       "type" : "author",
       "id_url" : "http://localhost:8000/authors/1",
       "url" : "http://localhost:8000/authors/1",
@@ -37,14 +37,15 @@
       "model": "InstaTonneApis.Author",
       "fields": {
         "id" : "2",
-	      "userID" : "2",
+	      "userID" : "3",
         "type" : "author",
         "id_url" : "http://localhost:8000/authors/2",
         "url" : "http://localhost:8000/authors/2",
         "host" : "http://localhost:8000",
         "displayName" : "displayName2",
         "github" : "github2",
-        "profileImage" : "https://i.imgur.com/2jN5DLC.jpeg"
+        "profileImage" : "https://i.imgur.com/2jN5DLC.jpeg",
+        "active" : true
       }
   },
   {
@@ -52,7 +53,7 @@
     "fields": {
       "id" : "1",
       "object" : "1",
-      "follower_url" : "http://localhost:8000/authors/2/",
+      "follower_url" : "http://localhost:8000/authors/2",
       "summary" : "user2 wants to follow user1",
       "accepted" : true
     }

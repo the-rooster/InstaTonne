@@ -82,9 +82,9 @@ def single_author_get(request: HttpRequest, author_id: str):
     return HttpResponse(content=res ,status=200)
 
 
+# get a single remote author
 def single_author_get_remote(request: HttpRequest, author_id: str):
-    remote_url = author_id
-    status_code, text = get_one_url(remote_url)
+    status_code, text = get_one_url(author_id)
     return HttpResponse(status=status_code, content=text)
 
 
