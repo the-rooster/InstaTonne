@@ -31,20 +31,22 @@ router = routers.DefaultRouter()
 
 
 urlpatterns = [
-    path("authors", authors),
-    path("authors/id/",get_author_id),
-    path("authors/<str:author_id>/", single_author),
-    re_path(r"^authors\/.*?\/followers\/?$", single_author_followers),
-    re_path(r"^authors\/.*?\/followers\/.*?\/?$", single_author_follower),
     path("register/",register_author),
     path("login/",login),
-    re_path(r"^authors\/.*?\/posts\/?$", single_author_posts),
-    re_path(r"^authors\/.*?\/posts\/.*?\/?$", single_author_post),
-    re_path(r"^authors\/.*?\/posts\/.*?\/comments\/?$", single_post_comments),
-    path("authors/<str:author_id>/posts/<str:post_id>/likes/", single_post_likes),
-    path("authors/<str:author_id>/posts/<str:post_id>/comments/<str:comment_id>/likes/", single_comment_likes),
-    path("authors/<str:author_id>/liked/", single_author_likes),
-    path("authors/<str:author_id>/inbox/",inbox_endpoint),
+    path("authors/id/",get_author_id),
+
+    re_path(r"^authors\/.+?\/liked\/?$", single_author_likes),
+    re_path(r"^authors\/.+?\/posts\/.+?\/comments\/.+?\/likes\/?$", single_comment_likes),
+    re_path(r"^authors\/.+?\/posts\/.+?\/comments\/?$", single_post_comments),
+    re_path(r"^authors\/.+?\/posts\/.+?\/likes\/?$", single_post_likes),
+    re_path(r"^authors\/.+?\/posts\/.+?\/?$", single_author_post),
+    re_path(r"^authors\/.+?\/posts\/?$", single_author_posts),
+    re_path(r"^authors\/.+?\/followers\/.+?\/?$", single_author_follower),
+    re_path(r"^authors\/.+?\/followers\/?$", single_author_followers),
+    re_path(r"^authors\/.+?\/?$", single_author),
+    re_path(r"^authors\/?$", authors),
+
+    path("authors/<str:author_id>/inbox/", inbox_endpoint),
     path("authors/<str:author_id>/posts/<str:post_id>/image", single_author_post_image),
-    path("csrf/",get_csrf)
+    path("csrf/", get_csrf)
 ]

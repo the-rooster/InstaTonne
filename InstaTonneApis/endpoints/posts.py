@@ -94,8 +94,7 @@ def single_author_post_get(request: HttpRequest, author_id: str, post_id: str):
 
 # get a single post of a remote author
 def single_author_post_get_remote(request: HttpRequest, author_id: str, post_id: str):
-    remote_url = post_id
-    status_code, text = get_one_url(remote_url)
+    status_code, text = get_one_url(post_id)
     return HttpResponse(status=status_code, content=text)
 
 
