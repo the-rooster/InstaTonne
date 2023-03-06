@@ -28,9 +28,9 @@ const vuetify = createVuetify({
 // These can be imported from other files
 import HomePage from "./components/HomePage.vue";
 import AboutPage from "./components/AboutPage.vue";
-import HelloWorld from "./components/HelloWorld.vue";
-import PostEditor from "./components/PostEditor.vue";
-import FollowRequests from "./components/FollowRequests.vue";
+import EditPostPage from "./components/EditPostPage.vue";
+import FollowRequestsPage from "./components/FollowRequestsPage.vue"
+import CreatePostPage from "./components/CreatePostPage.vue";
 import ProfilePage from "./components/ProfilePage.vue";
 import UserSearch from "./components/UserSearch.vue";
 import UserPost from "./components/UserPost.vue";
@@ -41,12 +41,9 @@ import { USER_AUTHOR_ID_COOKIE } from "./axiosCalls";
 const routes = [
   { path: "/", name: "Home", component: HomePage },
   { path: "/about", name: "About", component: AboutPage },
-  { path: "/posteditor/:postid/", name: "PostEditor", component: PostEditor },
-  {
-    path: "/FollowRequests",
-    name: "FollowRequests",
-    component: FollowRequests,
-  },
+  { path: "/editPost/:postid/", name: "EditPost", component: EditPostPage },
+  { path: "/FollowRequests", name: "FollowRequests", component: FollowRequestsPage },
+  { path: "/CreatePost", name: "Create New Post", component: CreatePostPage },
   { path: "/ProfilePage/:id", name: "ProfilePage", component: ProfilePage },
   { path: "/UserSearch", name: "UserSearch", component: UserSearch },
   {path: "/authors/:id/posts/:postid",name : "UserPost", component: UserPost}
@@ -55,11 +52,8 @@ const routes = [
 export const nav_bar_routes = [
   { path: "/", name: "Home", component: HomePage },
   { path: "/about", name: "About", component: AboutPage },
-  {
-    path: "/FollowRequests",
-    name: "FollowRequests",
-    component: FollowRequests,
-  },
+  { path: "/FollowRequests", name: "FollowRequests", component: FollowRequestsPage },
+  { path: "/CreatePost", name: "Create New Post", component: CreatePostPage },
   { path: `/ProfilePage/${Cookies.get(USER_AUTHOR_ID_COOKIE)}`, name: "ProfilePage", component: ProfilePage },
   { path: "/UserSearch", name: "UserSearch", component: UserSearch },
 ];
