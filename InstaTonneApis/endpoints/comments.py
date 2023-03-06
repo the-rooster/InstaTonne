@@ -2,11 +2,25 @@ from django.http import HttpRequest, HttpResponse
 import json
 from ..models import Post, PostSerializer, Comment, Author, CommentSerializer
 from django.core.paginator import Paginator
-from .utils import make_comment_url, make_comments_url
+from .utils import make_comment_url, make_comments_url, get_one_url, make_author_url, send_to_inboxes
+import re
 
 
-def single_post_comments(request: HttpRequest, author_id: str, post_id: str):
-    if request.method == "GET":
+def single_post_comments(request: HttpRequest):
+    matched = re.search(r"^\/authors\/(.*?)\/posts\/(.*?)\/comments\/?$", request.path)
+    if matched:
+        author_id: str = matched.group(1)
+        post_id: str = matched.group(2)
+    else:
+        return HttpResponse(status=405)
+    
+    print("!!!")
+
+    if "/" in post_id and request.method == "GET":
+        return single_post_comments_get_remote(request, author_id, post_id)
+    elif "/" in post_id:
+        return HttpResponse(status=405)
+    elif request.method == "GET":
         return single_post_comments_get(request, author_id, post_id)
     elif request.method == "POST":
         return single_post_comments_post(request, author_id, post_id)
@@ -45,6 +59,15 @@ def single_post_comments_get(request: HttpRequest, author_id: str, post_id: str)
     return HttpResponse(content=res, status=200)
 
 
+def single_post_comments_get_remote(request: HttpRequest, author_id: str, post_id: str):
+    query = request.META.get('QUERY_STRING', '')
+    if query:
+        query = '?' + query
+    remote_url = post_id + '/comments' + query
+    status_code, text = get_one_url(remote_url)
+    return HttpResponse(status=status_code, content=text)
+
+
 # add a comment to a post
 def single_post_comments_post(request: HttpRequest, author_id: str, post_id: str):
     try:
@@ -58,13 +81,15 @@ def single_post_comments_post(request: HttpRequest, author_id: str, post_id: str
             type = "comment",
             contentType = body["contentType"],
             comment = body["comment"],
-            author = Author.objects.all().filter(pk=author_id).first(),
+            author = make_author_url(request.get_host(), author_id),
             post = post
         )
 
         comment_id = comment.id #type: ignore
         comment.id_url = make_comment_url(request.get_host(), author_id, post_id, comment_id)
         comment.save()
+
+        send_to_inboxes(author_id, comment.author, comment.id_url, post.visibility)
 
         return HttpResponse(status=204)
     except Exception as e:

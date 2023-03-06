@@ -116,8 +116,6 @@ class Comment(models.Model):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    author = AuthorSerializer()
-
     class Meta:
         model = Comment
         fields = ['type', 'id_url', 'contentType', 'comment', 'published', 'author']
@@ -137,8 +135,6 @@ class Like(models.Model):
 
 
 class LikeSerializer(serializers.ModelSerializer):
-    author = AuthorSerializer()
-
     class Meta:
         model = Like
         fields = ['type', 'context', 'summary', 'author', 'post', 'comment']
