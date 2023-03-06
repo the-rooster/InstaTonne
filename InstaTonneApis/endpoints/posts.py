@@ -216,6 +216,7 @@ def single_author_posts_post(request: HttpRequest, author_id: str):
         return HttpResponse(status=204)
     except Exception as e:
         print(e)
+        print("HERE!")
         return HttpResponse(status=400)
     
 

@@ -40,6 +40,8 @@ def get_inbox(request : HttpRequest, id : str):
     
     urls = [item.url for item in inbox]
 
+    print(urls)
+
     result['items'] = get_all_urls(urls)
         
     print(result)

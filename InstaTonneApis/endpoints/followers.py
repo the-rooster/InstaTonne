@@ -23,13 +23,16 @@ def single_author_followers(request: HttpRequest):
 
 
 def single_author_follower(request: HttpRequest):
-    matched = re.search(r"^\/authors\/(.*?)\/follower\/(.*?)\/?$", request.path)
+    matched = re.search(r"^\/authors\/(.*?)\/followers\/(.*?)\/?$", request.path)
     if matched:
         author_id: str = matched.group(1)
         foreign_author_id: str = matched.group(2)
     else:
+        print("TEST")
         return HttpResponse(status=405)
-
+    foreign_author_id = unquote(foreign_author_id)
+    print("FOREIGN TIME: ",foreign_author_id)
+    print("METHOD: ",request.method)
     if request.method == "DELETE":
         return delete_author_follower(request, author_id, foreign_author_id)
     elif request.method == "PUT":
@@ -80,20 +83,23 @@ def delete_author_follower(request: HttpRequest, author_id: str, foreign_author_
 def put_author_follower(request: HttpRequest, author_id: str, foreign_author_id: str):
 
     if not valid_requesting_user(request, author_id):
+        print("invalid requesting user!")
         return HttpResponse(status=403)
     
     if author_id == foreign_author_id:
         return HttpResponse(status=403)  
     
-    user: Author | None = Author.objects.all().filter(pk=author_id).first()
+    user: Author | None = Author.objects.all().filter(id=author_id).first()
     
     print(foreign_author_id)
     if user is None:
+        print("HERE!!!")
         return HttpResponse(status=404)
     print(user,foreign_author_id)
     follows = Follow.objects.all().filter(object=user,follower_url=foreign_author_id)
     print(follows)
     if not follows:
+        print('wawaweewaa')
         return HttpResponse(content="no matching follow request",status=404)
     
     follow = follows[0]

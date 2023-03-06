@@ -35,7 +35,7 @@ urlpatterns = [
     path("authors/id/",get_author_id),
     path("authors/<str:author_id>/", single_author),
     re_path(r"^authors\/.*?\/followers\/?$", single_author_followers),
-    re_path(r"^authors\/.*?\/follower\/.*?\/?$", single_author_follower),
+    re_path(r"^authors\/.*?\/followers\/.*?\/?$", single_author_follower),
     path("register/",register_author),
     path("login/",login),
     re_path(r"^authors\/.*?\/posts\/?$", single_author_posts),

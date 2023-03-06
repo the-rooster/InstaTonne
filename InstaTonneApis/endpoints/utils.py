@@ -78,7 +78,11 @@ def author_follows_follower(author_url: str, follower_url: str) -> bool:
 
 def post_to_follower_inbox(follower_url: str, item_url: str) -> bool:
     inbox_url: str = follower_url + '/inbox/'
-    response: requests.Response = requests.post(inbox_url, item_url) # this will probs have to get changed when the inbox endpoints get updated
+    try:
+        response: requests.Response = requests.post(inbox_url, item_url) # this will probs have to get changed when the inbox endpoints get updated
+    except Exception as e:
+        print("SERVER DOWN!")
+        return True
     return response.status_code == 200
 
 
@@ -116,6 +120,7 @@ def valid_requesting_user(request: HttpRequest, required_author_id: str) -> bool
     if not request.user.is_authenticated:
         return False
 
+    print(request.user.pk)
     author: Author | None = Author.objects.all().filter(userID=request.user.pk).first()
 
     if author is None:
@@ -128,7 +133,7 @@ def valid_requesting_user(request: HttpRequest, required_author_id: str) -> bool
 
 
 def make_post_url(request_host: str, author_id: str, post_id: str) -> str:
-    return "http://" + request_host + "/service/authors/" + author_id + "/posts/" + post_id
+    return "http://" + request_host + "/authors/" + author_id + "/posts/" + post_id
 
 
 def make_comments_url(request_host: str, author_id: str, post_id: str) -> str:
