@@ -93,6 +93,7 @@ class Request(models.Model):
     actor = models.ForeignKey(Author, related_name='requester', on_delete=models.CASCADE)
     object = models.ForeignKey(Author, related_name='requestee', on_delete=models.CASCADE)
 
+
 class RequestSerializer(serializers.ModelSerializer):
     actor = AuthorSerializer()
     object = AuthorSerializer()
@@ -100,22 +101,21 @@ class RequestSerializer(serializers.ModelSerializer):
         model = Request
         fields = ['type','summary','published','actor','object']
 
+
 class Comment(models.Model):
     id = models.TextField(primary_key=True, default=default_id_generator, editable=False)
     type = models.TextField()
     id_url = models.TextField()
     contentType = models.TextField()
     comment = models.TextField()
+    author = models.TextField()
 
     published = models.DateTimeField(auto_now_add=True)
 
-    author = models.ForeignKey(Author, on_delete=models.CASCADE)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE,null=True)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True)
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    author = AuthorSerializer()
-
     class Meta:
         model = Comment
         fields = ['type', 'id_url', 'contentType', 'comment', 'published', 'author']
@@ -126,17 +126,15 @@ class Like(models.Model):
     type = models.TextField()
     context = models.TextField()
     summary = models.TextField()
+    author = models.TextField()
 
     published = models.DateTimeField(auto_now_add=True)
 
-    author = models.ForeignKey(Author, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True)
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE, null=True)
 
 
 class LikeSerializer(serializers.ModelSerializer):
-    author = AuthorSerializer()
-
     class Meta:
         model = Like
         fields = ['type', 'context', 'summary', 'author', 'post', 'comment']

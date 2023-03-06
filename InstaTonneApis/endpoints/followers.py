@@ -23,7 +23,7 @@ def single_author_followers(request: HttpRequest):
 
 
 def single_author_follower(request: HttpRequest):
-    matched = re.search(r"^\/authors\/(.*?)\/follower\/(.*?)\/?$", request.path)
+    matched = re.search(r"^\/authors\/(.*?)\/followers\/(.*?)\/?$", request.path)
     if matched:
         author_id: str = matched.group(1)
         foreign_author_id: str = matched.group(2)

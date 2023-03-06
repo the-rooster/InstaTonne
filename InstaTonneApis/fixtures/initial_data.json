@@ -22,11 +22,11 @@
     "model": "InstaTonneApis.Author",
     "fields": {
       "id" : "1",
-      "userID" : "1",
+      "userID" : "2",
       "type" : "author",
       "id_url" : "http://localhost:8000/authors/1",
-      "url" : "url1",
-      "host" : "host1",
+      "url" : "http://localhost:8000/authors/1",
+      "host" : "http://localhost:8000",
       "displayName" : "displayName1",
       "github" : "github1",
       "profileImage" : "https://i.imgur.com/2jN5DLC.jpeg",
@@ -37,36 +37,23 @@
       "model": "InstaTonneApis.Author",
       "fields": {
         "id" : "2",
-	"userID" : "2",
+	      "userID" : "3",
         "type" : "author",
         "id_url" : "http://localhost:8000/authors/2",
-        "url" : "url2",
-        "host" : "host2",
+        "url" : "http://localhost:8000/authors/2",
+        "host" : "http://localhost:8000",
         "displayName" : "displayName2",
         "github" : "github2",
-        "profileImage" : "https://i.imgur.com/2jN5DLC.jpeg"
+        "profileImage" : "https://i.imgur.com/2jN5DLC.jpeg",
+        "active" : true
       }
-  },
-  {
-    "model": "InstaTonneApis.Author",
-    "fields": {
-      "id" : "3",
-      "userID" : "3",
-      "type" : "author",
-      "id_url" : "http://localhost:8000/authors/3",
-      "url" : "url3",
-      "host" : "host3",
-      "displayName" : "displayName3",
-      "github" : "github3",
-      "profileImage" : "profileImage3"
-    }
   },
   {
     "model" : "InstaTonneApis.Follow",
     "fields": {
-      "id" : "4",
+      "id" : "1",
       "object" : "1",
-      "follower_url" : "http://localhost:8000/authors/2/",
+      "follower_url" : "http://localhost:8000/authors/2",
       "summary" : "user2 wants to follow user1",
       "accepted" : true
     }
@@ -74,20 +61,10 @@
   {
     "model" : "InstaTonneApis.Follow",
     "fields": {
-      "id" : "5",
+      "id" : "2",
       "object" : "1",
       "follower_url" : "http://localhost:8001/authors/1",
-      "summary" : "user1 wants to follow user2",
-      "accepted" : true
-    }
-  },
-  {
-    "model" : "InstaTonneApis.Follow",
-    "fields": {
-      "id" : "6",
-      "object" : "1",
-      "follower_url" : "http://localhost:8001/authors/2",
-      "summary" : "user1 wants to follow user2",
+      "summary" : "user1 wants to follow user1",
       "accepted" : true
     }
   },
@@ -104,12 +81,10 @@
       "contentType" : "contentType1",
       "content" : "content1",
       "visibility" : "PUBLIC",
-      "comments" : "http://website/comments/stuff",
-  
+      "comments" : "http://localhost:8000/authors/1/posts/1/comments",
       "categories" : ["cat1", "cat2"],
       "unlisted" : false,
       "published" : "2022-01-01 00:00:01",
-  
       "author" : "1"
     }
   },
@@ -125,13 +100,11 @@
       "description" : "description2",
       "contentType" : "contentType2",
       "content" : "content2",
-      "visibility" : "PUBLIC",
-      "comments" : "http://website/comments/stuff2",
-  
+      "visibility" : "PRIVATE",
+      "comments" : "http://localhost:8000/authors/1/posts/2/comments",
       "categories" : ["cat3", "cat4"],
       "unlisted" : false,
       "published" : "2022-01-01 00:00:01",
-  
       "author" : "1"
     }
   },
@@ -140,13 +113,11 @@
     "fields": {
       "id" : "1",
       "type" : "comment",
-      "id_url" : "id_url1",
+      "id_url" : "http://localhost:8000/authors/1/posts/1/comments/1",
       "contentType" : "contentType1",
       "comment" : "comment1",
-
       "published" : "2022-01-01 00:00:01",
-  
-      "author" : "2",
+      "author" : "http://localhost:8000/authors/1",
       "post" : "1"
     }
   },
@@ -155,13 +126,11 @@
     "fields": {
       "id" : "2",
       "type" : "comment",
-      "id_url" : "id_url2",
+      "id_url" : "http://localhost:8000/authors/1/posts/1/comments/2",
       "contentType" : "contentType2",
       "comment" : "comment2",
-
       "published" : "2022-01-01 00:00:01",
-  
-      "author" : "1",
+      "author" : "http://localhost:8001/authors/1",
       "post" : "1"
     }
   },
@@ -172,10 +141,8 @@
       "type" : "like",
       "context" : "context1",
       "summary" : "summary1",
-
       "published" : "2022-01-01 00:00:01",
-  
-      "author" : "1",
+      "author" : "http://localhost:8000/authors/1",
       "post" : "1"
     }
   },
@@ -186,11 +153,9 @@
       "type" : "like",
       "context" : "context1",
       "summary" : "summary1",
-
       "published" : "2022-01-01 00:00:01",
-  
-      "author" : "2",
-      "post" : "1"
+      "author" : "http://localhost:8001/authors/1",
+      "comment" : "1"
     }
   }
 ]
