@@ -2,17 +2,7 @@
   <div
     class="viewBox"
   >
-    <v-progress-circular
-      v-if="loading"
-      indeterminate
-      width="20"
-      size="200"
-      style="margin: 10em;"
-    />
-    <div v-else-if="errorMessage.length > 0">
-      <ErrorPage :error-message="errorMessage" />
-    </div>
-    <div v-else>
+    <div>
       <div style="display: flex;">
         <AuthorCard :author-info="postData.author" />
         <v-card>
@@ -41,23 +31,38 @@
           </v-card-item>
         </v-card>
       </div>
+      <div v-if="props.requireExtra">
+        Source:
+        <v-textarea
+          v-model="postData.source"
+          clearable
+        />
+        Origin:
+        <v-textarea
+          v-model="postData.origin"
+          clearable
+        />
+      </div>
+      Title:
       <v-textarea
         v-model="postData.title"
         clearable
       />
+      Description:
       <v-textarea
         v-model="postData.description"
         clearable
       />
+      Content:
       <v-textarea
         v-model="postData.content"
         clearable
       />
+      Categories:
       <v-combobox
         v-model="postData.categories"
         chips
         clearable
-        label="Categories"
         multiple
       >
         <template #selection="{ attrs, item, select, selected }">
@@ -73,6 +78,7 @@
         </template>
       </v-combobox>
       <v-btn
+        :disabled="disableSaving"
         @click="savePost"
       >
         SAVE
@@ -80,44 +86,40 @@
     </div>
   </div>
 </template>
-  
+    
 <script setup lang="ts">
-import { ref, onBeforeMount } from 'vue'
-import { useRoute } from "vue-router";
+import { ref, computed } from 'vue'
 import AuthorCard from './AuthorCard.vue'
-import ErrorPage from './ErrorPage.vue'
-import { createHTTP, USER_AUTHOR_ID_COOKIE } from '../axiosCalls'
-import Cookies from "js-cookie";
 
-const loading = ref(true)
-const errorMessage = ref("")
-const postData = ref({});
+const props = defineProps({
+  postData: {
+    type: Object,
+    required: true,
+  },
+  saveFunction: {
+    type: Function,
+    required: true
+  },
+  requireExtra: {
+    type: Boolean,
+    required: true
+  }
+});
 
-let route = useRoute();
+const postData = ref(props.postData) 
 
-const authorId = Cookies.get(USER_AUTHOR_ID_COOKIE);
-
-onBeforeMount(async () => {
-  await createHTTP(`authors/${authorId}/posts/${route.params.postid}/`).get().then((response: { data: object }) => {
-    postData.value = response.data;
-    loading.value = false;
-  }).catch(() => {
-    errorMessage.value = "404 Post Not Found"
-    loading.value = false;
-  });
-})
+const disableSaving = computed(() => postData.value.source.length == 0 ||
+postData.value.origin.length == 0 ||
+postData.value.title.length == 0 ||
+postData.value.content.length == 0 ||
+postData.value.description.length == 0 ||
+(postData.value.visibility != "PUBLIC" && postData.value.visibility != "FRIENDS"))
 
 async function savePost() {
-  // eventually this should do a backend call to push postData
-  // Note: since everything is binded, all the changes should be stored in postData already!
-  loading.value = true;
-  await createHTTP(`authors/${authorId}/posts/${route.params.postid}/`).post(JSON.stringify(postData.value)).then((response: { data: object }) => {
-    loading.value = false;
-  });
+  props.saveFunction(postData.value)
 }
 
 </script>
 
 <style scoped>
 </style>
-  
