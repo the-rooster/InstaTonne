@@ -2,7 +2,8 @@ from django.http import HttpRequest, HttpResponse
 import json
 from ..models import Author, AuthorSerializer
 from django.core.paginator import Paginator
-from .utils import valid_requesting_user
+from .utils import valid_requesting_user, get_one_url
+import re
 
 
 def get_author_id(request : HttpRequest):
@@ -26,7 +27,17 @@ def authors(request: HttpRequest):
     return HttpResponse(status=405)
 
 
-def single_author(request: HttpRequest, author_id: str):
+def single_author(request: HttpRequest):
+    matched = re.search(r"^\/authors\/(.*?)\/?$", request.path)
+    if matched:
+        author_id: str = matched.group(1)
+    else:
+        return HttpResponse(status=405)
+
+    if "/" in author_id and request.method == "GET":
+        return single_author_get_remote(request, author_id)
+    elif "/" in author_id:
+        return HttpResponse(status=405)
     if request.method == "GET":
         return single_author_get(request, author_id)
     if request.method == "POST":
@@ -69,6 +80,12 @@ def single_author_get(request: HttpRequest, author_id: str):
     del serialized_author["id_url"]
     res = json.dumps(serialized_author)
     return HttpResponse(content=res ,status=200)
+
+
+def single_author_get_remote(request: HttpRequest, author_id: str):
+    remote_url = author_id
+    status_code, text = get_one_url(remote_url)
+    return HttpResponse(status=status_code, content=text)
 
 
 # update a single author
