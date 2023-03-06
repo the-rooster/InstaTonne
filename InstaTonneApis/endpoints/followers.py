@@ -79,7 +79,7 @@ def delete_author_follower(request: HttpRequest, author_id: str, foreign_author_
 # accept follow request
 def put_author_follower(request: HttpRequest, author_id: str, foreign_author_id: str):
 
-    if not valid_requesting_user(request, foreign_author_id):
+    if not valid_requesting_user(request, author_id):
         return HttpResponse(status=403)
     
     if author_id == foreign_author_id:

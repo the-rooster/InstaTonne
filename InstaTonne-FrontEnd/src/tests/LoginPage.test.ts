@@ -1,12 +1,11 @@
 import { mount } from "@vue/test-utils";
-import { describe, expect, test, vi } from "vitest";
-import FollowRequests from '../components/FollowRequests.vue'
+import { describe, expect, test } from "vitest";
+import LoginPage from '../components/LoginPage.vue'
 import { setTimeout } from "timers/promises";
-import AuthorCard from '../components/AuthorCard.vue'
 
-describe('FollowRequests tests', async () => {
+describe('LoginPage tests', async () => {
     test("mounts", async () => {
-        const wrapper = await mount(FollowRequests)
+        const wrapper = await mount(LoginPage)
 
         // initially, show the loading animation
         const initialLoadingAnimation = wrapper.find(".loadingIcon")
@@ -14,8 +13,8 @@ describe('FollowRequests tests', async () => {
 
         // wait for get request
         await setTimeout(500).then(() => {
-            const authorCard = wrapper.findComponent(AuthorCard)
-            expect(authorCard.exists()).toBe(true)
+            const header = wrapper.find("h1")
+            expect(header.text()).toBe("InstaTonne")
         })
 
         // check the loading animation is hidden

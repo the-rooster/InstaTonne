@@ -22,17 +22,16 @@ function createHTTP(url: string) {
       async get() {
         return HTTP.get(url)
       },
-    //   async patch(element) {
-    //       console.log(element)
-    //       return HTTP.patch(`${url}${element.id}/`, element).then(response => {
-    //           console.log(response)
-    //           return response.data
-    //       })
-    //   },
-    //   async delete(id) {
-    //       HTTP.delete(`${url}${id}/`)
-    //       return id
-    //   },
+      async put(data: string) {
+          return HTTP.put(`${url}`, data, { headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          }}).then(response => {
+              return response.data
+          })
+      },
+      async delete() {
+        return HTTP.delete(url)
+      },
     //   async list(queryParams = '') {
     //       return HTTP.get(`${url}${queryParams}`).then(response => {
     //           return response.data.results
