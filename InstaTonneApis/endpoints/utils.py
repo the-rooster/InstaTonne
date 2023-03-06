@@ -1,10 +1,17 @@
 from django.http import HttpRequest, HttpResponse
-from ..models import Author
+from ..models import Author, Follow, FollowSerializer
 from threading import Thread, Lock
 import json
 import requests
+from typing import Tuple
+import urllib.parse
 
-def get_all_urls(urls):
+
+PUBLIC = "PUBLIC"
+PRIVATE = "PRIVATE"
+
+
+def get_all_urls(urls: list[str]):
     inbox_lock = Lock()
     threads : list[Thread] = []
     result = []
@@ -36,12 +43,52 @@ def get_all_urls(urls):
         thread.join()
     
     return result
+
+
+def get_one_url(url: str) -> Tuple[int, str]:
+    try:
+        response: requests.Response = requests.get(url)
+        return (response.status_code, response.text)
+    except Exception as e:
+        return (500, str(e))
+
+
+def send_to_inboxes(author_id: str, author_url: str, item_url: str, item_visibility: str):
+    follows = Follow.objects.all().filter(object=author_id, accepted=True)
+    if item_visibility == PUBLIC:
+        for follow in follows:
+            if not post_to_follower_inbox(follow.follower_url, item_url):
+                print("ERROR: bad inbox response, public")
+    elif item_visibility == PRIVATE:
+        for follow in follows:
+            if not author_follows_follower(author_url, follow.follower_url):
+                continue
+            if not post_to_follower_inbox(follow.follower_url, item_url):
+                print("ERROR: bad inbox response, private")
+    else:
+        print("ERROR: invalid visibility")
+
+
+def author_follows_follower(author_url: str, follower_url: str) -> bool:
+    encoded_author_url = urllib.parse.quote(author_url, safe='')
+    check_url: str = follower_url + '/follower/' + encoded_author_url
+    check_response: requests.Response = requests.get(check_url)
+    return check_response.status_code == 200
+
+
+def post_to_follower_inbox(follower_url: str, item_url: str) -> bool:
+    inbox_url: str = follower_url + '/inbox/'
+    response: requests.Response = requests.post(inbox_url, item_url) # this will probs have to get changed when the inbox endpoints get updated
+    return response.status_code == 200
+
+
 def get_author(id : str):
     user = Author.objects.filter(pk=id)
     if not user:
         print("db corrupted probably. user exists but author does not.")
         return None
     return user[0]
+
 
 # check if a user is authenticated
 def check_authenticated(request : HttpRequest, id : str):
@@ -63,7 +110,8 @@ def check_authenticated(request : HttpRequest, id : str):
         return None
     
     return user
-    
+
+
 def valid_requesting_user(request: HttpRequest, required_author_id: str) -> bool:
     if not request.user.is_authenticated:
         return False
