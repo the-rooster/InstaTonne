@@ -9,7 +9,7 @@ def get_author_id(request : HttpRequest):
     if request.method != "POST":
         return HttpResponse(status=405)
     
-    author = Author.objects.filter(userID=request.user.id)
+    author = Author.objects.filter(userID=request.user.id) #type: ignore
 
     if not author:
         return HttpResponse(status=404)
