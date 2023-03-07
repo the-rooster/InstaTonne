@@ -71,6 +71,7 @@ def parse_inbox_post(data : dict, user : Author):
         return parse_inbox_like(data,user)
 
 
+
 def parse_inbox_comment(data,user):
     # comment: dict = {
     #     "type" : "comment",
@@ -101,7 +102,57 @@ def parse_inbox_comment(data,user):
     return url
 
 def parse_inbox_like(data,user):
-    pass
+   
+    local_id = [x for x in data["object"].split("/") if x][-1]
+
+
+    #now get the post
+
+    obj = None
+    like = None
+
+    #decide if local_id is post or comment
+    post = True
+    obj = Post.objects.filter(id=local_id).first()
+
+    if obj:
+
+        #determine if the author has already liked this post
+        if not Like.objects.filter(post=obj,author=data["author"]):
+            like = Like.objects.create(type="like",summary=data["summary"],author=data["author"],post=obj)
+        else:
+            print('yeehaw')
+            return None
+
+    elif not obj:  
+        #no post, try comments
+
+        obj = Comment.objects.filter(id=local_id).first()
+        post = False
+        if obj:
+            if not Like.objects.filter(comment=obj,author=data["author"]):
+                like = Like.objects.create(type="like",summary=data["summary"],author=data["author"],comment=obj)
+            else:
+                print('yeesnaw')
+                return None
+    
+    if not obj:
+        print('yeespaw')
+        return None
+    
+    like.save()
+
+    url = ""
+
+    if post:
+        url = HOSTNAME + "/authors/" + user.id + "/posts/" + local_id + "/likes/" + like.id
+    else:
+        url = HOSTNAME + "/authors/" + user.id + "/posts/" + obj.post.id + "/comments/" + obj.id + "/likes/" + like.id
+    obj.id_url = url
+    
+    obj.save()
+
+    return url
 
 def parse_inbox_post_post(data,user):
 

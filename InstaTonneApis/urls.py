@@ -23,7 +23,7 @@ from .endpoints.register import register_author
 from .endpoints.login import login
 from .endpoints.posts import single_author_posts, single_author_post, single_author_post_image
 from .endpoints.comments import single_post_comments, get_single_comment_local
-from .endpoints.likes import single_comment_likes, single_post_likes, single_author_likes
+from .endpoints.likes import single_comment_likes, single_post_likes, single_author_likes, get_single_like_post_local, get_single_like_comment_local
 from .endpoints.inbox import inbox_endpoint
 from .endpoints.csrf import get_csrf
 # Routers provide an easy way of automatically determining the URL conf.
@@ -40,6 +40,8 @@ urlpatterns = [
     re_path(r"^authors\/.+?\/posts\/.+?\/comments\/?$", single_post_comments),
     path("authors/<str:author_id>/posts/<str:post_id>/comments/<str:comment_id>",get_single_comment_local),
     re_path(r"^authors\/.+?\/posts\/.+?\/likes\/?$", single_post_likes),
+    path("authors/<str:author_id>/posts/<str:post_id>/comments/<str:comment_id>/likes/<str:like_id>",get_single_like_comment_local),
+    path("authors/<str:author_id>/posts/<str:post_id>/likes/<str:like_id>",get_single_like_post_local),
     re_path(r"^authors\/.+?\/posts\/.+?\/?$", single_author_post),
     re_path(r"^authors\/.+?\/posts\/?$", single_author_posts),
     re_path(r"^authors\/.+?\/inbox\/?$",inbox_endpoint),

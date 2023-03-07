@@ -64,14 +64,19 @@ def single_post_comments_get(request: HttpRequest, author_id: str, post_id: str)
 
 def single_post_comments_get_remote(request: HttpRequest, author_id: str, post_id: str):
 
-    print("HERE")
     query = request.META.get('QUERY_STRING', '')
     if query:
         query = '?' + query
     remote_url = post_id + '/comments' + query
-    print("HERE@2")
+
+
     status_code, text = get_one_url(remote_url)
-    print("HERE@3")
+
+    if status_code != 200:
+        print("GETTING REMOTE COMMENTS FAILED:")
+        print(status_code,text)
+        return HttpResponse(status=404)
+
     return HttpResponse(status=status_code, content=text)
 
 def single_post_comments_post_remote(request: HttpRequest, author_id : str, post_id : str):
@@ -161,7 +166,7 @@ def get_single_comment_local(request:HttpRequest,author_id : str,post_id : str, 
     comment = Comment.objects.filter(id=comment_id).first()
 
     res = json.dumps({
-        "type": "comments",
+        "type": "comment",
 
         "post": comment.post.id,
         "author" : comment.author,
