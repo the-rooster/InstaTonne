@@ -125,7 +125,6 @@ class CommentSerializer(serializers.ModelSerializer):
 class Like(models.Model):
     id = models.TextField(primary_key=True, default=default_id_generator, editable=False)
     type = models.TextField()
-    context = models.TextField()
     summary = models.TextField()
     author = models.TextField()
 
