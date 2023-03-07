@@ -53,17 +53,26 @@ def get_one_url(url: str) -> Tuple[int, str]:
         return (500, str(e))
 
 
-def send_to_inboxes(author_id: str, author_url: str, item_url: str, item_visibility: str):
+def send_to_single_inbox(author_url : str, data : dict):
+    inbox_url: str = author_url + '/inbox/'
+    try:
+        response: requests.Response = requests.post(inbox_url,json.dumps(data)) # this will probs have to get changed when the inbox endpoints get updated
+    except Exception as e:
+        print("SERVER DOWN!")
+        return True
+    return response.status_code == 200
+
+def send_to_inboxes(author_id: str, author_url: str, data : dict, item_visibility: str):
     follows = Follow.objects.all().filter(object=author_id, accepted=True)
     if item_visibility == PUBLIC:
         for follow in follows:
-            if not post_to_follower_inbox(follow.follower_url, item_url):
+            if not post_to_follower_inbox(follow.follower_url, data):
                 print("ERROR: bad inbox response, public")
     elif item_visibility == PRIVATE:
         for follow in follows:
             if not author_follows_follower(author_url, follow.follower_url):
                 continue
-            if not post_to_follower_inbox(follow.follower_url, item_url):
+            if not post_to_follower_inbox(follow.follower_url, data):
                 print("ERROR: bad inbox response, private")
     else:
         print("ERROR: invalid visibility")
@@ -76,10 +85,10 @@ def author_follows_follower(author_url: str, follower_url: str) -> bool:
     return check_response.status_code == 200
 
 
-def post_to_follower_inbox(follower_url: str, item_url: str) -> bool:
+def post_to_follower_inbox(follower_url: str, data: dict) -> bool:
     inbox_url: str = follower_url + '/inbox/'
     try:
-        response: requests.Response = requests.post(inbox_url, item_url) # this will probs have to get changed when the inbox endpoints get updated
+        response: requests.Response = requests.post(inbox_url,json.dumps(data)) # this will probs have to get changed when the inbox endpoints get updated
     except Exception as e:
         print("SERVER DOWN!")
         return True
@@ -146,3 +155,6 @@ def make_comments_url(request_host: str, author_id: str, post_id: str) -> str:
 
 def make_comment_url(request_host: str, author_id: str, post_id: str, comment_id: str) -> str:
     return make_post_url(request_host, author_id, post_id) + "/comments/" + comment_id
+
+def make_inbox_url(request_host: str, author_id: str) -> str:
+    return make_author_url(request_host,author_id) + "/inbox"

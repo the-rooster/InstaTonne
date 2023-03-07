@@ -24,9 +24,10 @@ class Author(models.Model):
 
 
 class AuthorSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='id_url')
     class Meta:
         model = Author
-        fields = ['type', 'id_url', 'url', 'host', 'displayName', 'github', 'profileImage'] # ??? userID and active not here, should they be?
+        fields = ['type', 'id', 'url', 'host', 'displayName', 'github', 'profileImage'] # ??? userID and active not here, should they be?
 
     def create(self, validated_data):
         return Author.objects.create(**validated_data)
@@ -124,7 +125,6 @@ class CommentSerializer(serializers.ModelSerializer):
 class Like(models.Model):
     id = models.TextField(primary_key=True, default=default_id_generator, editable=False)
     type = models.TextField()
-    context = models.TextField()
     summary = models.TextField()
     author = models.TextField()
 
