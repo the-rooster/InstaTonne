@@ -76,8 +76,8 @@ def authors_get(request : HttpRequest):
 def single_author_get(request: HttpRequest, author_id: str):
     author = Author.objects.get(pk=author_id)
     serialized_author = AuthorSerializer(author).data
-    serialized_author["id"] = serialized_author["id_url"]
-    del serialized_author["id_url"]
+    # serialized_author["id"] = serialized_author["id_url"]
+    # del serialized_author["id_url"]
     res = json.dumps(serialized_author)
     return HttpResponse(content=res ,status=200)
 

@@ -85,8 +85,8 @@ def single_author_post_get(request: HttpRequest, author_id: str, post_id: str):
     comment_count = Comment.objects.all().filter(post=post_id).count()
     serialized_post["count"] = comment_count
     serialized_post["comments"] = comments_url
-    serialized_post["id"] = serialized_post["id_url"]
-    del serialized_post["id_url"]
+    # serialized_post["id"] = serialized_post["id_url"]
+    # del serialized_post["id_url"]
 
     res = json.dumps(serialized_post)
     return HttpResponse(content=res, status=200)

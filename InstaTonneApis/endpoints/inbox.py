@@ -1,5 +1,5 @@
 from django.http import HttpRequest, HttpResponse
-from ..models import Author, Follow, Inbox
+from ..models import Author, Follow, Inbox, Comment, Like, Post
 import json
 import requests
 from InstaTonne.settings import HOSTNAME
@@ -72,9 +72,33 @@ def parse_inbox_post(data : dict, user : Author):
 
 
 def parse_inbox_comment(data,user):
+    # comment: dict = {
+    #     "type" : "comment",
+    #     "contentType" : body["contentType"],
+    #     "content" : body["comment"],
+    #     "author" : make_author_url(request.get_host(), author.id),
+    #     "post" : post_id
+    # }
 
+    #get post from post_id (get last non empty field after splitting on /)
+
+    post_local_id = [x for x in data["post"].split("/") if x][-1]
+
+    #now get the post
+
+    post = Post.objects.filter(id=post_local_id).first()
+
+    if not post:
+        return None
     
-    pass
+    obj = Comment.objects.create(type=data["type"],id_url="",contentType=data["contentType"],comment=data["content"],author=data["author"],post=post)
+    
+    url = HOSTNAME + "/authors/" + user.id + "/posts/" + post_local_id + '/comments/' + obj.id
+    obj.id_url = url
+    
+    obj.save()
+
+    return url
 
 def parse_inbox_like(data,user):
     pass

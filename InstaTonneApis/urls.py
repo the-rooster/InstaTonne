@@ -22,7 +22,7 @@ from .endpoints.followers import single_author_followers, single_author_follower
 from .endpoints.register import register_author
 from .endpoints.login import login
 from .endpoints.posts import single_author_posts, single_author_post, single_author_post_image
-from .endpoints.comments import single_post_comments
+from .endpoints.comments import single_post_comments, get_single_comment_local
 from .endpoints.likes import single_comment_likes, single_post_likes, single_author_likes
 from .endpoints.inbox import inbox_endpoint
 from .endpoints.csrf import get_csrf
@@ -38,6 +38,7 @@ urlpatterns = [
     re_path(r"^authors\/.+?\/liked\/?$", single_author_likes),
     re_path(r"^authors\/.+?\/posts\/.+?\/comments\/.+?\/likes\/?$", single_comment_likes),
     re_path(r"^authors\/.+?\/posts\/.+?\/comments\/?$", single_post_comments),
+    path("authors/<str:author_id>/posts/<str:post_id>/comments/<str:comment_id>",get_single_comment_local),
     re_path(r"^authors\/.+?\/posts\/.+?\/likes\/?$", single_post_likes),
     re_path(r"^authors\/.+?\/posts\/.+?\/?$", single_author_post),
     re_path(r"^authors\/.+?\/posts\/?$", single_author_posts),
