@@ -21,7 +21,9 @@
 
         <template v-slot:append>
           <div class="justify-self-end">
-            <v-btn><v-icon class="me-1" icon="mdi-heart"></v-icon></v-btn>
+            <v-btn @click="likePost"
+              ><v-icon class="me-1" icon="mdi-heart"></v-icon
+            ></v-btn>
             <v-icon class="me-1" icon="mdi-share-variant"></v-icon>
           </div>
         </template>
@@ -84,10 +86,10 @@ const props = defineProps({
     type: Object,
     required: true,
   },
-  // commentData: {
-  //   type: Object,
-  //   required: true,
-  // },
+  commentData: {
+    type: Object,
+    required: true,
+  },
 });
 
 // const commentData = ref(props.commentData);
@@ -101,6 +103,17 @@ const props = defineProps({
 //       console.log(response.data);
 //     });
 // }
+
+console.log(toRaw(props.postData).id, 1000);
+console.log(toRaw(props.postData));
+
+async function likePost() {
+  await createHTTP(toRaw(props.postData).id + "/likes")
+    .post("")
+    .then((response: { data: object }) => {
+      console.log(response.data);
+    });
+}
 
 let comments = ref({});
 createHTTP(toRaw(props.postData.comments))

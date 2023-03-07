@@ -5,7 +5,9 @@
         <v-list-item-title>{{ author.displayName }}</v-list-item-title>
         <template v-slot:append>
           <div class="justify-self-end">
-            <v-icon class="me-1" icon="mdi-heart"></v-icon>
+            <v-btn @click="likeComment"
+              ><v-icon class="me-1" icon="mdi-heart" />
+            </v-btn>
           </div>
         </template>
         <v-list-item>{{ props.commentData.comment }}</v-list-item>
@@ -24,6 +26,16 @@ const props = defineProps({
     required: true,
   },
 });
+
+console.log(toRaw(props.commentData).id);
+
+async function likeComment() {
+  await createHTTP(toRaw(props.commentData).id + "/likes")
+    .post("")
+    .then((response: { data: object }) => {
+      console.log(response.data);
+    });
+}
 
 let author = ref({});
 createHTTP(toRaw(props.commentData).author)
