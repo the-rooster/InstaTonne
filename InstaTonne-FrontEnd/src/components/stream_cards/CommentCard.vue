@@ -2,9 +2,7 @@
   <v-card class="mx-auto" color="#fff" theme="light" max-width="400">
     <v-card-actions>
       <v-list-item class="w-100">
-        <v-list-item-title>{{
-          props.commentData.author?.displayName
-        }}</v-list-item-title>
+        <v-list-item-title>{{ author.displayName }}</v-list-item-title>
         <template v-slot:append>
           <div class="justify-self-end">
             <v-icon class="me-1" icon="mdi-heart"></v-icon>
@@ -17,6 +15,9 @@
 </template>
 
 <script setup lang="ts">
+import { createHTTP } from "../../axiosCalls";
+import { defineProps, ref, toRaw } from "vue";
+
 const props = defineProps({
   commentData: {
     type: Object,
@@ -24,8 +25,12 @@ const props = defineProps({
   },
 });
 
-console.log(props.commentData, 34879);
-
+let author = ref({});
+createHTTP(toRaw(props.commentData).author)
+  .get()
+  .then((response) => {
+    author.value = response.data;
+  });
 // defineProps<{ msg: string }>();
 </script>
 

@@ -1,5 +1,5 @@
 <template>
-  <v-card class="mx-auto" color="#fff" theme="light" max-width="400">
+  <v-card class="mx-auto" color="#eee" theme="light" max-width="400">
     <v-card-actions>
       <v-list-item class="w-100">
         <!-- <template v-slot:prepend>
@@ -21,14 +21,14 @@
 
         <template v-slot:append>
           <div class="justify-self-end">
-            <v-icon class="me-1" icon="mdi-heart"></v-icon>
+            <v-btn><v-icon class="me-1" icon="mdi-heart"></v-icon></v-btn>
             <v-icon class="me-1" icon="mdi-share-variant"></v-icon>
           </div>
         </template>
       </v-list-item>
     </v-card-actions>
 
-    <v-card>
+    <v-card class="mx-4">
       <v-img v-if="isImage" :src="require('${ props.postData.content }')" />
       <v-card-text v-else>
         <span>{{ props.postData.content }}</span>
@@ -49,7 +49,11 @@
     <v-expand-transition>
       <div v-show="show">
         <v-divider />
-
+        <!-- <v-textarea v-model="commentData.content" clearable />
+        <v-card-actions>
+          <v-spacer />
+          <v-btn @click="saveComment">Submit</v-btn>
+        </v-card-actions> -->
         <v-card-text>
           <div v-for="item in comments" v-bind:key="item.id_url">
             <CommentCard
@@ -69,7 +73,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, toRaw } from "vue";
 import CommentCard from "./CommentCard.vue";
 // defineProps<{ msg: string }>()
 
@@ -80,18 +84,29 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  // commentData: {
+  //   type: Object,
+  //   required: true,
+  // },
 });
 
-console.log(props.postData);
+// const commentData = ref(props.commentData);
+// commentData.value.content = "";
+// commentData.value.author = USER_AUTHOR_ID_COOKIE;
+
+// async function saveComment() {
+//   await createHTTP(``)
+//     .post(JSON.stringify(props.commentData))
+//     .then((response: { data: object }) => {
+//       console.log(response.data);
+//     });
+// }
 
 let comments = ref({});
-createHTTP(`${props.postData.id_url}/comments/`)
+createHTTP(toRaw(props.postData.comments))
   .get()
   .then((response) => {
-    console.log(response.data, 1341234);
     comments.value = response.data.comments;
-    console.log(response.data.comments, 567);
-    console.log(comments.value, 987);
   });
 
 // defineProps<{ msg: string }>()
@@ -103,6 +118,4 @@ const show = ref(false);
 .read-the-docs {
   color: #888;
 }
-
-
 </style>
