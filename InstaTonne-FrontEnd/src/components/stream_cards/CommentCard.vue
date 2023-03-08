@@ -2,12 +2,12 @@
   <v-card class="mx-auto" color="#fff" theme="light" max-width="400">
     <v-card-actions>
       <v-list-item class="w-100">
-        <v-list-item-title>{{
-          props.commentData.author?.displayName
-        }}</v-list-item-title>
+        <v-list-item-title>{{ author.displayName }}</v-list-item-title>
         <template v-slot:append>
           <div class="justify-self-end">
-            <v-icon class="me-1" icon="mdi-heart"></v-icon>
+            <v-btn @click="likeComment"
+              ><v-icon class="me-1" icon="mdi-heart" />
+            </v-btn>
           </div>
         </template>
         <v-list-item>{{ props.commentData.comment }}</v-list-item>
@@ -17,6 +17,9 @@
 </template>
 
 <script setup lang="ts">
+import { createHTTP } from "../../axiosCalls";
+import { defineProps, ref, toRaw } from "vue";
+
 const props = defineProps({
   commentData: {
     type: Object,
@@ -24,8 +27,22 @@ const props = defineProps({
   },
 });
 
-console.log(props.commentData, 34879);
+console.log(toRaw(props.commentData).id);
 
+async function likeComment() {
+  await createHTTP(toRaw(props.commentData).id + "/likes")
+    .post("")
+    .then((response: { data: object }) => {
+      console.log(response.data);
+    });
+}
+
+let author = ref({});
+createHTTP(toRaw(props.commentData).author)
+  .get()
+  .then((response) => {
+    author.value = response.data;
+  });
 // defineProps<{ msg: string }>();
 </script>
 
