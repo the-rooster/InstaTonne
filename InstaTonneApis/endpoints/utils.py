@@ -86,13 +86,15 @@ def author_follows_follower(author_url: str, follower_url: str) -> bool:
 
 
 def post_to_follower_inbox(follower_url: str, data: dict) -> bool:
+    follower_url = follower_url.strip("/")
     inbox_url: str = follower_url + '/inbox/'
     try:
         response: requests.Response = requests.post(inbox_url,json.dumps(data)) # this will probs have to get changed when the inbox endpoints get updated
     except Exception as e:
         print("SERVER DOWN!")
         return True
-    return response.status_code == 200
+    print("RESPONSE STATUS CODE!",response.status_code)
+    return response.status_code >= 200 and response.status_code < 300
 
 
 def get_author(id : str):

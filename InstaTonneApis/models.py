@@ -25,6 +25,7 @@ class Author(models.Model):
 
 class AuthorSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='id_url')
+
     class Meta:
         model = Author
         fields = ['type', 'id', 'url', 'host', 'displayName', 'github', 'profileImage'] # ??? userID and active not here, should they be?
@@ -70,12 +71,13 @@ class Post(models.Model):
 
 
 class PostSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='id_url')
     author = AuthorSerializer()
     categories = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Post
-        fields = ['type', 'title', 'id_url', 'source', 'origin', 'description', 'contentType',
+        fields = ['type', 'title', 'id', 'source', 'origin', 'description', 'contentType',
                   'content', 'author', 'categories', 'published', 'visibility', 'unlisted']
 
     def get_categories(self, instance):
@@ -117,9 +119,10 @@ class Comment(models.Model):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='id_url')
     class Meta:
         model = Comment
-        fields = ['type', 'id_url', 'contentType', 'comment', 'published', 'author']
+        fields = ['type', 'id', 'contentType', 'comment', 'published', 'author']
 
 
 class Like(models.Model):
@@ -135,9 +138,11 @@ class Like(models.Model):
 
 
 class LikeSerializer(serializers.ModelSerializer):
+    comment = CommentSerializer()
+    post = PostSerializer()
     class Meta:
         model = Like
-        fields = ['type', 'context', 'summary', 'author', 'post', 'comment']
+        fields = ['type', 'summary', 'author', 'comment', 'post']
 
 
 class Inbox(models.Model):

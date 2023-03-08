@@ -28,11 +28,8 @@ def single_author_follower(request: HttpRequest):
         author_id: str = matched.group(1)
         foreign_author_id: str = matched.group(2)
     else:
-        print("TEST")
         return HttpResponse(status=405)
-    foreign_author_id = unquote(foreign_author_id)
-    print("FOREIGN TIME: ",foreign_author_id)
-    print("METHOD: ",request.method)
+
     if request.method == "DELETE":
         return delete_author_follower(request, author_id, foreign_author_id)
     elif request.method == "PUT":
@@ -49,19 +46,19 @@ def single_author_followers_get(request: HttpRequest, author_id: str):
     urls = [item.follower_url for item in follows if item.accepted]
     serialized_data = get_all_urls(urls)
 
-    res = json.dumps([{
+    res = json.dumps({
         "type": "followers",
         "items": serialized_data
-    }])
+    })
 
-    return HttpResponse(content=res, status=200)
+    return HttpResponse(content=res, content_type="application/json", status=200)
 
 
 # get the followers of a remote author
 def single_author_followers_get_remote(request: HttpRequest, author_id: str):
     remote_url = author_id + '/followers/'
     status_code, text = get_one_url(remote_url)
-    return HttpResponse(status=status_code, content=text)
+    return HttpResponse(status=status_code, content_type="application/json", content=text)
 
 
 # remove the follow where foreign_author follows author

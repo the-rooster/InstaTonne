@@ -156,12 +156,11 @@ def parse_inbox_like(data,user):
 
 def parse_inbox_post_post(data,user):
 
+    print("INBOX POST SENT: ",data)
     if "id" not in data:
+        print('yahoo')
         return None
     
-    obj = Inbox.objects.create(user=user,url=data["id"])
-
-    obj.save()
 
     return data["id"]
 
@@ -208,6 +207,7 @@ def post_inbox(request : HttpRequest, id : str):
     url = parse_inbox_post(data,author)
 
     if not url:
+        print('here')
         return HttpResponse(status=400)
     
     obj = Inbox.objects.create(author=author,url=url)
