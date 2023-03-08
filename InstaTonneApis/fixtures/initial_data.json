@@ -139,11 +139,11 @@
     "fields": {
       "id" : "1",
       "type" : "like",
-      "context" : "context1",
       "summary" : "summary1",
       "published" : "2022-01-01 00:00:01",
       "author" : "http://localhost:8000/authors/1",
-      "post" : "1"
+      "post" : "1",
+      "comment" : null
     }
   },
   {
@@ -151,10 +151,10 @@
     "fields": {
       "id" : "2",
       "type" : "like",
-      "context" : "context1",
       "summary" : "summary1",
       "published" : "2022-01-01 00:00:01",
       "author" : "http://localhost:8001/authors/1",
+      "post" : null,
       "comment" : "1"
     }
   }

@@ -21,6 +21,7 @@ def get_author_id(request : HttpRequest):
 
     return HttpResponse(content=json.dumps(res),status=200)
 
+
 def authors(request: HttpRequest):
     if request.method == "GET":
         return authors_get(request)
@@ -58,10 +59,6 @@ def authors_get(request : HttpRequest):
     serialized_data = []
     for author in authors:
         serialized_author = AuthorSerializer(author).data
-
-        # serialized_author["id"] = serialized_author["id_url"]
-        # del serialized_author["id_url"]
-
         serialized_data.append(serialized_author)
 
     res = json.dumps({
@@ -69,7 +66,7 @@ def authors_get(request : HttpRequest):
         "items": serialized_data
     })
 
-    return HttpResponse(content=res, status=200)
+    return HttpResponse(content=res, content_type="application/json", status=200)
 
 
 # get a single author
@@ -79,13 +76,13 @@ def single_author_get(request: HttpRequest, author_id: str):
     # serialized_author["id"] = serialized_author["id_url"]
     # del serialized_author["id_url"]
     res = json.dumps(serialized_author)
-    return HttpResponse(content=res ,status=200)
+    return HttpResponse(content=res, content_type="application/json", status=200)
 
 
 # get a single remote author
 def single_author_get_remote(request: HttpRequest, author_id: str):
     status_code, text = get_one_url(author_id)
-    return HttpResponse(status=status_code, content=text)
+    return HttpResponse(content=text, content_type="application/json", status=status_code)
 
 
 # update a single author
