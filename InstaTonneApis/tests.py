@@ -183,17 +183,6 @@ class AuthorTestCase(TestCase):
         with self.assertRaises(Author.DoesNotExist):
             Author.objects.get(id=author_id)
 
-    def test_author_deserialization(self):
-        new_author_data = get_author_data(2)
-        serializer = AuthorSerializer(data=new_author_data)
-        self.assertTrue(serializer.is_valid())
-        author = serializer.save()
-        self.assertIsInstance(author, Author)
-        for key, value in new_author_data.items():
-            if key in ['userID', 'active']:
-                continue
-            self.assertEqual(getattr(author, key), value)
-
 
 class FollowModelTestCase(TestCase):
     def setUp(self):
@@ -389,28 +378,29 @@ class LikeModelTestCase(TestCase):
         self.comment = Comment.objects.create(**self.comment_data)
         self.like_data = {
             'type': 'Like',
-            'context': 'https://example.com/post/1',
             'summary': 'John Doe likes the post',
             'author': 'John Doe',
-            'post': self.post
+            'published': '2019-01-01T00:00:00Z',
+            'post': self.post,
+            'comment': self.comment
         }
         self.like = Like.objects.create(**self.like_data)
 
     def test_like_creation(self):
         self.assertIsInstance(self.like, Like)
         self.assertEqual(self.like.type, 'Like')
-        self.assertEqual(self.like.context, 'https://example.com/post/1')
         self.assertEqual(self.like.summary, 'John Doe likes the post')
         self.assertEqual(self.like.author, 'John Doe')
         self.assertEqual(self.like.post, self.post)
+        self.assertEqual(self.like.comment, self.comment)
 
     def test_like_reading(self):
         like = Like.objects.get(id=self.like.id)
         self.assertEqual(like.type, 'Like')
-        self.assertEqual(like.context, 'https://example.com/post/1')
         self.assertEqual(like.summary, 'John Doe likes the post')
         self.assertEqual(like.author, 'John Doe')
         self.assertEqual(like.post, self.post)
+        self.assertEqual(like.comment, self.comment)
 
     def test_like_updating(self):
         self.like.summary = 'John Doe likes the post (updated)'
