@@ -211,6 +211,7 @@ def single_author_posts_post(request: HttpRequest, author_id: str):
         post.save()
 
         data : dict = {
+            "type" : "post",
             "id" : post.id_url
         }
 

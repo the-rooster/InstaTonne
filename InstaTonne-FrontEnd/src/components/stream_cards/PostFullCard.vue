@@ -19,6 +19,8 @@
           props.postData.author?.host
         }}</v-list-item-subtitle>
 
+        
+
         <template v-slot:append>
           <div class="justify-self-end">
             <v-btn @click="likePost"
@@ -30,7 +32,12 @@
       </v-list-item>
     </v-card-actions>
 
+
+
     <v-card class="mx-4">
+      <v-list-item-title><h3>{{
+        props.postData.title
+      }}</h3></v-list-item-title>
       <v-img v-if="isImage" :src="require('${ props.postData.content }')" />
       <v-card-text v-else>
         <span>{{ props.postData.content }}</span>

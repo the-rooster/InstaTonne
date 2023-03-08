@@ -59,8 +59,8 @@ def authors_get(request : HttpRequest):
     for author in authors:
         serialized_author = AuthorSerializer(author).data
 
-        serialized_author["id"] = serialized_author["id_url"]
-        del serialized_author["id_url"]
+        # serialized_author["id"] = serialized_author["id_url"]
+        # del serialized_author["id_url"]
 
         serialized_data.append(serialized_author)
 
