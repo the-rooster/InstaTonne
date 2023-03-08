@@ -68,6 +68,12 @@ const loggedIn = computed(() => activeUserId.value != undefined);
 
 onBeforeMount(async () => {
   activeUserId.value = Cookies.get(USER_AUTHOR_ID_COOKIE)
+
+  if (!activeUserId.value){
+    loading.value = false;
+    return;
+  }
+
   await createHTTP(`authors/${activeUserId.value}`).get().then((response: { data: object }) => {
     authorData.value = response.data;
     loading.value = false;

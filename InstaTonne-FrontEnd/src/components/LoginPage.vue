@@ -186,16 +186,16 @@ async function register() {
   return;
 }
 
-const loading = ref(true);
+const loading = ref(false);
 const postData = ref({});
-onBeforeMount(async () => {
-  await createHTTP("authors/1/posts/1/")
-    .get()
-    .then((response: { data: object }) => {
-      postData.value = response.data;
-      loading.value = false;
-    });
-});
+// onBeforeMount(async () => {
+//   await createHTTP("authors/1/posts/1/")
+//     .get()
+//     .then((response: { data: object }) => {
+//       postData.value = response.data;
+//       loading.value = false;
+//     });
+// });
 </script>
 
 <style scoped>

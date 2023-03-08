@@ -1,5 +1,5 @@
 from django.http import HttpRequest, HttpResponse
-from ..models import Author, Follow, Inbox
+from ..models import Author, Follow, Inbox, Comment, Like, Post
 import json
 import requests
 from InstaTonne.settings import HOSTNAME
@@ -62,10 +62,107 @@ def parse_inbox_post(data : dict, user : Author):
     data_type = str(data["type"].lower())
 
     if data_type == "follow":
-
         return parse_inbox_follow_request(data,user)
+    elif data_type == "post":
+        return parse_inbox_post_post(data,user)
+    elif data_type == "comment":
+        return parse_inbox_comment(data,user)
+    elif data_type == "like":
+        return parse_inbox_like(data,user)
+
+
+
+def parse_inbox_comment(data,user):
+    # comment: dict = {
+    #     "type" : "comment",
+    #     "contentType" : body["contentType"],
+    #     "content" : body["comment"],
+    #     "author" : make_author_url(request.get_host(), author.id),
+    #     "post" : post_id
+    # }
+
+    #get post from post_id (get last non empty field after splitting on /)
+
+    post_local_id = [x for x in data["post"].split("/") if x][-1]
+
+    #now get the post
+
+    post = Post.objects.filter(id=post_local_id).first()
+
+    if not post:
+        return None
+    
+    obj = Comment.objects.create(type=data["type"],id_url="",contentType=data["contentType"],comment=data["content"],author=data["author"],post=post)
+    
+    url = HOSTNAME + "/authors/" + user.id + "/posts/" + post_local_id + '/comments/' + obj.id
+    obj.id_url = url
+    
+    obj.save()
+
+    return url
+
+def parse_inbox_like(data,user):
+   
+    local_id = [x for x in data["object"].split("/") if x][-1]
+
+
+    #now get the post
+
+    obj = None
+    like = None
+
+    #decide if local_id is post or comment
+    post = True
+    obj = Post.objects.filter(id=local_id).first()
+
+    if obj:
+
+        #determine if the author has already liked this post
+        if not Like.objects.filter(post=obj,author=data["author"]):
+            like = Like.objects.create(type="like",summary=data["summary"],author=data["author"],post=obj)
+        else:
+            print('yeehaw')
+            return None
+
+    elif not obj:  
+        #no post, try comments
+
+        obj = Comment.objects.filter(id=local_id).first()
+        post = False
+        if obj:
+            if not Like.objects.filter(comment=obj,author=data["author"]):
+                like = Like.objects.create(type="like",summary=data["summary"],author=data["author"],comment=obj)
+            else:
+                print('yeesnaw')
+                return None
+    
+    if not obj:
+        print('yeespaw')
+        return None
+    
+    like.save()
+
+    url = ""
+
+    if post:
+        url = HOSTNAME + "/authors/" + user.id + "/posts/" + local_id + "/likes/" + like.id
+    else:
+        url = HOSTNAME + "/authors/" + user.id + "/posts/" + obj.post.id + "/comments/" + obj.id + "/likes/" + like.id
+    obj.id_url = url
+    
+    obj.save()
+
+    return url
+
+def parse_inbox_post_post(data,user):
+
+    print("INBOX POST SENT: ",data)
+    if "id" not in data:
+        print('yahoo')
+        return None
     
 
+    return data["id"]
 
 def parse_inbox_follow_request(data : dict, user: Author):
         
@@ -110,6 +207,7 @@ def post_inbox(request : HttpRequest, id : str):
     url = parse_inbox_post(data,author)
 
     if not url:
+        print('here')
         return HttpResponse(status=400)
     
     obj = Inbox.objects.create(author=author,url=url)

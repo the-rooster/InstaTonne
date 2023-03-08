@@ -22,8 +22,8 @@ from .endpoints.followers import single_author_followers, single_author_follower
 from .endpoints.register import register_author
 from .endpoints.login import login
 from .endpoints.posts import single_author_posts, single_author_post, single_author_post_image
-from .endpoints.comments import single_post_comments
-from .endpoints.likes import single_comment_likes, single_post_likes, single_author_likes
+from .endpoints.comments import single_post_comments, single_post_comment
+from .endpoints.likes import single_comment_likes, single_post_likes, single_author_likes, single_comment_like, single_post_like
 from .endpoints.inbox import inbox_endpoint
 from .endpoints.csrf import get_csrf
 # Routers provide an easy way of automatically determining the URL conf.
@@ -35,9 +35,13 @@ urlpatterns = [
     path("login/",login),
     path("authors/id/",get_author_id),
 
+    re_path(r"^authors\/.+?\/inbox\/?$",inbox_endpoint),
     re_path(r"^authors\/.+?\/liked\/?$", single_author_likes),
+    re_path(r"^authors\/.+?\/posts\/.+?\/comments\/.+?\/likes\/.+?\/?$", single_comment_like),
     re_path(r"^authors\/.+?\/posts\/.+?\/comments\/.+?\/likes\/?$", single_comment_likes),
+    re_path(r"^authors\/.+?\/posts\/.+?\/comments\/.+?\/?$", single_post_comment),
     re_path(r"^authors\/.+?\/posts\/.+?\/comments\/?$", single_post_comments),
+    re_path(r"^authors\/.+?\/posts\/.+?\/likes\/.+?\/?$", single_post_like),
     re_path(r"^authors\/.+?\/posts\/.+?\/likes\/?$", single_post_likes),
     re_path(r"^authors\/.+?\/posts\/.+?\/?$", single_author_post),
     re_path(r"^authors\/.+?\/posts\/?$", single_author_posts),
@@ -46,6 +50,7 @@ urlpatterns = [
     re_path(r"^authors\/.+?\/followers\/?$", single_author_followers),
     re_path(r"^authors\/.+?\/?$", single_author),
     re_path(r"^authors\/?$", authors),
+
     path("authors/<str:author_id>/posts/<str:post_id>/image", single_author_post_image),
     path("csrf/", get_csrf)
 ]

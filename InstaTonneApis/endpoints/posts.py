@@ -70,7 +70,7 @@ def single_author_post_image_get(request: HttpRequest, author_id: str, post_id: 
         return HttpResponse(status=404)
 
     res = json.dumps(serialized_post["content"])
-    return HttpResponse(content=res, status=200)
+    return HttpResponse(content=res, content_type="application/json", status=200)
 
 
 # get a single post
@@ -85,17 +85,15 @@ def single_author_post_get(request: HttpRequest, author_id: str, post_id: str):
     comment_count = Comment.objects.all().filter(post=post_id).count()
     serialized_post["count"] = comment_count
     serialized_post["comments"] = comments_url
-    serialized_post["id"] = serialized_post["id_url"]
-    del serialized_post["id_url"]
 
     res = json.dumps(serialized_post)
-    return HttpResponse(content=res, status=200)
+    return HttpResponse(content=res, content_type="application/json", status=200)
 
 
 # get a single post of a remote author
 def single_author_post_get_remote(request: HttpRequest, author_id: str, post_id: str):
     status_code, text = get_one_url(post_id)
-    return HttpResponse(status=status_code, content=text)
+    return HttpResponse(status=status_code, content_type="application/json", content=text)
 
 
 # get all the posts of an author
@@ -122,8 +120,6 @@ def single_author_posts_get(request: HttpRequest, author_id: str):
         comment_count = Comment.objects.all().filter(post=post_id).count()
         serialized_post["count"] = comment_count
         serialized_post["comments"] = comments_url
-        serialized_post["id"] = serialized_post["id_url"]
-        del serialized_post["id_url"]
 
         serialized_data.append(serialized_post)
 
@@ -132,7 +128,7 @@ def single_author_posts_get(request: HttpRequest, author_id: str):
         "items": serialized_data
     })
 
-    return HttpResponse(content=res, status=200)
+    return HttpResponse(content=res, content_type="application/json", status=200)
 
 
 # get all the posts of a remote author
@@ -142,7 +138,7 @@ def single_author_posts_get_remote(request: HttpRequest, author_id: str):
         query = '?' + query
     remote_url = author_id + '/posts' + query
     status_code, text = get_one_url(remote_url)
-    return HttpResponse(status=status_code, content=text)
+    return HttpResponse(status=status_code, content_type="application/json", content=text)
 
 
 # update an existing post
@@ -210,7 +206,12 @@ def single_author_posts_post(request: HttpRequest, author_id: str):
         post.id_url = make_post_url(request.get_host(), author_id, post_id)
         post.save()
 
-        send_to_inboxes(author_id, author.id_url, post.id_url, body["visibility"])
+        data : dict = {
+            "type" : "post",
+            "id" : post.id_url
+        }
+
+        send_to_inboxes(author_id, author.id_url, data ,body["visibility"])
 
         return HttpResponse(status=204)
     except Exception as e:
@@ -262,7 +263,12 @@ def single_author_post_put(request: HttpRequest, author_id: str, post_id: str):
             author = author
         )
 
-        send_to_inboxes(author_id, author.id_url, post.id_url, body["visibility"])
+
+        data : dict = {
+            "id" : post.id_url
+        }
+
+        send_to_inboxes(author_id, author.id_url, data, body["visibility"])
 
         return HttpResponse(status=204)
     except Exception as e:
