@@ -1,5 +1,5 @@
 <template>
-  <v-card class="mx-auto" color="#eee" theme="light" max-width="400">
+  <v-card class="mx-auto" color="#eee" theme="light" max-width="80%">
     <v-card-actions>
       <v-list-item class="w-100">
         <!-- <template v-slot:prepend>
@@ -34,12 +34,12 @@
 
 
 
-    <v-card class="mx-4">
+    <v-card class="mx-4" min-height="30vh">
       <v-list-item-title><h3>{{
         props.postData.title
       }}</h3></v-list-item-title>
       <v-img v-if="isImage" :src="require('${ props.postData.content }')" />
-      <v-card-text v-else>
+      <v-card-text class="my-10" v-else>
         <span>{{ props.postData.content }}</span>
       </v-card-text>
     </v-card>

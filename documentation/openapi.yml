@@ -4,6 +4,7 @@ info:
   version: 1.0.0
 servers:
   - url: http://localhost:8000
+  - url: http://localhost:8001
 paths:
   /authors/1/inbox/:
     get:
@@ -18,35 +19,28 @@ paths:
     post:
       tags:
         - default
-      summary: post follow request
+      summary: post comment inbox
       requestBody:
         content:
           application/json:
             schema:
               type: object
               example:
-                type: Follow
-                summary: Greg wants to follow Lara
-                actor:
+                type: comment
+                author:
                   type: author
                   id: >-
                     http://127.0.0.1:5454/authors/1d698d25ff008f7538453c120f581471
                   url: >-
                     http://127.0.0.1:5454/authors/1d698d25ff008f7538453c120f581471
                   host: http://127.0.0.1:5454/
-                  displayName: Greg Johnson
                   github: http://github.com/gjohnson
                   profileImage: https://i.imgur.com/k7XVwpB.jpeg
-                object:
-                  type: author
-                  id: >-
-                    http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e
-                  host: http://127.0.0.1:5454/
-                  displayName: Lara Croft
-                  url: >-
-                    http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e
-                  github: http://github.com/laracroft
-                  profileImage: https://i.imgur.com/k7XVwpB.jpeg
+                comment: Sick Olde English
+                contentType: text/markdown
+                published: '2015-03-09T13:07:04+00:00'
+                id: >-
+                  http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e/posts/de305d54-75b4-431b-adb2-eb6b9e546013/comments/f6255bb01c648fe967714d52a89e8e9c
       parameters:
         - name: X-CSRFToken
           in: header
@@ -62,6 +56,48 @@ paths:
       tags:
         - default
       summary: http://localhost:8000/service/authors/1/inbox/
+      parameters:
+        - name: X-CSRFToken
+          in: header
+          schema:
+            type: string
+          example: f3gPbKMLdKXINBC9X3UZGz8fcnzFF8ml
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/7705e94f12a043e38c8f32c7745d96a3/inbox/:
+    post:
+      tags:
+        - default
+      summary: post follow request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                type: Follow
+                summary: User 2 wants to follow User1
+                actor:
+                  type: author
+                  id: >-
+                    http://127.0.0.1:8000/authors/9839dde5e9db4deeba850b12d7a919ea
+                  url: url1
+                  host: host1
+                  displayName: displayName1
+                  github: github1
+                  profileImage: https://i.imgur.com/k7XVwpB.jpeg
+                object:
+                  type: author
+                  id: >-
+                    http://127.0.0.1:8000/authors/7705e94f12a043e38c8f32c7745d96a3
+                  host: host2
+                  displayName: displayName2
+                  url: url2
+                  github: github2
+                  profileImage: https://i.imgur.com/k7XVwpB.jpeg
       parameters:
         - name: X-CSRFToken
           in: header
@@ -115,7 +151,7 @@ paths:
     get:
       tags:
         - default
-      summary: authors
+      summary: authors remote
       parameters:
         - name: page
           in: query
@@ -142,6 +178,16 @@ paths:
           description: Successful response
           content:
             application/json: {}
+  /authors/http://localhost:8001/authors/1:
+    get:
+      tags:
+        - default
+      summary: author remote
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
   /authors/1/:
     post:
       tags:
@@ -153,9 +199,9 @@ paths:
             schema:
               type: object
               example:
-                displayName: displayName1
-                github: github1
-                profileImage: profileImage1
+                displayName: displayName2
+                github: github76.1
+                profileImage: profileImage2
       parameters:
         - name: X-CSRFToken
           in: header
@@ -177,7 +223,17 @@ paths:
           description: Successful response
           content:
             application/json: {}
-  /authors/1/followers/2/:
+  /authors/http://localhost:8001/authors/1/followers:
+    get:
+      tags:
+        - default
+      summary: author followers remote
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/1/followers/http://localhost:8000/authors/2:
     get:
       tags:
         - default
@@ -187,7 +243,6 @@ paths:
           description: Successful response
           content:
             application/json: {}
-  /authors/2/followers/1/:
     put:
       tags:
         - default
@@ -241,6 +296,27 @@ paths:
           description: Successful response
           content:
             application/json: {}
+  /authors/http://localhost:8001/authors/1/posts:
+    get:
+      tags:
+        - default
+      summary: author posts remote
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+          example: '1'
+        - name: size
+          in: query
+          schema:
+            type: integer
+          example: '5'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
   /authors/1/posts/:
     post:
       tags:
@@ -258,7 +334,7 @@ paths:
                 description: description76.1
                 contentType: contentType76.1
                 content: content76.1
-                visibility: visibility76.1
+                visibility: PUBLIC
                 categories:
                   - cat76.0
                   - cat76.1
@@ -285,6 +361,16 @@ paths:
           description: Successful response
           content:
             application/json: {}
+  /authors/1/posts/http://localhost:8001/authors/1/posts/1:
+    get:
+      tags:
+        - default
+      summary: author post remote
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
   /authors/1/posts/1/:
     post:
       tags:
@@ -300,7 +386,7 @@ paths:
                 description: description76.1
                 contentType: contentType76.1
                 content: content76.1
-                visibility: visibility76.1
+                visibility: PUBLIC
                 categories:
                   - cat76.0
                   - cat76.1
@@ -347,8 +433,8 @@ paths:
                 origin: origin76.1
                 description: description76.1
                 contentType: image/png;base64
-                content: >- base64encodedimage
-                visibility: visibility
+                content: base64stuff
+                visibility: visibility76.1
                 categories:
                   - cat76.0
                   - cat76.1
@@ -386,6 +472,37 @@ paths:
           description: Successful response
           content:
             application/json: {}
+  /authors/1/posts/http://localhost:8001/authors/1/posts/1/comments:
+    get:
+      tags:
+        - default
+      summary: post comments remote
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+          example: '1'
+        - name: size
+          in: query
+          schema:
+            type: integer
+          example: '5'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/1/posts/1/comments/1:
+    get:
+      tags:
+        - default
+      summary: post comment
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
   /authors/1/posts/1/comments/:
     post:
       tags:
@@ -397,9 +514,10 @@ paths:
             schema:
               type: object
               example:
+                type: comment
                 contentType: contentType76.1
                 comment: comment76.1
-                author: 1
+                author: http://localhost:8000/authors/1
       parameters:
         - name: X-CSRFToken
           in: header
@@ -411,11 +529,27 @@ paths:
           description: Successful response
           content:
             application/json: {}
-  /authors/1/posts/1/comments/1/likes:
-    get:
+  /authors/1/posts/http://localhost:8001/authors/1/posts/1/comments/:
+    post:
       tags:
         - default
-      summary: comment likes
+      summary: post comments remote
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                type: comment
+                contentType: contentType76.1
+                comment: comment76.1
+                author: http://localhost:8000/authors/1
+      parameters:
+        - name: X-CSRFToken
+          in: header
+          schema:
+            type: string
+          example: '{{csrftoken}}'
       responses:
         '200':
           description: Successful response
@@ -431,11 +565,130 @@ paths:
           description: Successful response
           content:
             application/json: {}
+    post:
+      tags:
+        - default
+      summary: post likes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                contentType: contentType76.1
+                comment: comment76.1
+                author: http://localhost:8000/authors/1
+      parameters:
+        - name: X-CSRFToken
+          in: header
+          schema:
+            type: string
+          example: '{{csrftoken}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/1/posts/http://localhost:8001/authors/1/posts/1/likes:
+    get:
+      tags:
+        - default
+      summary: post likes remote
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    post:
+      tags:
+        - default
+      summary: post likes remote
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                contentType: contentType76.1
+                comment: comment76.1
+                author: http://localhost:8000/authors/1
+      parameters:
+        - name: X-CSRFToken
+          in: header
+          schema:
+            type: string
+          example: '{{csrftoken}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/1/posts/1/likes/1:
+    get:
+      tags:
+        - default
+      summary: post like
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/1/posts/1/comments/1/likes:
+    get:
+      tags:
+        - default
+      summary: comment likes
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/1/posts/1/comments/http://localhost:8001/authors/1/posts/1/comments/1/likes:
+    get:
+      tags:
+        - default
+      summary: comment likes remote
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    post:
+      tags:
+        - default
+      summary: comment likes remote
+      requestBody:
+        content: {}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/1/posts/1/comments/1/likes/2:
+    get:
+      tags:
+        - default
+      summary: comment like
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
   /authors/1/liked:
     get:
       tags:
         - default
       summary: author likes
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/http://localhost:8001/authors/1/liked:
+    get:
+      tags:
+        - default
+      summary: author likes remote
       responses:
         '200':
           description: Successful response

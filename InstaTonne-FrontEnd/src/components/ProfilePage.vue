@@ -10,11 +10,6 @@
     <br>
     <a v-bind:href="profileData.github"><p>Github: {{profileData.github}}</p></a>
     <a v-bind:href="profileData.host"><p>Origin: {{profileData.host}}</p></a>
-    <v-btn
-    class="button"
-
-    @click="follow()"
-  >
     <br>
     <div class="flex-container">
       <img class="profile-picture" v-bind:src="profileData.profileImage">
@@ -74,7 +69,8 @@
   createHTTP(`authors/${profileId}/followers/`)
   .get()
   .then((response) => {
-    let data = response.data[0]
+    console.log(response,123123123);
+    let data = response.data
     console.log(data, 51515);
     followers.value = data.items;
     follow_count.value = data.items.length;
