@@ -183,7 +183,7 @@ def parse_inbox_follow_request(data : dict, user: Author):
 
         obj.save()
 
-        return HOSTNAME + "/authors/" + user.id + "/followers/" + quote(actor_id)
+        return HOSTNAME + "/authors/" + user.id + "/followers/" + quote(actor_id) + "/request"
 """
 Post an item to a users inbox!
 """

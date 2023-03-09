@@ -18,7 +18,7 @@ from django.urls import path, include, re_path
 from rest_framework import routers, serializers, viewsets
 from rest_framework.schemas import get_schema_view
 from .endpoints.authors import single_author, authors, get_author_id
-from .endpoints.followers import single_author_followers, single_author_follower
+from .endpoints.followers import single_author_followers, single_author_follower, get_request_object
 from .endpoints.register import register_author
 from .endpoints.login import login
 from .endpoints.posts import single_author_posts, single_author_post, single_author_post_image
@@ -46,6 +46,7 @@ urlpatterns = [
     re_path(r"^authors\/.+?\/posts\/.+?\/?$", single_author_post),
     re_path(r"^authors\/.+?\/posts\/?$", single_author_posts),
     re_path(r"^authors\/.+?\/inbox\/?$",inbox_endpoint),
+    re_path(r"^authors\/.+?\/followers\/.+?/request\/?$", get_request_object),
     re_path(r"^authors\/.+?\/followers\/.+?\/?$", single_author_follower),
     re_path(r"^authors\/.+?\/followers\/?$", single_author_followers),
     re_path(r"^authors\/.+?\/?$", single_author),
