@@ -57,6 +57,7 @@ def get_inbox(request : HttpRequest, id : str):
 def parse_inbox_post(data : dict, user : Author):
 
     if "type" not in data:
+        print("NO TYPE ON INBOX POST!")
         return None
     
     data_type = str(data["type"].lower())
@@ -82,7 +83,8 @@ def parse_inbox_comment(data,user):
     # }
 
     #get post from post_id (get last non empty field after splitting on /)
-
+    
+    print("POST LINK",data["post"])
     post_local_id = [x for x in data["post"].split("/") if x][-1]
 
     #now get the post
@@ -90,6 +92,7 @@ def parse_inbox_comment(data,user):
     post = Post.objects.filter(id=post_local_id).first()
 
     if not post:
+        print("POST WITH ID ",post_local_id, " DOES NOT EXIST")
         return None
     
     obj = Comment.objects.create(type=data["type"],id_url="",contentType=data["contentType"],comment=data["content"],author=data["author"],post=post)
@@ -105,6 +108,7 @@ def parse_inbox_like(data,user):
    
     local_id = [x for x in data["object"].split("/") if x][-1]
 
+    print(local_id)
 
     #now get the post
 
