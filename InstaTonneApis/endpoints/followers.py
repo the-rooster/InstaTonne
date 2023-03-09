@@ -167,7 +167,7 @@ def check_author_follower(request: HttpRequest, author_id: str, foreign_author_i
     
     print("FOREIGN AUTHOR: ",foreign_author_id)
 
-    #if foreign author is local author:
+    #if foreign author is local author return 404
     if user.id_url == foreign_author_id:
         return HttpResponse(status=200)
     
