@@ -34,6 +34,7 @@ import CreatePostPage from "./components/CreatePostPage.vue";
 import ProfilePage from "./components/ProfilePage.vue";
 import UserSearch from "./components/UserSearch.vue";
 import UserPost from "./components/UserPost.vue";
+import FriendsPage from "./components/FriendsPage.vue";
 import { USER_AUTHOR_ID_COOKIE } from "./axiosCalls";
 // 2. Define some routes
 // Each route should map to a component.
@@ -46,6 +47,7 @@ const routes = [
   { path: "/CreatePost", name: "Create New Post", component: CreatePostPage },
   { path: "/ProfilePage/:id", name: "ProfilePage", component: ProfilePage },
   { path: "/UserSearch", name: "UserSearch", component: UserSearch },
+  { path: "/FriendsPage", name: "FriendsPage", component: FriendsPage },
   {path: "/authors/:id/posts/:postid",name : "UserPost", component: UserPost}
 ];
 
@@ -56,6 +58,7 @@ export const nav_bar_routes = [
   { path: "/CreatePost", name: "Create New Post", component: CreatePostPage },
   { path: `/ProfilePage/${Cookies.get(USER_AUTHOR_ID_COOKIE)}`, name: "ProfilePage", component: ProfilePage },
   { path: "/UserSearch", name: "UserSearch", component: UserSearch },
+  { path: "/FriendsPage", name: "FriendsPage", component: FriendsPage },
 ];
 
 // 3. Create the router instance and pass the `routes` option
