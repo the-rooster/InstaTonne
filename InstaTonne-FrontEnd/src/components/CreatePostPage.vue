@@ -24,7 +24,6 @@
       v-else
       :post-data="postData"
       :save-function="savePost"
-      :require-extra="true"
     />
   </div>
 </template>

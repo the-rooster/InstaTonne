@@ -7,14 +7,6 @@
         <AuthorCard :author-info="postData.author" />
         <v-card>
           <template #title>
-            Published On:
-          </template>
-          <v-card-item>
-            {{ postData.published }}
-          </v-card-item>
-        </v-card>
-        <v-card>
-          <template #title>
             Visibility:
           </template>
           <v-card-item>
@@ -31,18 +23,6 @@
           </v-card-item>
         </v-card>
       </div>
-      <div v-if="props.requireExtra">
-        Source:
-        <v-textarea
-          v-model="postData.source"
-          clearable
-        />
-        Origin:
-        <v-textarea
-          v-model="postData.origin"
-          clearable
-        />
-      </div>
       Title:
       <v-textarea
         v-model="postData.title"
@@ -54,9 +34,10 @@
         clearable
       />
       Content:
-      <v-textarea
-        v-model="postData.content"
-        clearable
+      <ContentBox
+        :content="postData.content"
+        :content-type="postData.contentType"
+        :editable="true"
       />
       Categories:
       <v-combobox
@@ -90,6 +71,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import AuthorCard from './AuthorCard.vue'
+import ContentBox from './ContentBox.vue'
+import { marked } from "marked";
 
 const props = defineProps({
   postData: {
@@ -98,10 +81,6 @@ const props = defineProps({
   },
   saveFunction: {
     type: Function,
-    required: true
-  },
-  requireExtra: {
-    type: Boolean,
     required: true
   }
 });

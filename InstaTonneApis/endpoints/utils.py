@@ -11,7 +11,7 @@ PUBLIC = "PUBLIC"
 PRIVATE = "PRIVATE"
 
 
-def get_all_urls(urls: list[str]):
+def get_all_urls(urls):
     inbox_lock = Lock()
     threads : list[Thread] = []
     result = []
