@@ -143,7 +143,7 @@ def single_post_comments_post(request: HttpRequest, author_id: str, post_id: str
 
         if post is None:
             return HttpResponse(status=404)
-        
+        print("SENDING COMMENT ON POST ",post.id_url)
         body: dict = json.loads(request.body)
         comment: dict = {
             "type" : "comment",

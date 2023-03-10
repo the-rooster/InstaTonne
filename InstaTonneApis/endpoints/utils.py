@@ -58,9 +58,10 @@ def send_to_single_inbox(author_url : str, data : dict):
     try:
         response: requests.Response = requests.post(inbox_url,json.dumps(data)) # this will probs have to get changed when the inbox endpoints get updated
     except Exception as e:
-        print("SERVER DOWN!")
-        return True
-    return response.status_code == 200
+        print(e)
+        print("SERVER DOWN! Returning 404")
+        return 404
+    return response.status_code
 
 def send_to_inboxes(author_id: str, author_url: str, data : dict, item_visibility: str):
     follows = Follow.objects.all().filter(object=author_id, accepted=True)
