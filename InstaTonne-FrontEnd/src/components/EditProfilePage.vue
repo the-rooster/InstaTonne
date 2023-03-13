@@ -15,7 +15,7 @@
       class="my-10"
       clearable
     />
-    <v-file-input
+    <v-text-field
       v-model="authorData.profileImage"
       label="Upload image"
       variant="filled"
