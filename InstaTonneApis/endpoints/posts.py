@@ -168,6 +168,8 @@ def single_author_post_post(request: HttpRequest, author_id: str, post_id: str):
             post.categories = body["categories"]
         if "unlisted" in body:
             post.unlisted = body["unlisted"]
+        if request.get_host() not in post.source:
+            post.source = make_post_url(request.get_host(), author_id, post_id)
         post.save()
 
         return HttpResponse(status=204)
@@ -191,8 +193,6 @@ def single_author_posts_post(request: HttpRequest, author_id: str):
         post: Post = Post.objects.create(
             type = "post",
             title = body["title"],
-            source = body["source"],
-            origin = body["origin"],
             description = body["description"],
             contentType = body["contentType"],
             content = body["content"],
@@ -204,6 +204,8 @@ def single_author_posts_post(request: HttpRequest, author_id: str):
 
         post_id = post.id #type: ignore
         post.id_url = make_post_url(request.get_host(), author_id, post_id)
+        post.source = post.id_url
+        post.origin = post.id_url
         post.save()
 
         data : dict = {

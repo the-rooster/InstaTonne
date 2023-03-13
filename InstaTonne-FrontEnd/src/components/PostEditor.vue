@@ -1,66 +1,61 @@
 <template>
-  <div
-    class="viewBox"
-  >
+  <div class="viewBox">
     <div>
-      <div style="display: flex;">
+      <div style="display: flex">
         <AuthorCard :author-info="postData.author" />
-        <v-card>
-          <template #title>
-            Published On:
-          </template>
-          <v-card-item>
-            {{ postData.published }}
-          </v-card-item>
-        </v-card>
-        <v-card>
-          <template #title>
-            Visibility:
-          </template>
-          <v-card-item>
-            <v-radio-group v-model="postData.visibility">
-              <v-radio
-                label="public"
-                value="PUBLIC"
-              />
-              <v-radio
-                label="friends only"
-                value="FRIENDS"
-              />
-            </v-radio-group>
-          </v-card-item>
-        </v-card>
       </div>
-      <div v-if="props.requireExtra">
-        Source:
-        <v-textarea
-          v-model="postData.source"
-          clearable
-        />
-        Origin:
-        <v-textarea
-          v-model="postData.origin"
-          clearable
-        />
-      </div>
-      Title:
-      <v-textarea
+      <v-text-field
         v-model="postData.title"
+        label="Title"
+        class="my-10"
         clearable
       />
-      Description:
+      <v-select
+        v-model="postData.contentType"
+        label="Content Type"
+        :items="[
+          'text/markdown',
+          'text/plain',
+          'application/base64',
+          'image/png;base64',
+          'image/jpeg;base64',
+        ]"
+        class="my-10"
+      />
+      <v-file-input
+        v-if="
+          postData.contentType == 'image/png;base64' ||
+          postData.contentType == 'image/jpeg;base64'
+        "
+        v-model="postData.content"
+        label="Upload image"
+        variant="filled"
+        prepend-icon="mdi-camera"
+        class="my-10"
+      />
+      <v-textarea
+        v-else
+        v-model="postData.content"
+        label="Content"
+        class="my-10"
+        clearable
+      />
       <v-textarea
         v-model="postData.description"
+        label="Description"
+        class="my-10"
         clearable
       />
-      Content:
-      <v-textarea
-        v-model="postData.content"
-        clearable
+      <v-select
+        v-model="postData.visibility"
+        label="Visibility"
+        :items="['PUBLIC', 'FRIENDS']"
+        class="my-10"
       />
-      Categories:
       <v-combobox
         v-model="postData.categories"
+        label="Categories"
+        class="my-10"
         chips
         clearable
         multiple
@@ -77,19 +72,15 @@
           </v-chip>
         </template>
       </v-combobox>
-      <v-btn
-        :disabled="disableSaving"
-        @click="savePost"
-      >
-        SAVE
-      </v-btn>
+      <v-checkbox v-model="postData.unlisted" label="Unlisted"></v-checkbox>
+      <v-btn :disabled="disableSaving" @click="savePost"> SAVE </v-btn>
     </div>
   </div>
 </template>
-    
+
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import AuthorCard from './AuthorCard.vue'
+import { ref, computed } from "vue";
+import AuthorCard from "./AuthorCard.vue";
 
 const props = defineProps({
   postData: {
@@ -98,28 +89,30 @@ const props = defineProps({
   },
   saveFunction: {
     type: Function,
-    required: true
+    required: true,
   },
   requireExtra: {
     type: Boolean,
-    required: true
-  }
+    required: true,
+  },
 });
 
-const postData = ref(props.postData) 
+const postData = ref(props.postData);
 
-const disableSaving = computed(() => postData.value.source.length == 0 ||
-postData.value.origin.length == 0 ||
-postData.value.title.length == 0 ||
-postData.value.content.length == 0 ||
-postData.value.description.length == 0 ||
-(postData.value.visibility != "PUBLIC" && postData.value.visibility != "FRIENDS"))
+const disableSaving = computed(
+  () =>
+    postData.value.title.length == 0 ||
+    postData.value.content.length == 0 ||
+    postData.value.description.length == 0 ||
+    (postData.value.visibility != "PUBLIC" &&
+      postData.value.visibility != "FRIENDS")
+  // (postData.value.contentType != "Text" &&
+  //   postData.value.contentType != "Image")
+);
 
 async function savePost() {
-  props.saveFunction(postData.value)
+  props.saveFunction(postData.value);
 }
-
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
