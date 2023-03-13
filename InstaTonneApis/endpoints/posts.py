@@ -193,6 +193,7 @@ def single_author_posts_post(request: HttpRequest, author_id: str):
         post: Post = Post.objects.create(
             type = "post",
             title = body["title"],
+            source = body["source"] if "source" in body else "",
             description = body["description"],
             contentType = body["contentType"],
             content = body["content"],
@@ -202,10 +203,17 @@ def single_author_posts_post(request: HttpRequest, author_id: str):
             author = author
         )
 
+        print("author_id: ", author_id)
+        print("post_id: ", post.id)
+        print("post.author: ", str(post.author.id))
+
         post_id = post.id #type: ignore
-        post.id_url = make_post_url(request.get_host(), author_id, post_id)
-        post.source = post.id_url
-        post.origin = post.id_url
+        post.id_url = make_post_url(request.get_host(), post.author.id, post_id)
+        if not post.source:
+            post.source = post.id_url
+        else:
+            post.source = make_post_url(request.get_host(), author_id, post_id)
+        post.origin = post.id_url if not body["origin"] else body["origin"]
         post.save()
 
         data : dict = {

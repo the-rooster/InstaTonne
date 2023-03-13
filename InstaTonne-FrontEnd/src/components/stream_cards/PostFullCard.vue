@@ -19,25 +19,23 @@
           props.postData.author?.host
         }}</v-list-item-subtitle>
 
-        
-
         <template v-slot:append>
           <div class="justify-self-end">
             <v-btn @click="likePost"
               ><v-icon class="me-1" icon="mdi-heart"></v-icon
             ></v-btn>
-            <v-icon class="me-1" icon="mdi-share-variant"></v-icon>
+            <v-btn @click="sharePost"
+              ><v-icon class="me-1" icon="mdi-share-variant"></v-icon
+            ></v-btn>
           </div>
         </template>
       </v-list-item>
     </v-card-actions>
 
-
-
     <v-card class="mx-4" min-height="30vh">
-      <v-list-item-title><h3>{{
-        props.postData.title
-      }}</h3></v-list-item-title>
+      <v-list-item-title
+        ><h3>{{ props.postData.title }}</h3></v-list-item-title
+      >
       <v-img v-if="isImage" :src="require('${ props.postData.content }')" />
       <v-card-text class="my-10" v-else>
         <span>{{ props.postData.content }}</span>
@@ -70,11 +68,6 @@
               v-bind:commentData="item"
             />
           </div>
-          <!-- I'm a thing. But, like most politicians, he promised more than he
-          could deliver. You won't have time for sleeping, soldier, not with all
-          the bed making you'll be doing. Then we'll go with that data file!
-          Hey, you add a one and two zeros to that or we walk! You're going to
-          do his laundry? I've got to find a way to escape. -->
         </v-card-text>
       </div>
     </v-expand-transition>
@@ -82,8 +75,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, toRaw } from "vue";
+import { ref, toRaw, onBeforeMount } from "vue";
 import CommentCard from "./CommentCard.vue";
+import Cookies from "js-cookie";
 // defineProps<{ msg: string }>()
 
 import { USER_AUTHOR_ID_COOKIE, createHTTP } from "../../axiosCalls";
@@ -122,6 +116,24 @@ async function likePost() {
     });
 }
 
+// async function sharePost() {}
+
+const authorId = Cookies.get(USER_AUTHOR_ID_COOKIE);
+const loading = ref(true);
+
+async function sharePost() {
+  loading.value = true;
+  var updatedPost = toRaw(props.postData);
+  console.log(updatedPost, 1002);
+  updatedPost.source = Cookies.get(USER_AUTHOR_ID_COOKIE);
+  console.log(updatedPost, 1003);
+  await createHTTP(`authors/${authorId}/posts/`)
+    .post(JSON.stringify(updatedPost))
+    .then((response: { data: object }) => {
+      loading.value = false;
+    });
+}
+
 let comments = ref({});
 createHTTP(toRaw(props.postData.comments))
   .get()
@@ -130,7 +142,9 @@ createHTTP(toRaw(props.postData.comments))
   });
 
 // defineProps<{ msg: string }>()
-const isImage = props.postData.author.contentType === "image/png;base64";
+const isImage =
+  props.postData.author.contentType === "image/png;base64" ||
+  props.postData.author.contentType === "image/jpeg;base64";
 const show = ref(false);
 </script>
 
