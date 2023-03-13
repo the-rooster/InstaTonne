@@ -42,6 +42,9 @@ def single_author(request: HttpRequest):
     if request.method == "GET":
         return single_author_get(request, author_id)
     if request.method == "POST":
+        print("Getting into single_author_post")
+        print(request)
+        print(author_id)
         return single_author_post(request, author_id)
     return HttpResponse(status=405)
 
@@ -87,6 +90,7 @@ def single_author_get_remote(request: HttpRequest, author_id: str):
 
 # update a single author
 def single_author_post(request: HttpRequest, author_id: str):
+    
     if not valid_requesting_user(request, author_id):
         return HttpResponse(status=403)
 
