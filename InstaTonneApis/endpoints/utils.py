@@ -113,7 +113,8 @@ def post_to_follower_inbox(follower_url: str, data: dict) -> bool:
     follower_url = follower_url.strip("/")
     inbox_url: str = follower_url + '/inbox/'
     try:
-        response: requests.Response = requests.post(inbox_url,json.dumps(data)) # this will probs have to get changed when the inbox endpoints get updated
+        response: requests.Response = requests.post(inbox_url,json.dumps(data),headers={"Origin":HOSTNAME,
+                                                                                        "Authorization" : get_auth_header_for_server(follower_url)}) # this will probs have to get changed when the inbox endpoints get updated
     except Exception as e:
         print("SERVER DOWN!")
         return True

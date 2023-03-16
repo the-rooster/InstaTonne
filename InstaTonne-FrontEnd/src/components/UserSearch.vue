@@ -2,10 +2,11 @@
   <div
     class="viewBox"
   >
-    <h3>
+    <h2>
       User Search
-    </h3>
+    </h2>
     <!-- server list -->
+    <h4 style="padding:0px">Connected Servers</h4>
     <div class="server-list">
       <div
       v-for="server in servers"
@@ -15,11 +16,14 @@
         <v-btn
         class="server-display"
         @click="() => {setServerShown(server.host)}"
+        :disabled="servershown==server.host"
         >
           <h4>{{server.host}}</h4>
         </v-btn>
       </div>
     </div>
+    <br>
+    <br>
     <div class="flex-container">
       <input
         v-model="search"
@@ -77,14 +81,23 @@ import { onBeforeUpdate } from 'vue';
   function nextPage(){
 
     pageNum.page++;
-    fetchAuthors()
+    if (servershown.value == "local"){
+        fetchAuthors();
+        return
+    }
+    fetchRemoteAuthors(servershown.value);
   }
 
   function previousPage(){
 
     if (pageNum.page > 1){
       pageNum.page--;
-      fetchAuthors()
+
+      if (servershown.value == "local"){
+        fetchAuthors();
+        return
+      }
+      fetchRemoteAuthors(servershown.value);
     }
 
   }
@@ -100,6 +113,7 @@ import { onBeforeUpdate } from 'vue';
   async function setServerShown(server : string){
 
     servershown.value = server;
+    pageNum.page = 1;
 
     if (server == "local"){
       fetchAuthors();
@@ -121,7 +135,6 @@ import { onBeforeUpdate } from 'vue';
 
   // fetch all authors from a remote server
   async function fetchRemoteAuthors(server : string){
-    pageNum.page = 0;
 
     let total_remote_author_urls = encodeURI("http://" + server + `/authors?page=${pageNum.page}&size=${pageSize}/`);
     await createHTTP(`remote-authors/${total_remote_author_urls}`).get().then( (response) => {
@@ -168,7 +181,8 @@ import { onBeforeUpdate } from 'vue';
 
   .server-display {
     color: #888;
-    margin:1vw;
+    margin-left: 0.1vw;
+    margin-right: 0.1vw;
   }
 
   .read-the-docs {
