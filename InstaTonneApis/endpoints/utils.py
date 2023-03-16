@@ -21,8 +21,15 @@ def get_all_urls(urls: list[str]):
         print(url)
 
         def get_item(url : str):
+
+            #check if we can make a request to this url
+            if not can_send_request(url):
+                inbox_lock.acquire()
+                result.append({"error" : "url not connected to this server"})
+                inbox_lock.release()
             try:
-                response : requests.Response = requests.get(url,headers={"Origin":HOSTNAME})
+                response : requests.Response = requests.get(url,headers={"Origin":HOSTNAME,
+                                                                         "Authentication" : get_auth_header_for_server(url)})
                 print("STATUS: ",response.status_code)
                 if response.status_code >= 200 and response.status_code < 300:
                     print(response.text)
@@ -47,8 +54,15 @@ def get_all_urls(urls: list[str]):
 
 
 def get_one_url(url: str) -> Tuple[int, str]:
+
+    # check if requested hostname in valid hosts here
+    if not can_send_request(url):
+        print("NOT IN LIST OF ACCEPTED SERVERS")
+        return (401,str("NOT IN LIST OF ACCEPTED SERVERS"))
+    
     try:
-        response: requests.Response = requests.get(url,headers={"Origin":HOSTNAME})
+        response: requests.Response = requests.get(url,headers={"Origin":HOSTNAME,
+                                                                "Authentication" : get_auth_header_for_server(url)})
         return (response.status_code, response.text)
     except Exception as e:
         print("ERROR GETTING URL: ",e)
@@ -56,9 +70,16 @@ def get_one_url(url: str) -> Tuple[int, str]:
 
 
 def send_to_single_inbox(author_url : str, data : dict):
+
+    # check if requested hostname in valid hosts here
+    if not can_send_request(author_url):
+        return (401,str("NOT IN LIST OF ACCEPTED SERVERS"))
+    
     inbox_url: str = author_url + '/inbox/'
     try:
-        response: requests.Response = requests.post(inbox_url,json.dumps(data)) # this will probs have to get changed when the inbox endpoints get updated
+        response: requests.Response = requests.post(inbox_url,
+                                                    json.dumps(data),headers={"Origin" : HOSTNAME, 
+                                                                            "Authentication" : get_auth_header_for_server(author_url)})
     except Exception as e:
         print(e)
         print("SERVER DOWN! Returning 404")
@@ -172,12 +193,8 @@ def make_inbox_url(request_host: str, author_id: str) -> str:
 def check_auth_header(request : HttpRequest):
 
     print("CHECKING AUTH HEADER")
-
-    if 'HTTP_ORIGIN' not in request.META:
-        print("NO ORIGIN SPECIFIED")
-        return False
     
-    origin = request.META['HTTP_ORIGIN']
+    origin = request.META.get('HTTP_ORIGIN')
 
     print("ORIGIN:",origin)
 
@@ -191,7 +208,7 @@ def check_auth_header(request : HttpRequest):
     #check if the request is from a connected server
     auth_header = request.META['HTTP_AUTHORIZATION']
 
-    connected = ConnectedServer.objects.first(creds=auth_header)
+    connected = ConnectedServer.objects.filter(accepted_creds=auth_header)
 
     print("CHECKING AUTH HEADER!")
     print(auth_header,origin,HOSTNAME)
@@ -202,3 +219,33 @@ def check_auth_header(request : HttpRequest):
         return False
     
     return True
+
+#check if the url is in our list of allowed servers to make requests to. otherwise, return 401
+def can_send_request(url : str):
+
+    parsed_url = urllib.parse.urlparse(url)
+    parsed_hostname = urllib.parse.urlparse(HOSTNAME)
+
+    print("HERE",parsed_url.netloc,parsed_hostname.netloc)
+
+    if parsed_url.netloc == parsed_hostname.netloc:
+        return True
+    
+    connected = ConnectedServer.objects.filter(host=parsed_url.netloc)
+
+    print(connected)
+    if connected:
+        return True
+    
+    return False
+
+def get_auth_header_for_server(url : str):
+    parsed_url = urllib.parse.urlparse(url)
+
+    connected = ConnectedServer.objects.filter(host=parsed_url.hostname)
+
+    if connected:
+
+        return connected[0].our_creds
+    
+    return ""

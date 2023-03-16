@@ -21,6 +21,14 @@ def get_author_id(request : HttpRequest):
 
     return HttpResponse(content=json.dumps(res),status=200)
 
+# get remote authors from url
+def remote_authors(request: HttpRequest,remote_authors : str):
+    
+    if request.method == "GET":
+        status, resp = get_one_url(remote_authors)
+        return HttpResponse(status=status,content=resp)
+    
+    return HttpResponse(status=405)
 
 def authors(request: HttpRequest):
     if request.method == "GET":
@@ -33,7 +41,7 @@ def single_author(request: HttpRequest):
     if matched:
         author_id: str = matched.group(1)
     else:
-        return HttpResponse(status=405)
+        return HttpResponse(status=400)
 
     if "/" in author_id and request.method == "GET":
         return single_author_get_remote(request, author_id)

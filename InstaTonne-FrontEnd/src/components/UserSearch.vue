@@ -5,6 +5,21 @@
     <h3>
       User Search
     </h3>
+    <!-- server list -->
+    <div class="server-list">
+      <div
+      v-for="server in servers"
+      :key="server.host"
+      class="server-display"
+      > 
+        <v-btn
+        class="server-display"
+        @click="() => {setServerShown(server.host)}"
+        >
+          <h4>{{server.host}}</h4>
+        </v-btn>
+      </div>
+    </div>
     <div class="flex-container">
       <input
         v-model="search"
@@ -49,11 +64,15 @@ import { onBeforeUpdate } from 'vue';
 
   const loading = ref(true)
   const result : any[] = [];
-  const postData = ref(result);
+  const authorsList = ref(result);
   const search = ref("")
 
   const pageSize = 5;
   const pageNum = reactive({"page" : 1});
+
+
+  const servers = ref([]);
+  const servershown = ref("local");
 
   function nextPage(){
 
@@ -70,24 +89,60 @@ import { onBeforeUpdate } from 'vue';
 
   }
 
+  async function getAllServers(){
+    await createHTTP("connected-servers/").get().then((response : object) => {
+      console.log("GOT CONNECTED SERVERS!!!!",response.data.servers);
+      servers.value = [...response.data.servers,{"host" : "local"}];
+
+    });
+  }
+
+  async function setServerShown(server : string){
+
+    servershown.value = server;
+
+    if (server == "local"){
+      fetchAuthors();
+      return;
+    }
+
+    fetchRemoteAuthors(server);
+
+  }
+
   async function fetchAuthors(){
     await createHTTP(`authors?page=${pageNum.page}&size=${pageSize}`).get().then((response: { data: object }) => {
       console.log("YUP");
       console.log(response);
-      postData.value = response.data.items;
+      authorsList.value = response.data.items;
       loading.value = false;
     });
   }
 
-  onBeforeMount(() => {fetchAuthors()
+  // fetch all authors from a remote server
+  async function fetchRemoteAuthors(server : string){
+    pageNum.page = 0;
+
+    let total_remote_author_urls = encodeURI("http://" + server + `/authors?page=${pageNum.page}&size=${pageSize}/`);
+    await createHTTP(`remote-authors/${total_remote_author_urls}`).get().then( (response) => {
+      console.log("YUP");
+      console.log(response);
+      authorsList.value = response.data.items;
+      loading.value = false;
+    });
+  }
+
+  onBeforeMount(() => {fetchAuthors(); getAllServers();
   });
+
+  
 
   const myVal = computed({
   get() {
-    return postData.value.filter(u => {
+    return authorsList.value.filter(u => {
         return u.displayName.toLowerCase().indexOf(search.value.toLowerCase()) != -1;
       })
-    // return postData.value
+    // return authorsList.value
   },
   set(val) {
     return
@@ -95,14 +150,27 @@ import { onBeforeUpdate } from 'vue';
 })
 
   // function filteredUsers() {
-  //   // return postData.value.reduce((u: string) => {
+  //   // return authorsList.value.reduce((u: string) => {
   //   //   return u.toLowerCase().indexOf(this.search.toLowerCase()) != -1;
   //   // });
-  //   return postData
+  //   return authorsList
   // }
 </script>
 
 <style scoped>
+
+  .server-list {
+    display:flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: space-between;
+  }
+
+  .server-display {
+    color: #888;
+    margin:1vw;
+  }
+
   .read-the-docs {
     color: #888;
   }
