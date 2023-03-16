@@ -52,6 +52,7 @@ def single_author_follower(request: HttpRequest):
 
 def post_author_follower(request: HttpRequest, author_id : str, foreign_author_id : str):
 
+    print("USER ID",foreign_author_id)
     if not valid_requesting_user(request, foreign_author_id):
         print("invalid requesting user! post_author_follower")
         return HttpResponse(status=401)

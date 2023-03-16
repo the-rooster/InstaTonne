@@ -17,7 +17,7 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 #Configure this before deployment
-HOSTNAME = "http://127.0.0.1:8000"
+HOSTNAME = "http://localhost:8000"
 FRONTEND = "http://localhost:5173"
 
 # Quick-start development settings - unsuitable for production

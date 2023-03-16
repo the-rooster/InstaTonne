@@ -203,6 +203,7 @@ def check_auth_header(request : HttpRequest):
         return True
 
     if 'HTTP_AUTHORIZATION' not in request.META:
+        print("MISSING AUTH HEADER")
         return False
     
     #check if the request is from a connected server
@@ -229,12 +230,14 @@ def can_send_request(url : str):
     print("HERE",parsed_url.netloc,parsed_hostname.netloc)
 
     if parsed_url.netloc == parsed_hostname.netloc:
+        print("REQUEST TO SELF")
         return True
     
     connected = ConnectedServer.objects.filter(host=parsed_url.netloc)
 
     print(connected)
     if connected:
+        print("SUCCESS. THIS URL IS CONNECTED")
         return True
     
     return False
