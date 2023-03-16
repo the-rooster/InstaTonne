@@ -4,7 +4,7 @@ import json
 import requests
 from InstaTonne.settings import HOSTNAME
 from django.views.decorators.csrf import csrf_exempt
-from .utils import check_authenticated, get_author, get_all_urls
+from .utils import check_authenticated, get_author, get_all_urls, check_auth_header
 import time
 from threading import Thread, Lock
 from InstaTonne.settings import HOSTNAME
@@ -40,7 +40,7 @@ def get_inbox(request : HttpRequest, id : str):
     # user = check_authenticated(request,id)
     user = get_author(id)
     if not user:
-        return HttpResponse(status=403)
+        return HttpResponse(status=401)
     
 
     inbox = Inbox.objects.filter(author=user)
@@ -188,6 +188,10 @@ def parse_inbox_follow_request(data : dict, user: Author):
 Post an item to a users inbox!
 """
 def post_inbox(request : HttpRequest, id : str):
+
+    #check that request is authenticated. remote or local
+    if not check_auth_header(request):
+        return HttpResponse(status=401)
     
     #parse request body
     data = request.body
@@ -227,7 +231,7 @@ def delete_inbox(request : HttpRequest, id : str):
 
     if not user:
         print("test")
-        return HttpResponse(status=403)
+        return HttpResponse(status=401)
 
 
     

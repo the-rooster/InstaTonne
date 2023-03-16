@@ -1,10 +1,11 @@
 from django.http import HttpRequest, HttpResponse
-from ..models import Author, Follow, FollowSerializer
+from ..models import Author, Follow, FollowSerializer, ConnectedServer
 from threading import Thread, Lock
 import json
 import requests
 from typing import Tuple
 import urllib.parse
+from InstaTonne.settings import HOSTNAME, FRONTEND
 
 
 PUBLIC = "PUBLIC"
@@ -21,7 +22,7 @@ def get_all_urls(urls: list[str]):
 
         def get_item(url : str):
             try:
-                response : requests.Response = requests.get(url)
+                response : requests.Response = requests.get(url,headers={"Origin":HOSTNAME})
                 print("STATUS: ",response.status_code)
                 if response.status_code >= 200 and response.status_code < 300:
                     print(response.text)
@@ -47,9 +48,10 @@ def get_all_urls(urls: list[str]):
 
 def get_one_url(url: str) -> Tuple[int, str]:
     try:
-        response: requests.Response = requests.get(url)
+        response: requests.Response = requests.get(url,headers={"Origin":HOSTNAME})
         return (response.status_code, response.text)
     except Exception as e:
+        print("ERROR GETTING URL: ",e)
         return (500, str(e))
 
 
@@ -130,15 +132,18 @@ def check_authenticated(request : HttpRequest, id : str):
 
 def valid_requesting_user(request: HttpRequest, required_author_id: str) -> bool:
     if not request.user.is_authenticated:
+        print('here1')
         return False
 
     print(request.user.pk)
     author: Author | None = Author.objects.all().filter(userID=request.user.pk).first()
 
     if author is None:
+        print('here2')
         return False
     
     if author.id != required_author_id:
+        print('here3')
         return False
 
     return True
@@ -161,3 +166,39 @@ def make_comment_url(request_host: str, author_id: str, post_id: str, comment_id
 
 def make_inbox_url(request_host: str, author_id: str) -> str:
     return make_author_url(request_host,author_id) + "/inbox"
+
+# checks that the request is authenticated either with our connected servers table in the DB,
+# or the request is coming from our frontend/backend
+def check_auth_header(request : HttpRequest):
+
+    print("CHECKING AUTH HEADER")
+
+    if 'HTTP_ORIGIN' not in request.META:
+        print("NO ORIGIN SPECIFIED")
+        return False
+    
+    origin = request.META['HTTP_ORIGIN']
+
+    print("ORIGIN:",origin)
+
+    #check if the request is from us
+    if origin == FRONTEND or origin == HOSTNAME:
+        return True
+
+    if 'HTTP_AUTHORIZATION' not in request.META:
+        return False
+    
+    #check if the request is from a connected server
+    auth_header = request.META['HTTP_AUTHORIZATION']
+
+    connected = ConnectedServer.objects.first(creds=auth_header)
+
+    print("CHECKING AUTH HEADER!")
+    print(auth_header,origin,HOSTNAME)
+
+    #if there is no connection object in the db
+    if not connected:
+        print("UNAUTHORIZED ORIGIN TRIED TO SEND US STUFF")
+        return False
+    
+    return True

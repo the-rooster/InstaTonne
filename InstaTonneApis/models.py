@@ -148,3 +148,9 @@ class LikeSerializer(serializers.ModelSerializer):
 class Inbox(models.Model):
     author = models.ForeignKey(Author,on_delete=models.CASCADE)
     url = models.TextField()
+
+
+class ConnectedServer(models.Model):
+    host = models.TextField()
+    accepted_creds = models.TextField()
+    our_creds = models.TextField()
