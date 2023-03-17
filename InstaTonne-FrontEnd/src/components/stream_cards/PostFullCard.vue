@@ -38,7 +38,9 @@
       >
       <v-img v-if="isImage" :src="require('${ props.postData.content }')" />
       <v-card-text class="my-10" v-else>
-        <span>{{ props.postData.content }}</span>
+        <div v-html="content" v-if="props.postData.contentType == 'text/markdown'"></div>
+        <span v-if="props.postData.contentType == 'text/plain' || props.postData.contentType == 'application/base64'">{{content}}</span>
+        <img v-bind:src="content" v-if="props.postData.contentType == 'image/png;base64' || props.postData.contentType == 'image/jpeg;base64'">
       </v-card-text>
     </v-card>
 
@@ -75,9 +77,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, toRaw, onBeforeMount } from "vue";
+import { ref, toRaw, onBeforeMount, computed } from "vue";
 import CommentCard from "./CommentCard.vue";
 import Cookies from "js-cookie";
+import {marked} from "marked";
+import DOMPurify from "dompurify";
+
 // defineProps<{ msg: string }>()
 
 import { USER_AUTHOR_ID_COOKIE, createHTTP } from "../../axiosCalls";
@@ -92,6 +97,26 @@ const props = defineProps({
     required: true,
   },
 });
+
+let content = computed(() => {
+
+  console.log("PROP",props.postData)
+
+  if (!props.postData){
+    return "";
+  }
+
+
+  if (props.postData.contentType == "text/markdown"){
+    console.log("YAHOOO")
+    console.log(DOMPurify.sanitize(marked.parse(props.postData.content)));
+    return DOMPurify.sanitize(marked.parse(props.postData.content));
+  }
+
+
+
+  return props.postData.content;
+})
 
 // const commentData = ref(props.commentData);
 // commentData.value.content = "";

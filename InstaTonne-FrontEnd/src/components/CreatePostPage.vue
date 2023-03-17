@@ -53,13 +53,33 @@ const postData = ref({
 
 async function savePost(updatedPost) {
   loading.value = true;
+  console.log("SENDING POST: ",updatedPost);
 
-  await createHTTP(`authors/${authorId}/posts/`)
+  // case for posting image data as b64
+  if(updatedPost.contentType.includes("image/")){
+    let reader = new FileReader();
+    reader.readAsDataURL(updatedPost.content[0]);
+    reader.onload = function () {
+      updatedPost.content = reader.result;
+
+      createHTTP(`authors/${authorId}/posts/`)
+      .post(JSON.stringify(updatedPost))
+      .then((response: { data: object }) => {
+        errorMessage.value = "Post created Successfully";
+        loading.value = false;
+    });
+    }
+  }
+  else{
+    // posting standard plain text
+    await createHTTP(`authors/${authorId}/posts/`)
     .post(JSON.stringify(updatedPost))
     .then((response: { data: object }) => {
       errorMessage.value = "Post created Successfully";
       loading.value = false;
     });
+  }
+
 }
 </script>
 

@@ -24,9 +24,9 @@
       "id" : "1",
       "userID" : "2",
       "type" : "author",
-      "id_url" : "http://localhost:8001/authors/1",
-      "url" : "http://localhost:8001/authors/1",
-      "host" : "http://localhost:8001",
+      "id_url" : "http://127.0.0.1:8001/authors/1",
+      "url" : "http://127.0.0.1:8001/authors/1",
+      "host" : "http://127.0.0.1:8001",
       "displayName" : "displayName1remote",
       "github" : "github1",
       "profileImage" : "https://i.imgur.com/2jN5DLC.jpeg",
@@ -39,9 +39,9 @@
         "id" : "2",
 	      "userID" : "3",
         "type" : "author",
-        "id_url" : "http://localhost:8001/authors/2",
-        "url" : "http://localhost:8001/authors/2",
-        "host" : "http://localhost:8001",
+        "id_url" : "http://127.0.0.1:8001/authors/2",
+        "url" : "http://127.0.0.1:8001/authors/2",
+        "host" : "http://127.0.0.1:8001",
         "displayName" : "displayName2remote",
         "github" : "github2",
         "profileImage" : "https://i.imgur.com/2jN5DLC.jpeg",
@@ -53,7 +53,7 @@
     "fields": {
       "id" : "1",
       "object" : "1",
-      "follower_url" : "http://localhost:8000/authors/1",
+      "follower_url" : "http://127.0.0.1:8000/authors/1",
       "summary" : "user1 wants to follow user1",
       "accepted" : true
     }
@@ -63,7 +63,7 @@
     "fields": {
       "id" : "2",
       "object" : "1",
-      "follower_url" : "http://localhost:8001/authors/2",
+      "follower_url" : "http://127.0.0.1:8001/authors/2",
       "summary" : "user2 wants to follow user1",
       "accepted" : true
     }
@@ -73,7 +73,7 @@
     "fields": {
       "id" : "1",
       "type" : "post",
-      "id_url" : "http://localhost:8001/authors/1/posts/1",
+      "id_url" : "http://127.0.0.1:8001/authors/1/posts/1",
       "title" : "title1",
       "source" : "source1",
       "origin" : "origin1",
@@ -81,7 +81,7 @@
       "contentType" : "contentType1",
       "content" : "content1",
       "visibility" : "PUBLIC",
-      "comments" : "http://localhost:8001/authors/1/posts/1/comments",
+      "comments" : "http://127.0.0.1:8001/authors/1/posts/1/comments",
       "categories" : ["cat1", "cat2"],
       "unlisted" : false,
       "published" : "2022-01-01 00:00:01",
@@ -93,7 +93,7 @@
     "fields": {
       "id" : "2",
       "type" : "post",
-      "id_url" : "http://localhost:8001/authors/1/posts/2",
+      "id_url" : "http://127.0.0.1:8001/authors/1/posts/2",
       "title" : "title2",
       "source" : "source2",
       "origin" : "origin2",
@@ -101,7 +101,7 @@
       "contentType" : "contentType2",
       "content" : "content2",
       "visibility" : "PRIVATE",
-      "comments" : "http://localhost:8001/authors/1/posts/2/comments",
+      "comments" : "http://127.0.0.1:8001/authors/1/posts/2/comments",
       "categories" : ["cat3", "cat4"],
       "unlisted" : false,
       "published" : "2022-01-01 00:00:01",
@@ -113,11 +113,11 @@
     "fields": {
       "id" : "1",
       "type" : "comment",
-      "id_url" : "http://localhost:8001/authors/1/posts/1/comments/1",
+      "id_url" : "http://127.0.0.1:8001/authors/1/posts/1/comments/1",
       "contentType" : "contentType1",
       "comment" : "comment1",
       "published" : "2022-01-01 00:00:01",
-      "author" : "http://localhost:8001/authors/1",
+      "author" : "http://127.0.0.1:8001/authors/1",
       "post" : "1"
     }
   },
@@ -126,11 +126,11 @@
     "fields": {
       "id" : "2",
       "type" : "comment",
-      "id_url" : "http://localhost:8001/authors/1/posts/1/comments/2",
+      "id_url" : "http://127.0.0.1:8001/authors/1/posts/1/comments/2",
       "contentType" : "contentType2",
       "comment" : "comment2",
       "published" : "2022-01-01 00:00:01",
-      "author" : "http://localhost:8000/authors/1",
+      "author" : "http://127.0.0.1:8000/authors/1",
       "post" : "1"
     }
   },
@@ -141,7 +141,7 @@
       "type" : "like",
       "summary" : "summary1",
       "published" : "2022-01-01 00:00:01",
-      "author" : "http://localhost:8000/authors/1",
+      "author" : "http://127.0.0.1:8000/authors/1",
       "post" : "1"
     }
   },
@@ -152,7 +152,7 @@
       "type" : "like",
       "summary" : "summary1",
       "published" : "2022-01-01 00:00:01",
-      "author" : "http://localhost:8001/authors/1",
+      "author" : "http://127.0.0.1:8001/authors/1",
       "comment" : "1"
     }
   }

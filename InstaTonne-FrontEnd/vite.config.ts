@@ -22,8 +22,8 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      'http://localhost:8000/': {
-        target: 'http://localhost:8000/',
+      'http://127.0.0.1:8000/': {
+        target: 'http://127.0.0.1:8000/',
         changeOrigin: true,
         // rewrite: (path) => path.replace(/^\/service/, ''),
         secure: false,
@@ -34,7 +34,7 @@ export default defineConfig({
       
     },
     cors: {
-      origin: 'http://localhost:8000/'
+      origin: 'http://127.0.0.1:8000/'
     }
   }
 })
