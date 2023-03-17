@@ -40,7 +40,7 @@ urlpatterns = [
     re_path(r"^remote-authors\/(.*?)\/?$",remote_authors),
     re_path(r"^authors\/.+?\/inbox\/?$",inbox_endpoint),
     re_path(r"^authors\/.+?\/liked\/?$", single_author_likes),
-    path("authors/<str:author_id>/posts/<str:post_id>/image", single_author_post_image),
+    re_path(r"^authors\/(.*?)\/posts\/(.*?)\/image\/?$", single_author_post_image),
     re_path(r"^authors\/.+?\/posts\/.+?\/comments\/.+?\/likes\/.+?\/?$", single_comment_like),
     re_path(r"^authors\/.+?\/posts\/.+?\/comments\/.+?\/likes\/?$", single_comment_likes),
     re_path(r"^authors\/.+?\/posts\/.+?\/comments\/.+?\/?$", single_post_comment),

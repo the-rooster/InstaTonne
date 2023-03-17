@@ -59,7 +59,9 @@ def single_author_posts(request: HttpRequest):
 
 def single_author_post_image(request: HttpRequest, author_id: str, post_id: str):
     print("HEREEEEE")
-    if request.method == "GET":
+    if request.method == "GET" and "/" in post_id:
+        return single_author_post_image_get_remote(request,author_id,post_id)
+    elif request.method == "GET":
         return single_author_post_image_get(request, author_id, post_id)
     return HttpResponse(status=405)
 
@@ -85,6 +87,15 @@ def single_author_post_image_get(request: HttpRequest, author_id: str, post_id: 
 
     return HttpResponse(content=res, content_type=serialized_post["contentType"], status=200)
 
+#weird hacky terrible endpoint for getting local images with our bizarre uri schema
+def single_author_post_image_get_remote(request: HttpRequest, author_id: str, post_id: str):
+
+    post_id = post_id.split("/")[-1]
+    author_id = author_id.split("/")[-1]
+    
+    print("GETTING IMAGE AT POST ID ",post_id)
+
+    return single_author_post_image_get(request,author_id,post_id)
 
 # get a single post
 def single_author_post_get(request: HttpRequest, author_id: str, post_id: str):

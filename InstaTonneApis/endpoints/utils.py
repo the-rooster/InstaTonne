@@ -6,7 +6,7 @@ import requests
 from typing import Tuple
 import urllib.parse
 from InstaTonne.settings import HOSTNAME, FRONTEND
-
+import copy
 
 PUBLIC = "PUBLIC"
 PRIVATE = "PRIVATE"
@@ -225,22 +225,26 @@ def check_auth_header(request : HttpRequest):
 #check if the url is in our list of allowed servers to make requests to. otherwise, return 401
 def can_send_request(url : str):
 
-    parsed_url = urllib.parse.urlparse(url)
-    parsed_hostname = urllib.parse.urlparse(HOSTNAME)
+    print("TEST: ",urllib.parse.urlparse(url).netloc)
+    print("URL: ",url)
+    parsed_url = copy.copy(urllib.parse.urlparse(url).netloc)
 
-    print("HERE",parsed_url.netloc,parsed_hostname.netloc)
-
-    if parsed_url.netloc == parsed_hostname.netloc:
+    parsed_hostname = urllib.parse.urlparse(HOSTNAME).netloc
+    print("HOSTNAME PARSED",parsed_hostname)
+    print("HERE2","HOST:" + parsed_hostname + " URL: " + parsed_url)
+    print("WHAT " + parsed_url)
+    if parsed_url == parsed_hostname:
         print("REQUEST TO SELF")
         return True
     
-    connected = ConnectedServer.objects.filter(host=parsed_url.netloc)
+    connected = ConnectedServer.objects.filter(host=parsed_url)
 
     print(connected)
     if connected:
         print("SUCCESS. THIS URL IS CONNECTED")
         return True
     
+    print("FAIL!")
     return False
 
 def get_auth_header_for_server(url : str):
