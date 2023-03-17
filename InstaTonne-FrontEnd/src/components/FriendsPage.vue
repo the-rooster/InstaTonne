@@ -13,9 +13,10 @@
     <div v-else>
       {{ }}
       <div style="display: flex;">
+        Followers
         <FriendCard
-          v-for="request in following"
-          :key="request.displayName"
+          v-for="request in followers"
+          :key="request"
           :request-data="request"
           :author-id="authorId"
           @update="removeRequest(request)"
@@ -42,26 +43,38 @@ import { createHTTP, USER_AUTHOR_ID_COOKIE } from '../axiosCalls'
 import Cookies from "js-cookie";
 
 const loading = ref(true)
-const postData = ref({});
+// number of calls to make
+const loadingCounter = ref(2);
+const followersData = ref({});
+const requestData = ref({});
 
 const authorId = Cookies.get(USER_AUTHOR_ID_COOKIE);
 
 const removeRequest = ((request) => {
-  const index = postData.value.items.indexOf(request)
-  postData.value.items.splice(index, 1)
+  const index = requestData.value.items.indexOf(request)
+  requestData.value.items.splice(index, 1)
 })
 
 onBeforeMount(async () => {
-  await createHTTP(`authors/${authorId}/inbox/`).get().then((response: { data: object }) => {
-    postData.value = response.data;
-    loading.value = false;
+  await createHTTP(`authors/${authorId}/followers/`).get().then((response: { data: object }) => {
+    followersData.value = response.data;
+    loadingCounter.value = loadingCounter.value - 1;
+    if (loadingCounter.value == 0) {
+      loading.value = false;
+    }
   });
+  await createHTTP(`authors/${authorId}/inbox/`).get().then((response: { data: object }) => {
+    requestData.value = response.data;
+    loadingCounter.value = loadingCounter.value - 1;
+    if (loadingCounter.value == 0) {
+      loading.value = false;
+    }
+  });
+
 })
 
-const trueFriends = computed(() => postData.value?.items?.filter(item => item.type == "Follow" && item.accepted == true))
-const followers = computed(() => postData.value?.items?.filter(item => item.type == "Follow" && item.accepted == true))
-const following = computed(() => postData.value?.items?.filter(item => item.type == "Follow" && item.accepted == true))
-const followRequests = computed(() => postData.value?.items?.filter(item => item.type == "Follow" && item.accepted == false))
+const followers = computed(() => followersData.value?.items)
+const followRequests = computed(() => requestData.value?.items?.filter(item => item.type == "Follow" && item.accepted == false))
 
 </script>
 

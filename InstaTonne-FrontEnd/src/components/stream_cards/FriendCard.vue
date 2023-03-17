@@ -36,12 +36,6 @@
           </div>
         </template>
         <v-list-item>{{ props.requestData.summary }}</v-list-item>
-        <v-list-item>
-          <v-btn @click="unfollow">
-            Unfollow
-          </v-btn>
-          {{ error }}
-        </v-list-item>
       </v-list-item>
     </v-card-actions>
   </v-card>
@@ -68,15 +62,6 @@ const props = defineProps({
 const emit = defineEmits(['update'])
 
 const error = ref("")
-
-async function unfollow() {
-  loading.value = true;
-  const foreignId = encodeURIComponent(props.requestData.actor.id)
-  await createHTTP(`authors/${props.authorId}/followers/${foreignId}`).delete(JSON.stringify({})).then(() => {
-    emit('update')
-    loading.value = false;
-  });
-}
 </script>
 
 <style scoped>
