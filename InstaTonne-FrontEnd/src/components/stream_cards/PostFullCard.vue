@@ -39,9 +39,8 @@
       <v-img v-if="isImage" :src="require('${ props.postData.content }')" />
       <v-card-text class="my-10" v-else>
         <div v-html="content" v-if="props.postData.contentType == 'text/markdown'"></div>
-        <span v-if="props.postData.contentType == 'text/plain'">{{content}}</span>
+        <span v-if="props.postData.contentType == 'text/plain' || props.postData.contentType == 'application/base64'">{{content}}</span>
         <img v-bind:src="content" v-if="props.postData.contentType == 'image/png;base64' || props.postData.contentType == 'image/jpeg;base64'">
-        <span v-else>{{content}}</span>
       </v-card-text>
     </v-card>
 

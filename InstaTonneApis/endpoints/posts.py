@@ -92,7 +92,7 @@ def single_author_post_image_get_remote(request: HttpRequest, author_id: str, po
 
     post_id = post_id.split("/")[-1]
     author_id = author_id.split("/")[-1]
-    
+
     print("GETTING IMAGE AT POST ID ",post_id)
 
     return single_author_post_image_get(request,author_id,post_id)
@@ -210,7 +210,8 @@ def single_author_post_post(request: HttpRequest, author_id: str, post_id: str):
     except Exception as e:
         print(e)
         return HttpResponse(status=400)
-    
+
+
 
 # create a new post without a specified post id
 def single_author_posts_post(request: HttpRequest, author_id: str):
@@ -224,6 +225,14 @@ def single_author_posts_post(request: HttpRequest, author_id: str):
             return HttpResponse(status=404)
         
         body: dict = json.loads(request.body)
+        #if were creating an image, create a seperate unlisted post with the image to link to
+        if body["contentType"] == PNG_CONTENT_TYPE or body["contentType"] == JPEG_CONTENT_TYPE:
+            print("CREATING UNLISTED IMAGE POST")
+            uri = make_image_post(request,author,author_id)
+            body["content"] = f"<img src=\"{uri}\">"
+            body["contentType"] = "text/markdown"
+        
+
         post: Post = Post.objects.create(
             type = "post",
             title = body["title"],
@@ -262,7 +271,39 @@ def single_author_posts_post(request: HttpRequest, author_id: str):
         print(e)
         print("HERE!")
         return HttpResponse(status=400)
-    
+
+#make image post to link to markdown post
+def make_image_post(request : HttpRequest,author: Author,author_id : str):
+    body: dict = json.loads(request.body)
+    post: Post = Post.objects.create(
+        type = "post",
+        title = "image",
+        source = body["source"] if "source" in body else "",
+        description = "image",
+        contentType = body["contentType"],
+        content = body["content"],
+        visibility = body["visibility"],
+        categories = body["categories"],
+        unlisted = True,
+        author = author
+    )
+
+    print("author_id: ", author_id)
+    print("post_id: ", post.id)
+    print("post.author: ", str(post.author.id))
+
+    post_id = post.id #type: ignore
+    post.id_url = make_post_url(request.get_host(), post.author.id, post_id)
+    if not post.source:
+        post.source = post.id_url
+    else:
+        post.source = make_post_url(request.get_host(), author_id, post_id)
+    post.origin = post.id_url if not body["origin"] else body["origin"]
+    post.save()
+
+
+
+    return post.id_url + "/image"
 
 # delete a post
 def single_author_post_delete(request: HttpRequest, author_id: str, post_id: str):
