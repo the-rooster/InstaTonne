@@ -1,7 +1,7 @@
 from django.http import HttpRequest, HttpResponse
 import json
 from ..models import Follow, FollowSerializer, Author, AuthorSerializer
-from .utils import valid_requesting_user, get_all_urls, get_one_url, get_author, send_to_single_inbox
+from .utils import valid_requesting_user, get_all_urls, get_one_url, get_author, send_to_single_inbox, check_auth_header
 from urllib.parse import unquote, quote
 import re
 
@@ -52,9 +52,10 @@ def single_author_follower(request: HttpRequest):
 
 def post_author_follower(request: HttpRequest, author_id : str, foreign_author_id : str):
 
+    print("USER ID",foreign_author_id)
     if not valid_requesting_user(request, foreign_author_id):
         print("invalid requesting user! post_author_follower")
-        return HttpResponse(status=403)
+        return HttpResponse(status=401)
     
     author = get_author(foreign_author_id)
 
@@ -92,6 +93,10 @@ def post_author_follower(request: HttpRequest, author_id : str, foreign_author_i
     return HttpResponse(status=200)
 # get the followers of an author
 def single_author_followers_get(request: HttpRequest, author_id: str):
+
+    if not check_auth_header(request):
+        return HttpResponse(status=401)
+    
     follows = Follow.objects.all().filter(object=author_id)
 
     urls = [item.follower_url for item in follows if item.accepted]
@@ -115,7 +120,7 @@ def single_author_followers_get_remote(request: HttpRequest, author_id: str):
 # remove the follow where foreign_author follows author
 def delete_author_follower(request: HttpRequest, author_id: str, foreign_author_id: str):
     # if not valid_requesting_user(request, foreign_author_id):
-    #     return HttpResponse(status=403)
+    #     return HttpResponse(status=401)
     print(author_id,foreign_author_id)
     follows = Follow.objects.all().filter(object=author_id, follower_url=foreign_author_id)
 
@@ -132,10 +137,10 @@ def put_author_follower(request: HttpRequest, author_id: str, foreign_author_id:
 
     if not valid_requesting_user(request, author_id):
         print("invalid requesting user!")
-        return HttpResponse(status=403)
+        return HttpResponse(status=401)
     
     if author_id == foreign_author_id:
-        return HttpResponse(status=403)  
+        return HttpResponse(status=401)  
     
     user: Author | None = Author.objects.all().filter(id=author_id).first()
     
@@ -160,6 +165,11 @@ def put_author_follower(request: HttpRequest, author_id: str, foreign_author_id:
 
 # return success if foreign_author follows author
 def check_author_follower(request: HttpRequest, author_id: str, foreign_author_id: str):
+
+    #check that request is authenticated. remote or local
+    if not check_auth_header(request):
+        return HttpResponse(status=401)
+    
     user: Author | None = Author.objects.all().filter(pk=author_id).first()
     
     if user is None:
@@ -183,12 +193,12 @@ def check_author_follower(request: HttpRequest, author_id: str, foreign_author_i
 
     return HttpResponse(status=200)
 
-#check if a local author is following a remote author. foreign_author_id in this case should be a local authro
+#check if a local author is following a remote author. foreign_author_id in this case should be a local author
 def check_author_follower_remote(request : HttpRequest, author_id : str, foreign_author_id : str):
 
     if not valid_requesting_user(request, foreign_author_id):
         print("invalid requesting user!")
-        return HttpResponse(status=403)
+        return HttpResponse(status=401)
     
     author = get_author(foreign_author_id)
 

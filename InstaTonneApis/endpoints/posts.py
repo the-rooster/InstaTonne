@@ -2,7 +2,7 @@ from django.http import HttpRequest, HttpResponse
 import json
 from ..models import Post, PostSerializer, Comment, Author
 from django.core.paginator import Paginator
-from .utils import make_comments_url, make_post_url, valid_requesting_user, get_all_urls, get_one_url, send_to_inboxes
+from .utils import make_comments_url, make_post_url, valid_requesting_user, get_all_urls, get_one_url, send_to_inboxes, check_auth_header
 import re
 
 
@@ -59,6 +59,11 @@ def single_author_post_image(request: HttpRequest, author_id: str, post_id: str)
 
 # get a the encoded image from a single post
 def single_author_post_image_get(request: HttpRequest, author_id: str, post_id: str):
+
+    #check that request is authenticated. remote or local
+    if not check_auth_header(request):
+        return HttpResponse(status=401)
+    
     post: Post | None = Post.objects.all().filter(author=author_id, pk=post_id).first()
 
     if post is None:
@@ -75,6 +80,11 @@ def single_author_post_image_get(request: HttpRequest, author_id: str, post_id: 
 
 # get a single post
 def single_author_post_get(request: HttpRequest, author_id: str, post_id: str):
+
+    #check that request is authenticated. remote or local
+    if not check_auth_header(request):
+        return HttpResponse(status=401)
+    
     post: Post | None = Post.objects.all().filter(author=author_id, pk=post_id).first()
 
     if post is None:
@@ -98,6 +108,11 @@ def single_author_post_get_remote(request: HttpRequest, author_id: str, post_id:
 
 # get all the posts of an author
 def single_author_posts_get(request: HttpRequest, author_id: str):
+
+    #check that request is authenticated. remote or local
+    if not check_auth_header(request):
+        return HttpResponse(status=401)
+    
     author: Author | None = Author.objects.all().filter(pk=author_id).first()
 
     if author is None:
@@ -144,7 +159,7 @@ def single_author_posts_get_remote(request: HttpRequest, author_id: str):
 # update an existing post
 def single_author_post_post(request: HttpRequest, author_id: str, post_id: str):
     if not valid_requesting_user(request, author_id):
-        return HttpResponse(status=403)
+        return HttpResponse(status=401)
 
     try:
         post: Post | None = Post.objects.all().filter(author=author_id, pk=post_id).first()
@@ -181,7 +196,7 @@ def single_author_post_post(request: HttpRequest, author_id: str, post_id: str):
 # create a new post without a specified post id
 def single_author_posts_post(request: HttpRequest, author_id: str):
     if not valid_requesting_user(request, author_id):
-        return HttpResponse(status=403)
+        return HttpResponse(status=401)
 
     try:
         author: Author | None = Author.objects.all().filter(pk=author_id).first()
@@ -233,7 +248,7 @@ def single_author_posts_post(request: HttpRequest, author_id: str):
 # delete a post
 def single_author_post_delete(request: HttpRequest, author_id: str, post_id: str):
     if not valid_requesting_user(request, author_id):
-        return HttpResponse(status=403)
+        return HttpResponse(status=401)
 
     post: Post | None = Post.objects.all().filter(author=author_id, pk=post_id).first()
 
@@ -248,7 +263,7 @@ def single_author_post_delete(request: HttpRequest, author_id: str, post_id: str
 # create a new post with a specified post id
 def single_author_post_put(request: HttpRequest, author_id: str, post_id: str):
     if not valid_requesting_user(request, author_id):
-        return HttpResponse(status=403)
+        return HttpResponse(status=401)
 
     try:
         author: Author | None = Author.objects.all().filter(pk=author_id).first()

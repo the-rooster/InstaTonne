@@ -27,7 +27,7 @@
       "id_url" : "http://localhost:8001/authors/1",
       "url" : "http://localhost:8001/authors/1",
       "host" : "http://localhost:8001",
-      "displayName" : "displayName1",
+      "displayName" : "displayName1remote",
       "github" : "github1",
       "profileImage" : "https://i.imgur.com/2jN5DLC.jpeg",
       "active" : true
@@ -42,7 +42,7 @@
         "id_url" : "http://localhost:8001/authors/2",
         "url" : "http://localhost:8001/authors/2",
         "host" : "http://localhost:8001",
-        "displayName" : "displayName2",
+        "displayName" : "displayName2remote",
         "github" : "github2",
         "profileImage" : "https://i.imgur.com/2jN5DLC.jpeg",
         "active" : true

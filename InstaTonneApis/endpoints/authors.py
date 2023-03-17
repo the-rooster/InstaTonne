@@ -2,7 +2,7 @@ from django.http import HttpRequest, HttpResponse
 import json
 from ..models import Author, AuthorSerializer
 from django.core.paginator import Paginator
-from .utils import valid_requesting_user, get_one_url
+from .utils import valid_requesting_user, get_one_url, check_auth_header
 import re
 
 
@@ -21,6 +21,14 @@ def get_author_id(request : HttpRequest):
 
     return HttpResponse(content=json.dumps(res),status=200)
 
+# get remote authors from url
+def remote_authors(request: HttpRequest,remote_authors : str):
+    
+    if request.method == "GET":
+        status, resp = get_one_url(remote_authors)
+        return HttpResponse(status=status,content=resp)
+    
+    return HttpResponse(status=405)
 
 def authors(request: HttpRequest):
     if request.method == "GET":
@@ -33,7 +41,7 @@ def single_author(request: HttpRequest):
     if matched:
         author_id: str = matched.group(1)
     else:
-        return HttpResponse(status=405)
+        return HttpResponse(status=400)
 
     if "/" in author_id and request.method == "GET":
         return single_author_get_remote(request, author_id)
@@ -51,6 +59,10 @@ def single_author(request: HttpRequest):
 
 # get all authors
 def authors_get(request : HttpRequest):
+
+    if not check_auth_header(request):
+        return HttpResponse(status=401)
+    
     authors = Author.objects.all().order_by("id")
     page_num = request.GET.get("page")
     page_size = request.GET.get("size")
@@ -74,6 +86,10 @@ def authors_get(request : HttpRequest):
 
 # get a single author
 def single_author_get(request: HttpRequest, author_id: str):
+
+    if not check_auth_header(request):
+        return HttpResponse(status=401)
+    
     author = Author.objects.get(pk=author_id)
     serialized_author = AuthorSerializer(author).data
     # serialized_author["id"] = serialized_author["id_url"]
@@ -92,7 +108,7 @@ def single_author_get_remote(request: HttpRequest, author_id: str):
 def single_author_post(request: HttpRequest, author_id: str):
     
     if not valid_requesting_user(request, author_id):
-        return HttpResponse(status=403)
+        return HttpResponse(status=401)
 
     try:
         author: Author | None = Author.objects.all().filter(pk=author_id).first()
