@@ -32,6 +32,7 @@
         variant="filled"
         prepend-icon="mdi-camera"
         class="my-10"
+        accept="image/*"
       />
       <v-textarea
         v-else

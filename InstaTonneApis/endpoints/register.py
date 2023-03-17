@@ -22,9 +22,10 @@ def register_author(request : HttpRequest):
         return HttpResponse(status=400)
 
     user = User.objects.create_user(username=form.data["username"],password=form.data["password"])
-    obj = Author.objects.create(displayName=form.data["username"],type="author",url="none",host="none",github="none",profileImage="none",userID=user.pk,active=False,id_url="none")
+    obj = Author.objects.create(displayName=form.data["username"],type="author",url="none",host=HOSTNAME,github="none",profileImage="none",userID=user.pk,active=False,id_url="none")
 
     obj.id_url = HOSTNAME + "/authors/" + obj.id
+    obj.url = HOSTNAME + "/authors/" + obj.id
     obj.save()
     
     return HttpResponse(status=200)
