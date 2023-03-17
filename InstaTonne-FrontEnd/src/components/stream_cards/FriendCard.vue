@@ -21,21 +21,12 @@
         v-else
         class="w-100"
       >
-        <v-list-item-title>
-          <AuthorCard :author-info="props.requestData.actor" />
-        </v-list-item-title>
+        <v-list-item-title />
         <template #append>
           {{
             props.requestData.displayName
           }}
-          <div class="justify-self-end">
-            <v-icon
-              class="me-1"
-              icon="mdi-heart"
-            />
-          </div>
         </template>
-        <v-list-item>{{ props.requestData.summary }}</v-list-item>
       </v-list-item>
     </v-card-actions>
   </v-card>

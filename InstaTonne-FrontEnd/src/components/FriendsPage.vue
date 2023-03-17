@@ -12,22 +12,24 @@
     />
     <div v-else>
       {{ }}
-      <div style="display: flex;">
+      <div style="display: flex; flex-direction: column;">
         Followers
         <FriendCard
           v-for="request in followers"
           :key="request"
           :request-data="request"
           :author-id="authorId"
-          @update="removeRequest(request)"
+          style="margin: 1em;"
         />
       </div>
-      <div style="display: flex;">
+      <div style="display: flex; flex-direction: column;">
+        Follow Requests
         <FollowRequestCard
           v-for="request in followRequests"
           :key="request.displayName"
           :request-data="request"
           :author-id="authorId"
+          style="margin: 1em;"
           @update="removeRequest(request)"
         />
       </div>
