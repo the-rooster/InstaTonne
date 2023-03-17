@@ -44,10 +44,11 @@ class Follow(models.Model):
 
 class FollowSerializer(serializers.ModelSerializer):
     object = AuthorSerializer()
+    actor = serializers.CharField(source='follower_url')
 
     class Meta:
         model = Follow
-        fields = ['object','summary','accepted']
+        fields = ['object','summary','accepted','actor']
 
 
 class Post(models.Model):

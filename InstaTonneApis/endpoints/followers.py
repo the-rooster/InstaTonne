@@ -1,24 +1,25 @@
 from django.http import HttpRequest, HttpResponse
 import json
 from ..models import Follow, FollowSerializer, Author, AuthorSerializer
-from .utils import valid_requesting_user, get_all_urls, get_one_url, get_author, send_to_single_inbox, check_auth_header
+from .utils import valid_requesting_user, get_all_urls, get_one_url, get_author, send_to_single_inbox, check_auth_header, isaURL
 from urllib.parse import unquote, quote
 import re
 
 
-def single_author_followers(request: HttpRequest):
-    matched = re.search(r"^\/authors\/(.*?)\/followers\/?$", request.path)
-    if matched:
-        author_id: str = matched.group(1)
-    else:
-        return HttpResponse(status=405)
+# handle requests for a single authors followers
+def single_author_followers(request: HttpRequest, author_id: str):
+    if not check_auth_header(request):
+        return HttpResponse(status=401)
 
-    if "/" in author_id and request.method == "GET":
+    if isaURL(author_id) and request.method == "GET":
         return single_author_followers_get_remote(request, author_id)
-    elif "/" in author_id:
+    
+    if isaURL(author_id):
         return HttpResponse(status=405)
-    elif request.method == "GET":
+    
+    if request.method == "GET":
         return single_author_followers_get(request, author_id)  
+    
     return HttpResponse(status=405)
 
 
@@ -91,6 +92,8 @@ def post_author_follower(request: HttpRequest, author_id : str, foreign_author_i
         return HttpResponse(status=status)
     
     return HttpResponse(status=200)
+
+
 # get the followers of an author
 def single_author_followers_get(request: HttpRequest, author_id: str):
 

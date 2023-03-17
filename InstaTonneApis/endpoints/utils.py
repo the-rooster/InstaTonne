@@ -27,6 +27,7 @@ def get_all_urls(urls: list[str]):
                 inbox_lock.acquire()
                 result.append({"error" : "url not connected to this server"})
                 inbox_lock.release()
+                return
             try:
                 response : requests.Response = requests.get(url,headers={"Origin":HOSTNAME,
                                                                          "Authentication" : get_auth_header_for_server(url)})
@@ -53,20 +54,21 @@ def get_all_urls(urls: list[str]):
     return result
 
 
-def get_one_url(url: str) -> Tuple[int, str]:
+def get_one_url(url: str) -> Tuple[int, str, str|None]:
 
     # check if requested hostname in valid hosts here
     if not can_send_request(url):
         print("NOT IN LIST OF ACCEPTED SERVERS")
-        return (401,str("NOT IN LIST OF ACCEPTED SERVERS"))
+        return (401, str("NOT IN LIST OF ACCEPTED SERVERS"), None)
     
     try:
         response: requests.Response = requests.get(url,headers={"Origin":HOSTNAME,
                                                                 "Authentication" : get_auth_header_for_server(url)})
-        return (response.status_code, response.text)
+        
+        return (response.status_code, response.text, response.headers['Content-Type'])
     except Exception as e:
         print("ERROR GETTING URL: ",e)
-        return (500, str(e))
+        return (500, str(e), None)
 
 
 def send_to_single_inbox(author_url : str, data : dict):
@@ -257,3 +259,6 @@ def get_auth_header_for_server(url : str):
         return connected[0].our_creds
     
     return ""
+
+def isaURL(s: str):
+    return "/" in s

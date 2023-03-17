@@ -37,7 +37,8 @@ urlpatterns = [
     path("login/",login),
     path("authors/id/",get_author_id),
     path("connected-servers/",get_all_connected_servers),
-    re_path(r"^remote-authors\/(.*?)\/?$",remote_authors),
+
+    re_path(r"^remote-authors\/(.+?)\/?$",remote_authors),
     re_path(r"^authors\/.+?\/inbox\/?$",inbox_endpoint),
     re_path(r"^authors\/.+?\/liked\/?$", single_author_likes),
     re_path(r"^authors\/(.*?)\/posts\/(.*?)\/image\/?$", single_author_post_image),
@@ -52,8 +53,8 @@ urlpatterns = [
     re_path(r"^authors\/.+?\/inbox\/?$",inbox_endpoint),
     re_path(r"^authors\/.+?\/followers\/.+?\/request\/?$", get_request_object),
     re_path(r"^authors\/.+?\/followers\/.+?\/?$", single_author_follower),
-    re_path(r"^authors\/.+?\/followers\/?$", single_author_followers),
-    re_path(r"^authors\/.+?\/?$", single_author),
+    re_path(r"^authors\/(.+?)\/followers\/?$", single_author_followers),
+    re_path(r"^authors\/(.+?)\/?$", single_author),
     re_path(r"^authors\/?$", authors),
     path("csrf/", get_csrf)
 ]
