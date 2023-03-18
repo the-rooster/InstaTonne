@@ -2,7 +2,7 @@ from django.http import HttpRequest, HttpResponse
 import json
 from ..models import Post, PostSerializer, Comment, Author, CommentSerializer
 from django.core.paginator import Paginator
-from .utils import make_comment_url, make_comments_url, get_one_url, make_author_url, send_to_single_inbox, check_authenticated
+from .utils import make_comment_url, make_comments_url, get_one_url, make_author_url, send_to_single_inbox, check_authenticated, check_auth_header
 import re
 from InstaTonne.settings import HOSTNAME
 
@@ -44,6 +44,11 @@ def single_post_comment(request: HttpRequest):
 
 # get the comments from a post
 def single_post_comments_get(request: HttpRequest, author_id: str, post_id: str):
+
+    #check that request is authenticated. remote or local
+    if not check_auth_header(request):
+        return HttpResponse(status=401)
+    
     post_url = Post.objects.all().filter(pk=post_id).first().id_url #type: ignore
     comments = Comment.objects.all().filter(post=post_id).order_by("published")
     page_num = request.GET.get("page")
@@ -93,7 +98,7 @@ def single_post_comments_post_remote(request: HttpRequest, author_id : str, post
     author: Author | None = Author.objects.all().filter(userID=request.user.pk).first()
     
     if not author:
-        return HttpResponse(status=403)
+        return HttpResponse(status=401)
     
     try:
         
@@ -136,14 +141,14 @@ def single_post_comments_post(request: HttpRequest, author_id: str, post_id: str
     author: Author | None = Author.objects.all().filter(userID=request.user.pk).first()
 
     if not author:
-        return HttpResponse(status=403)
+        return HttpResponse(status=401)
     
     try:
         post: Post | None = Post.objects.all().filter(pk=post_id).first()
 
         if post is None:
             return HttpResponse(status=404)
-        
+        print("SENDING COMMENT ON POST ",post.id_url)
         body: dict = json.loads(request.body)
         comment: dict = {
             "type" : "comment",

@@ -1,7 +1,7 @@
 from django.http import HttpRequest, HttpResponse
 import json
 from ..models import Post, PostSerializer, Comment, Author, CommentSerializer, Like, LikeSerializer
-from .utils import get_one_url, make_author_url, send_to_single_inbox
+from .utils import get_one_url, make_author_url, send_to_single_inbox, check_auth_header
 from django.core.paginator import Paginator
 import re
 
@@ -98,7 +98,7 @@ def single_post_likes_post_remote(request : HttpRequest,author_id : str,post_id 
     author: Author | None = Author.objects.all().filter(userID=request.user.pk).first()
     
     if not author:
-        return HttpResponse(status=403)
+        return HttpResponse(status=401)
     
     try:
         like: dict = {
@@ -135,7 +135,7 @@ def single_post_likes_post(request : HttpRequest,author_id : str,post_id : str):
     author: Author | None = Author.objects.all().filter(userID=request.user.pk).first()
 
     if not author:
-        return HttpResponse(status=403)
+        return HttpResponse(status=401)
     
     try:
         post: Post | None = Post.objects.all().filter(pk=post_id).first()
@@ -168,7 +168,7 @@ def single_comment_likes_post_remote(request: HttpRequest, author_id: str, post_
     author: Author | None = Author.objects.all().filter(userID=request.user.pk).first()
     
     if not author:
-        return HttpResponse(status=403)
+        return HttpResponse(status=401)
     
     try:
         like: dict = {
@@ -205,7 +205,7 @@ def single_comment_likes_post(request: HttpRequest, author_id: str, post_id: str
     author: Author | None = Author.objects.all().filter(userID=request.user.pk).first()
 
     if not author:
-        return HttpResponse(status=403)
+        return HttpResponse(status=401)
     
     try:
         comment: Comment | None = Comment.objects.all().filter(pk=comment_id).first()
@@ -236,6 +236,11 @@ def single_comment_likes_post(request: HttpRequest, author_id: str, post_id: str
 
 # get the likes from a post
 def single_post_likes_get(request: HttpRequest, author_id: str, post_id: str):
+
+    #check that request is authenticated. remote or local
+    if not check_auth_header(request):
+        return HttpResponse(status=401)
+    
     post: Post | None = Post.objects.all().filter(pk=post_id).first()
 
     if post is None:
@@ -269,6 +274,11 @@ def single_post_likes_get_remote(request: HttpRequest, author_id: str, post_id: 
 
 # get the likes from a comment
 def single_comment_likes_get(request: HttpRequest, author_id: str, post_id: str, comment_id: str):
+
+    #check that request is authenticated. remote or local
+    if not check_auth_header(request):
+        return HttpResponse(status=401)
+    
     comment = Comment.objects.all().filter(pk=comment_id).first()
 
     if comment is None:
@@ -302,6 +312,11 @@ def single_comment_likes_get_remote(request: HttpRequest, author_id: str, post_i
 
 # get the likes from an author
 def single_author_likes_get(request: HttpRequest, author_id: str):
+    
+    #check that request is authenticated. remote or local
+    if not check_auth_header(request):
+        return HttpResponse(status=401)
+    
     likes = Like.objects.all().filter(author=make_author_url(request.get_host(), author_id)).order_by("published")
 
     serialized_data = []

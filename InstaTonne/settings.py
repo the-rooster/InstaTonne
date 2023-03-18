@@ -18,7 +18,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 #Configure this before deployment
 HOSTNAME = "http://127.0.0.1:8000"
-
+FRONTEND = "http://127.0.0.1:5173"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -61,11 +61,13 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173", # allow frontend
     "http://localhost:3000", # allow tests
+    "http://127.0.0.1:5173"
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173", # allow frontend
     "http://localhost:3000", # allow tests
+    "http://127.0.0.1:5173"
 ]
 
 CORS_ALLOW_HEADERS = [
@@ -75,10 +77,7 @@ CORS_ALLOW_HEADERS = [
 
 CSRF_COOKIE_HTTPONLY = False
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173", # allow frontend
-    "http://localhost:3000", # allow tests
-]
+
 
 CORS_ALLOW_CREDENTIALS = True
 

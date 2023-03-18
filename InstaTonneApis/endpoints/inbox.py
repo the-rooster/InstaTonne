@@ -4,7 +4,7 @@ import json
 import requests
 from InstaTonne.settings import HOSTNAME
 from django.views.decorators.csrf import csrf_exempt
-from .utils import check_authenticated, get_author, get_all_urls
+from .utils import check_authenticated, get_author, get_all_urls, check_auth_header
 import time
 from threading import Thread, Lock
 from InstaTonne.settings import HOSTNAME
@@ -40,7 +40,7 @@ def get_inbox(request : HttpRequest, id : str):
     # user = check_authenticated(request,id)
     user = get_author(id)
     if not user:
-        return HttpResponse(status=403)
+        return HttpResponse(status=401)
     
 
     inbox = Inbox.objects.filter(author=user)
@@ -57,6 +57,7 @@ def get_inbox(request : HttpRequest, id : str):
 def parse_inbox_post(data : dict, user : Author):
 
     if "type" not in data:
+        print("NO TYPE ON INBOX POST!")
         return None
     
     data_type = str(data["type"].lower())
@@ -82,7 +83,8 @@ def parse_inbox_comment(data,user):
     # }
 
     #get post from post_id (get last non empty field after splitting on /)
-
+    
+    print("POST LINK",data["post"])
     post_local_id = [x for x in data["post"].split("/") if x][-1]
 
     #now get the post
@@ -90,6 +92,7 @@ def parse_inbox_comment(data,user):
     post = Post.objects.filter(id=post_local_id).first()
 
     if not post:
+        print("POST WITH ID ",post_local_id, " DOES NOT EXIST")
         return None
     
     obj = Comment.objects.create(type=data["type"],id_url="",contentType=data["contentType"],comment=data["content"],author=data["author"],post=post)
@@ -105,6 +108,7 @@ def parse_inbox_like(data,user):
    
     local_id = [x for x in data["object"].split("/") if x][-1]
 
+    print(local_id)
 
     #now get the post
 
@@ -179,11 +183,15 @@ def parse_inbox_follow_request(data : dict, user: Author):
 
         obj.save()
 
-        return HOSTNAME + "/authors/" + user.id + "/followers/" + quote(actor_id)
+        return HOSTNAME + "/authors/" + user.id + "/followers/" + quote(actor_id) + "/request"
 """
 Post an item to a users inbox!
 """
 def post_inbox(request : HttpRequest, id : str):
+
+    #check that request is authenticated. remote or local
+    if not check_auth_header(request):
+        return HttpResponse(status=401)
     
     #parse request body
     data = request.body
@@ -223,7 +231,7 @@ def delete_inbox(request : HttpRequest, id : str):
 
     if not user:
         print("test")
-        return HttpResponse(status=403)
+        return HttpResponse(status=401)
 
 
     

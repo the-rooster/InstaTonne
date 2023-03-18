@@ -152,7 +152,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"type\": \"Follow\",      \r\n    \"summary\":\"User 2 wants to follow User1\",\r\n    \"actor\":{\r\n        \"type\":\"author\",\r\n        \"id\":\"http://127.0.0.1:8000/authors/2\",\r\n        \"url\":\"url1\",\r\n        \"host\":\"host1\",\r\n        \"displayName\":\"displayName1\",\r\n        \"github\": \"github1\",\r\n        \"profileImage\": \"https://i.imgur.com/k7XVwpB.jpeg\"\r\n    },\r\n    \"object\":{\r\n        \"type\":\"author\",\r\n        \"id\":\"http://127.0.0.1:8000/authors/1\",\r\n        \"host\":\"host2\",\r\n        \"displayName\":\"displayName2\",\r\n        \"url\":\"url2\",\r\n        \"github\": \"github2\",\r\n        \"profileImage\": \"https://i.imgur.com/k7XVwpB.jpeg\"\r\n    }\r\n}",
+					"raw": "{\r\n    \"type\": \"Follow\",      \r\n    \"summary\":\"User 2 wants to follow User1\",\r\n    \"actor\":{\r\n        \"type\":\"author\",\r\n        \"id\":\"http://127.0.0.1:8000/authors/9839dde5e9db4deeba850b12d7a919ea\",\r\n        \"url\":\"url1\",\r\n        \"host\":\"host1\",\r\n        \"displayName\":\"displayName1\",\r\n        \"github\": \"github1\",\r\n        \"profileImage\": \"https://i.imgur.com/k7XVwpB.jpeg\"\r\n    },\r\n    \"object\":{\r\n        \"type\":\"author\",\r\n        \"id\":\"http://127.0.0.1:8000/authors/7705e94f12a043e38c8f32c7745d96a3\",\r\n        \"host\":\"host2\",\r\n        \"displayName\":\"displayName2\",\r\n        \"url\":\"url2\",\r\n        \"github\": \"github2\",\r\n        \"profileImage\": \"https://i.imgur.com/k7XVwpB.jpeg\"\r\n    }\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -160,7 +160,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8000/authors/1/inbox/",
+					"raw": "http://localhost:8000/authors/7705e94f12a043e38c8f32c7745d96a3/inbox/",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -168,7 +168,7 @@
 					"port": "8000",
 					"path": [
 						"authors",
-						"1",
+						"7705e94f12a043e38c8f32c7745d96a3",
 						"inbox",
 						""
 					]
@@ -863,6 +863,30 @@
 			"response": []
 		},
 		{
+			"name": "post comment",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/authors/1/posts/1/comments/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"authors",
+						"1",
+						"posts",
+						"1",
+						"comments",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "post comments",
 			"request": {
 				"method": "POST",
@@ -875,7 +899,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"contentType\" : \"contentType76.1\",\n    \"comment\" : \"comment76.1\",\n    \"author\" : 1\n}",
+					"raw": "{\n    \"type\" : \"comment\",\n    \"contentType\" : \"contentType76.1\",\n    \"comment\" : \"comment76.1\",\n    \"author\" : \"http://localhost:8000/authors/1\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -896,6 +920,191 @@
 						"1",
 						"comments",
 						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "post comments remote",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-CSRFToken",
+						"value": "{{csrftoken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"type\" : \"comment\",\n    \"contentType\" : \"contentType76.1\",\n    \"comment\" : \"comment76.1\",\n    \"author\" : \"http://localhost:8000/authors/1\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/authors/1/posts/http%3A%2F%2Flocalhost%3A8001%2Fauthors%2F1%2Fposts%2F1/comments/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"authors",
+						"1",
+						"posts",
+						"http%3A%2F%2Flocalhost%3A8001%2Fauthors%2F1%2Fposts%2F1",
+						"comments",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "post likes",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/authors/1/posts/1/likes",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"authors",
+						"1",
+						"posts",
+						"1",
+						"likes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "post likes remote",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/authors/1/posts/http%3A%2F%2Flocalhost%3A8001%2Fauthors%2F1%2Fposts%2F1/likes",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"authors",
+						"1",
+						"posts",
+						"http%3A%2F%2Flocalhost%3A8001%2Fauthors%2F1%2Fposts%2F1",
+						"likes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "post like",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/authors/1/posts/1/likes/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"authors",
+						"1",
+						"posts",
+						"1",
+						"likes",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "post likes",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-CSRFToken",
+						"value": "{{csrftoken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"contentType\" : \"contentType76.1\",\n    \"comment\" : \"comment76.1\",\n    \"author\" : \"http://localhost:8000/authors/1\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/authors/1/posts/1/likes",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"authors",
+						"1",
+						"posts",
+						"1",
+						"likes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "post likes remote",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-CSRFToken",
+						"value": "{{csrftoken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"contentType\" : \"contentType76.1\",\n    \"comment\" : \"comment76.1\",\n    \"author\" : \"http://localhost:8000/authors/1\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/authors/1/posts/http%3A%2F%2Flocalhost%3A8001%2Fauthors%2F1%2Fposts%2F1/likes",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"authors",
+						"1",
+						"posts",
+						"http%3A%2F%2Flocalhost%3A8001%2Fauthors%2F1%2Fposts%2F1",
+						"likes"
 					]
 				}
 			},
@@ -952,12 +1161,12 @@
 			"response": []
 		},
 		{
-			"name": "post likes",
+			"name": "comment like",
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8000/authors/1/posts/1/likes",
+					"raw": "http://localhost:8000/authors/1/posts/1/comments/1/likes/2",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -968,19 +1177,30 @@
 						"1",
 						"posts",
 						"1",
-						"likes"
+						"comments",
+						"1",
+						"likes",
+						"2"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "post likes remote",
+			"name": "comment likes",
 			"request": {
-				"method": "GET",
+				"method": "POST",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "comment likes remote",
+			"request": {
+				"method": "POST",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8000/authors/1/posts/http%3A%2F%2Flocalhost%3A8001%2Fauthors%2F1%2Fposts%2F1/likes",
+					"raw": "http://localhost:8000/authors/1/posts/1/comments/http%3A%2F%2Flocalhost%3A8001%2Fauthors%2F1%2Fposts%2F1%2Fcomments%2F1/likes",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -990,7 +1210,9 @@
 						"authors",
 						"1",
 						"posts",
-						"http%3A%2F%2Flocalhost%3A8001%2Fauthors%2F1%2Fposts%2F1",
+						"1",
+						"comments",
+						"http%3A%2F%2Flocalhost%3A8001%2Fauthors%2F1%2Fposts%2F1%2Fcomments%2F1",
 						"likes"
 					]
 				}
