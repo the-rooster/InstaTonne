@@ -3,11 +3,11 @@
     <v-app>
       <v-layout>
         <v-navigation-drawer
+          v-if="loggedIn"
           expand-on-hover
           rail
           absolute
           width="500"
-          v-if="loggedIn"
         >
           <v-list>
             <v-list-item
@@ -38,6 +38,13 @@
               :to="route.path"
             />
           </v-list>
+          <v-list>
+            <v-list-item
+              v-if="loggedIn"
+              title="Logout"
+              @click="logout"
+            />
+          </v-list>
         </v-navigation-drawer>        
         <v-main style="height: 100em;">
           <router-view v-if="loggedIn" />
@@ -52,19 +59,28 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onBeforeMount, computed } from 'vue'
-import { RouterView } from 'vue-router';
-import { nav_bar_routes as routes } from "./main"
+import { ref, onBeforeMount, computed, watch } from 'vue'
+import { RouterView, useRoute } from 'vue-router';
+import { nav_bar_routes as routes, router } from "./main"
 import { createHTTP, USER_AUTHOR_ID_COOKIE } from './axiosCalls'
 import LoginPage from './components/LoginPage.vue'
 import Cookies from 'js-cookie';
-import { reactive } from 'vue';
 
 const loading = ref(true)
 const authorData = ref({});
 const activeUserId = ref("")
 
 const loggedIn = computed(() => activeUserId.value != undefined);
+
+const logout = () => {
+  Cookies.remove(USER_AUTHOR_ID_COOKIE)
+  router.push({ path: "/" })
+}
+
+const route = useRoute()
+watch(route, () => {
+  activeUserId.value = Cookies.get(USER_AUTHOR_ID_COOKIE)
+})
 
 onBeforeMount(async () => {
   activeUserId.value = Cookies.get(USER_AUTHOR_ID_COOKIE)

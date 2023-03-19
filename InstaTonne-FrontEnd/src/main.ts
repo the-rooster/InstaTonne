@@ -85,6 +85,16 @@ export const router = createRouter({
   routes, // short for `routes: routes`
 });
 
+router.beforeEach((to, from, next) => {
+  if (to.path != "/" && !Cookies.get(USER_AUTHOR_ID_COOKIE)) {
+    next({
+      path: "/",
+      params: { nextUrl: to.fullPath },
+    })
+  }
+  next()
+})
+
 // 5. Create and mount the root instance.
 // Make sure to _use_ the router instance to make the
 // whole app router-aware.
