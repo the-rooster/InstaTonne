@@ -29,7 +29,6 @@ const vuetify = createVuetify({
 import HomePage from "./components/HomePage.vue";
 import AboutPage from "./components/AboutPage.vue";
 import EditPostPage from "./components/EditPostPage.vue";
-import FollowRequestsPage from "./components/FollowRequestsPage.vue";
 import CreatePostPage from "./components/CreatePostPage.vue";
 import ProfilePage from "./components/ProfilePage.vue";
 import UserSearch from "./components/UserSearch.vue";
@@ -44,11 +43,6 @@ const routes = [
   { path: "/", name: "Home", component: HomePage },
   { path: "/about", name: "About", component: AboutPage },
   { path: "/editPost/:postid/", name: "EditPost", component: EditPostPage },
-  {
-    path: "/FollowRequests",
-    name: "FollowRequests",
-    component: FollowRequestsPage,
-  },
   { path: "/CreatePost", name: "Create New Post", component: CreatePostPage },
   { path: "/ProfilePage/:id", name: "ProfilePage", component: ProfilePage },
   { path: "/UserSearch", name: "UserSearch", component: UserSearch },
@@ -64,11 +58,6 @@ const routes = [
 export const nav_bar_routes = [
   { path: "/", name: "Home", component: HomePage },
   { path: "/about", name: "About", component: AboutPage },
-  {
-    path: "/FollowRequests",
-    name: "FollowRequests",
-    component: FollowRequestsPage,
-  },
   { path: "/CreatePost", name: "Create New Post", component: CreatePostPage },
   {
     path: `/ProfilePage/${Cookies.get(USER_AUTHOR_ID_COOKIE)}`,
