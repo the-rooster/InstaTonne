@@ -1,24 +1,9 @@
 from django.http import HttpRequest, HttpResponse
 import json
-from ..models import Author, AuthorSerializer
+from InstaTonneApis.models import Author, AuthorSerializer
+from InstaTonneApis.endpoints.utils import valid_requesting_user, check_auth_header, isaURL, get_auth_headers
 from django.core.paginator import Paginator
-from .utils import valid_requesting_user, get_one_url, check_auth_header, isaURL
-
-
-def get_author_id(request : HttpRequest):
-    if request.method != "POST":
-        return HttpResponse(status=405)
-    
-    author = Author.objects.filter(userID=request.user.id) #type: ignore
-
-    if not author:
-        return HttpResponse(status=404)
-    
-    author = author[0]
-
-    res = {"id" : author.id}
-
-    return HttpResponse(content=json.dumps(res),status=200)
+import requests
 
 
 # handle requests for remote authors
@@ -88,8 +73,13 @@ def authors_get(request : HttpRequest):
 
 # get all remote authors
 def authors_get_remote(request: HttpRequest, remote_authors: str):
-    status, resp, type = get_one_url(remote_authors)
-    return HttpResponse(status=status, content_type=type, content=resp)
+    url = remote_authors
+    response: requests.Response = requests.get(url, headers=get_auth_headers(url))
+    return HttpResponse(
+        status=response.status_code,
+        content_type=response.headers['Content-Type'],
+        content=response.content.decode('utf-8')
+    )
 
 
 # get a single author
@@ -107,8 +97,13 @@ def single_author_get(request: HttpRequest, author_id: str):
 
 # get a single remote author
 def single_author_get_remote(request: HttpRequest, author_id: str):
-    status_code, text, type = get_one_url(author_id)
-    return HttpResponse(content=text, content_type=type, status=status_code)
+    url = author_id
+    response: requests.Response = requests.get(url, headers=get_auth_headers(url))
+    return HttpResponse(
+        status=response.status_code,
+        content_type=response.headers['Content-Type'],
+        content=response.content.decode('utf-8')
+    )
 
 
 # update a single author
@@ -136,3 +131,19 @@ def single_author_post(request: HttpRequest, author_id: str):
     except Exception as e:
         print(e)
         return HttpResponse(status=400)
+
+
+def get_author_id(request : HttpRequest):
+    if request.method != "POST":
+        return HttpResponse(status=405)
+    
+    author = Author.objects.filter(userID=request.user.id) #type: ignore
+
+    if not author:
+        return HttpResponse(status=404)
+    
+    author = author[0]
+
+    res = {"id" : author.id}
+
+    return HttpResponse(content=json.dumps(res),status=200)

@@ -1,11 +1,10 @@
 from django.http import HttpRequest, HttpResponse
 import json
-from ..models import Follow, FollowSerializer, Author, AuthorSerializer
-from .utils import valid_requesting_user, get_all_urls, get_one_url, get_author, send_to_single_inbox, check_auth_header, isaURL, get_auth_headers
-from urllib.parse import unquote, quote
-import re
+from InstaTonneApis.models import Follow, FollowSerializer, Author, AuthorSerializer
+from InstaTonneApis.endpoints.utils import valid_requesting_user, get_all_urls, get_author, check_auth_header, isaURL, get_auth_headers
+from urllib.parse import quote
 import requests
-from InstaTonne.settings import HOSTNAME
+import re
 
 
 # handle requests for the followers of an author
