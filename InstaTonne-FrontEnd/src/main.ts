@@ -24,6 +24,7 @@ const vuetify = createVuetify({
   },
 });
 
+
 // 1. Define route components.
 // These can be imported from other files
 import HomePage from "./components/HomePage.vue";

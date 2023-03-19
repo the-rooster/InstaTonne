@@ -1,5 +1,5 @@
 <template>
-    <v-card class="mx-auto" color="#fff" theme="light" max-width="100%">
+    <v-card class="mx-auto" color="#fff" theme="light" max-width="90%" style="margin:5%">
       <v-card-actions>
         <v-list-item class="w-100">
           <v-list-item-title>{{ author.displayName }} commented on your post</v-list-item-title>
