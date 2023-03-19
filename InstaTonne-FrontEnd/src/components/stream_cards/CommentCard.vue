@@ -25,15 +25,23 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  postData: {
+    type: Object,
+    required: true,
+  },
 });
 
-console.log(toRaw(props.commentData).id);
+console.log(toRaw(props.commentData).id, 555);
 
 async function likeComment() {
-  await createHTTP(toRaw(props.commentData).id + "/likes")
+  await createHTTP(
+    `/authors/${encodeURI(props.postData.author.id)}/posts/${encodeURI(
+      props.postData.id
+    )}/comments/${props.commentData.id}/likes/`
+  )
     .post("")
-    .then((response: { data: object }) => {
-      console.log(response.data);
+    .then((resp) => {
+      return;
     });
 }
 

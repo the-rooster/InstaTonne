@@ -95,7 +95,7 @@ def parse_inbox_comment(data,user):
         print("POST WITH ID ",post_local_id, " DOES NOT EXIST")
         return None
     
-    obj = Comment.objects.create(type=data["type"],id_url="",contentType=data["contentType"],comment=data["content"],author=data["author"],post=post)
+    obj = Comment.objects.create(type="comment",id_url="",contentType=data["contentType"],comment=data["content"],author=data["author"],post=post)
     
     url = HOSTNAME + "/authors/" + user.id + "/posts/" + post_local_id + '/comments/' + obj.id
     obj.id_url = url
@@ -105,9 +105,10 @@ def parse_inbox_comment(data,user):
     return url
 
 def parse_inbox_like(data,user):
-   
+    print("Data: ", data)
     local_id = [x for x in data["object"].split("/") if x][-1]
 
+    is_comment = "comments" in data["object"]
     print(local_id)
 
     #now get the post
@@ -119,7 +120,7 @@ def parse_inbox_like(data,user):
     post = True
     obj = Post.objects.filter(id=local_id).first()
 
-    if obj:
+    if obj and not is_comment:
 
         #determine if the author has already liked this post
         if not Like.objects.filter(post=obj,author=data["author"]):
@@ -128,7 +129,7 @@ def parse_inbox_like(data,user):
             print('yeehaw')
             return None
 
-    elif not obj:  
+    elif not obj or is_comment:  
         #no post, try comments
 
         obj = Comment.objects.filter(id=local_id).first()
@@ -152,9 +153,9 @@ def parse_inbox_like(data,user):
         url = HOSTNAME + "/authors/" + user.id + "/posts/" + local_id + "/likes/" + like.id
     else:
         url = HOSTNAME + "/authors/" + user.id + "/posts/" + obj.post.id + "/comments/" + obj.id + "/likes/" + like.id
-    obj.id_url = url
+    like.id_url = url
     
-    obj.save()
+    like.save()
 
     return url
 
@@ -197,6 +198,7 @@ def post_inbox(request : HttpRequest, id : str):
     data = request.body
     try:
         data = json.loads(data)
+        print("INBOX POST DATA: ",data)
     except Exception as e:
         return HttpResponse(content="expected json!",status=400)
     

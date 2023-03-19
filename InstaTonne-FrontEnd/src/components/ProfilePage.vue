@@ -160,12 +160,9 @@ function follow() {
   color: #888;
 }
 .flex-container {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  flex-basis: 0;
+  display: grid;
+  grid-template-columns: auto auto auto;
   max-width: 36em;
-  justify-content: space-around;
 }
 .flex-content {
   width: 10em;

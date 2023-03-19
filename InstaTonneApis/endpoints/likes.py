@@ -13,16 +13,19 @@ def single_post_likes(request: HttpRequest):
         post_id: str = matched.group(2)
     else:
         return HttpResponse(status=400)
-
+    print("POST ID: " + post_id)
+    print("request.method: " + request.method)
     if "/" in post_id and request.method == "GET":
         return single_post_likes_get_remote(request, author_id, post_id)
     elif "/" in post_id and request.method == "POST":
+        print("POSTING TO REMOTE")
         return single_post_likes_post_remote(request,author_id,post_id)
     elif "/" in post_id or "/" in author_id:
         return HttpResponse(status=405)
     elif request.method == "GET":
         return single_post_likes_get(request, author_id, post_id)
     elif request.method == "POST":
+        print("POSTING TO LOCAL")
         return single_post_likes_post(request,author_id,post_id)
     return HttpResponse(status=405)
 
@@ -50,7 +53,7 @@ def single_post_like(request: HttpRequest):
         like_id: str = matched.group(3)
     else:
         return HttpResponse(status=400)
-
+    print("posting to local in single_post_like")
     if request.method == "GET":
         return get_single_like_post_local(request, author_id, post_id, like_id)
     return HttpResponse(status=405)
@@ -104,7 +107,8 @@ def single_post_likes_post_remote(request : HttpRequest,author_id : str,post_id 
         like: dict = {
             "type" : "like",
             "author" : make_author_url(request.get_host(), author.id),
-            "object" : post_id
+            "object" : post_id,
+            "summary" : "I like this post!"
         }
 
         # comment_id = comment.id #type: ignore
@@ -120,14 +124,16 @@ def single_post_likes_post_remote(request : HttpRequest,author_id : str,post_id 
         
         #assume author.id field. might need adapter for this boy
         res_content = json.loads(res[1])
-        print("CONTENT: ",res_content)
+        print("CONTENT for single_post_likes_post_remote: ",res_content)
+        print("res_content: ",res_content)
         author_inbox_url = res_content["author"]["id"]
-
+        print("author_inbox_url: ",author_inbox_url)
         send_to_single_inbox(author_inbox_url,like)
 
         return HttpResponse(status=204)
     except Exception as e:
         print(e)
+        print("ERROR IN SINGLE POST LIKES POST REMOTE")
         return HttpResponse(status=400)
 
 
@@ -174,7 +180,8 @@ def single_comment_likes_post_remote(request: HttpRequest, author_id: str, post_
         like: dict = {
             "type" : "like",
             "author" : make_author_url(request.get_host(), author.id),
-            "object" : comment_id
+            "object" : comment_id,
+            "summary" : "I like this comment!"
         }
 
         # comment_id = comment.id #type: ignore
@@ -182,16 +189,17 @@ def single_comment_likes_post_remote(request: HttpRequest, author_id: str, post_
         # comment.save()
 
         #get post information to recover author url
-        res = get_one_url(comment_id)
+        status, res = get_one_url(comment_id)
 
+        print("RESPONSE: ",res)
         if not res:
             print("POST NOT FOUND WHEN TRYING TO MAKE COMMENT!")
             return HttpResponse(status=400)
         
         #assume author.id field. might need adapter for this boy
         res_content = json.loads(res[1])
-        print("CONTENT: ",res_content)
-        author_inbox_url = res_content["author"]["id"]
+        print("CONTENT for single_comment_likes_post_remote: ",res_content)
+        author_inbox_url = res_content["author"]
 
         send_to_single_inbox(author_inbox_url,like)
 
