@@ -47,7 +47,6 @@
   
 <script setup lang="ts">
 import { ref } from 'vue'
-import AuthorCard from "../AuthorCard.vue"
 import { createHTTP,  } from '../../axiosCalls'
 
 const loading = ref(false)
