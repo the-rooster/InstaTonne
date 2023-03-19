@@ -38,12 +38,33 @@
       >
       <v-img v-if="isImage" :src="require('${ props.postData.content }')" />
       <v-card-text class="my-10" v-else>
-        <div v-html="content" v-if="props.postData.contentType == 'text/markdown'"></div>
-        <span v-if="props.postData.contentType == 'text/plain' || props.postData.contentType == 'application/base64'">{{content}}</span>
-        <img v-bind:src="content" v-if="props.postData.contentType == 'image/png;base64' || props.postData.contentType == 'image/jpeg;base64'">
+        <div
+          v-html="content"
+          v-if="props.postData.contentType == 'text/markdown'"
+        ></div>
+        <span
+          v-if="
+            props.postData.contentType == 'text/plain' ||
+            props.postData.contentType == 'application/base64'
+          "
+          >{{ content }}</span
+        >
+        <img
+          v-bind:src="content"
+          v-if="
+            props.postData.contentType == 'image/png;base64' ||
+            props.postData.contentType == 'image/jpeg;base64'
+          "
+        />
       </v-card-text>
     </v-card>
-
+    <v-text-field
+      v-model="newComment"
+      label="Comment"
+      placeholder="Comment"
+      clearable
+      @keyup.enter="saveComment"
+    />
     <v-card-actions>
       <v-btn variant="text"> Comments </v-btn>
 
@@ -68,6 +89,7 @@
             <CommentCard
               v-if="(item.type = 'comment')"
               v-bind:commentData="item"
+              v-bind:postData="postData"
             />
           </div>
         </v-card-text>
@@ -80,7 +102,7 @@
 import { ref, toRaw, onBeforeMount, computed } from "vue";
 import CommentCard from "./CommentCard.vue";
 import Cookies from "js-cookie";
-import {marked} from "marked";
+import { marked } from "marked";
 import DOMPurify from "dompurify";
 
 // defineProps<{ msg: string }>()
@@ -96,52 +118,42 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  newComment: {
+    type: Object,
+    required: true,
+  },
 });
 
 let content = computed(() => {
+  console.log("PROP", props.postData);
 
-  console.log("PROP",props.postData)
-
-  if (!props.postData){
+  if (!props.postData) {
     return "";
   }
 
-
-  if (props.postData.contentType == "text/markdown"){
-    console.log("YAHOOO")
+  if (props.postData.contentType == "text/markdown") {
+    console.log("YAHOOO");
     console.log(DOMPurify.sanitize(marked.parse(props.postData.content)));
     return DOMPurify.sanitize(marked.parse(props.postData.content));
   }
 
-
-
   return props.postData.content;
-})
-
-// const commentData = ref(props.commentData);
-// commentData.value.content = "";
-// commentData.value.author = USER_AUTHOR_ID_COOKIE;
-
-// async function saveComment() {
-//   await createHTTP(``)
-//     .post(JSON.stringify(props.commentData))
-//     .then((response: { data: object }) => {
-//       console.log(response.data);
-//     });
-// }
+});
 
 console.log(toRaw(props.postData).id, 1000);
 console.log(toRaw(props.postData));
 
 async function likePost() {
-  await createHTTP(toRaw(props.postData).id + "/likes")
+  await createHTTP(
+    `/authors/${encodeURI(props.postData.author.id)}/posts/${encodeURI(
+      props.postData.id
+    )}/likes/`
+  )
     .post("")
     .then((response: { data: object }) => {
       console.log(response.data);
     });
 }
-
-// async function sharePost() {}
 
 const authorId = Cookies.get(USER_AUTHOR_ID_COOKIE);
 const loading = ref(true);
@@ -159,10 +171,35 @@ async function sharePost() {
     });
 }
 
+const newComment = ref("");
+async function saveComment() {
+  console.log("newComment", newComment.value);
+  await createHTTP(
+    `/authors/${encodeURI(props.postData.author.id)}/posts/${encodeURI(
+      props.postData.id
+    )}/comments/`
+  )
+    .post(
+      JSON.stringify({
+        type: "comment",
+        contentType: "application/x-www-urlencoded",
+        comment: newComment.value,
+      })
+    )
+    .then((response: { data: object }) => {
+      loading.value = false;
+    });
+}
+
 let comments = ref({});
-createHTTP(toRaw(props.postData.comments))
+createHTTP(
+  `/authors/${encodeURI(props.postData.author.id)}/posts/${encodeURI(
+    props.postData.id
+  )}/comments/`
+)
   .get()
   .then((response) => {
+    console.log(response.data, 4567);
     comments.value = response.data.comments;
   });
 

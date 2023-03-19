@@ -18,12 +18,14 @@ def single_post_comments(request: HttpRequest):
     if "/" in post_id and request.method == "GET":
         return single_post_comments_get_remote(request, author_id, post_id)
     elif "/" in post_id and request.method == "POST":
+        print("POSTING COMMENT to remote")
         return single_post_comments_post_remote(request,author_id,post_id)
     elif "/" in post_id or "/" in author_id:
         return HttpResponse(status=405)
     elif request.method == "GET":
         return single_post_comments_get(request, author_id, post_id)
     elif request.method == "POST":
+        print("POSTING COMMENT to local")
         return single_post_comments_post(request, author_id, post_id)
     return HttpResponse(status=405)
 
@@ -103,6 +105,7 @@ def single_post_comments_post_remote(request: HttpRequest, author_id : str, post
     try:
         
         body: dict = json.loads(request.body)
+        print("BODY for single_post_comments_post_remote: ",body)
         comment: dict = {
             "type" : "comment",
             "contentType" : body["contentType"],
@@ -110,6 +113,8 @@ def single_post_comments_post_remote(request: HttpRequest, author_id : str, post
             "author" : make_author_url(request.get_host(), author.id),
             "post" : post_id
         }
+
+        print("COMMENT for single_post_comments_post_remote: ",comment)
 
         # comment_id = comment.id #type: ignore
         # comment.id_url = make_comment_url(request.get_host(), author_id, post_id, comment_id)
@@ -124,7 +129,8 @@ def single_post_comments_post_remote(request: HttpRequest, author_id : str, post
         
         #assume author.id field. might need adapter for this boy
         res_content = json.loads(res[1])
-        print("CONTENT: ",res_content)
+        print("CONTENT for single_post_comments_post_remote: ",res_content)
+        print("AUTHOR for single_post_comments_post_remote: ",res_content["author"])
         author_inbox_url = res_content["author"]["id"]
 
         send_to_single_inbox(author_inbox_url,comment)
