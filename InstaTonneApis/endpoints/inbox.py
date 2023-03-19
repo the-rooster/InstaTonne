@@ -95,7 +95,7 @@ def parse_inbox_comment(data,user):
         print("POST WITH ID ",post_local_id, " DOES NOT EXIST")
         return None
     
-    obj = Comment.objects.create(type=data["type"],id_url="",contentType=data["contentType"],comment=data["content"],author=data["author"],post=post)
+    obj = Comment.objects.create(type="comment",id_url="",contentType=data["contentType"],comment=data["content"],author=data["author"],post=post)
     
     url = HOSTNAME + "/authors/" + user.id + "/posts/" + post_local_id + '/comments/' + obj.id
     obj.id_url = url

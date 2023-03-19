@@ -108,6 +108,7 @@ import DOMPurify from "dompurify";
 // defineProps<{ msg: string }>()
 
 import { USER_AUTHOR_ID_COOKIE, createHTTP } from "../../axiosCalls";
+import { vModelCheckbox } from "vue";
 
 const props = defineProps({
   postData: {
@@ -182,13 +183,17 @@ async function saveComment() {
     .post(
       JSON.stringify({
         type: "comment",
-        contentType: "application/x-www-urlencoded",
+        contentType: "text/plain",
         comment: newComment.value,
       })
     )
     .then((response: { data: object }) => {
       loading.value = false;
+      // gotta do what you gotta do
+      window.history.go();
     });
+
+
 }
 
 let comments = ref({});

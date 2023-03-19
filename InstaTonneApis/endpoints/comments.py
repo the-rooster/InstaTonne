@@ -132,7 +132,6 @@ def single_post_comments_post_remote(request: HttpRequest, author_id : str, post
         print("CONTENT for single_post_comments_post_remote: ",res_content)
         print("AUTHOR for single_post_comments_post_remote: ",res_content["author"])
         author_inbox_url = res_content["author"]["id"]
-
         send_to_single_inbox(author_inbox_url,comment)
 
         return HttpResponse(status=204)
@@ -188,5 +187,7 @@ def get_single_comment_local(request:HttpRequest,author_id : str,post_id : str, 
     serialized_comment = CommentSerializer(comment).data
 
     res = json.dumps(serialized_comment)
+
+    print("GETTING COMMENT: ",res)
 
     return HttpResponse(content=res, content_type="application/json", status=200)

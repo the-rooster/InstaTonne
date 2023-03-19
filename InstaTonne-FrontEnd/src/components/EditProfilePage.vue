@@ -30,6 +30,7 @@
 import { ref, computed, onBeforeMount } from "vue";
 import { createHTTP, USER_AUTHOR_ID_COOKIE } from "../axiosCalls";
 import { useRoute } from "vue-router";
+import { router } from "../main";
 import Cookies from "js-cookie";
 
 console.log("showing something");
@@ -61,6 +62,7 @@ async function savePost() {
     .post(JSON.stringify(authorData.value))
     .then((response: { data: object }) => {
       loading.value = false;
+      router.push(`/ProfilePage/${encodeURIComponent(authorData.value.id)}/`)
     });
 }
 </script>
