@@ -52,7 +52,7 @@ urlpatterns = [
     re_path(r"^authors\/.+?\/posts\/?$", single_author_posts),
     re_path(r"^authors\/.+?\/inbox\/?$",inbox_endpoint),
     re_path(r"^authors\/.+?\/followers\/.+?\/request\/?$", get_request_object),
-    re_path(r"^authors\/.+?\/followers\/.+?\/?$", single_author_follower),
+    re_path(r"^authors\/(.+?)\/followers\/(.+?)\/?$", single_author_follower),
     re_path(r"^authors\/(.+?)\/followers\/?$", single_author_followers),
     re_path(r"^authors\/(.+?)\/?$", single_author),
     re_path(r"^authors\/?$", authors),

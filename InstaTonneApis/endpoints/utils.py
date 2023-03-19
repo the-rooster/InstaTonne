@@ -260,5 +260,8 @@ def get_auth_header_for_server(url : str):
     
     return ""
 
+def get_auth_headers(url: str):
+    return {"Origin": HOSTNAME, "Authentication": get_auth_header_for_server(url)}
+
 def isaURL(s: str):
     return "/" in s

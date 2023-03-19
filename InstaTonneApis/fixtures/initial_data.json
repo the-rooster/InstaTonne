@@ -23,7 +23,7 @@
     "pk": 3,
     "fields": {
       "username": "username2",
-      "password": "pbkdf2_sha256$390000$qNmGFiZJzIeaxwOP6Ydwv8$9jc3/9tEt3I2meX52eYmf2LezRPVNIBnfKZPHW6qhtk="
+      "password": "pbkdf2_sha256$390000$iTUc5a7hBDHjaqTLMyb5UE$oaaihzwq461SiByfgAmQOx5BfO/u4iP4fYuNTx81qYY="
     }
   },
   {

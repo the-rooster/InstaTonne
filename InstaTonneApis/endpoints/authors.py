@@ -58,9 +58,6 @@ def single_author(request: HttpRequest, author_id: str):
         return single_author_get(request, author_id)
     
     if request.method == "POST":
-        print("Getting into single_author_post")
-        print(request)
-        print(author_id)
         return single_author_post(request, author_id)
     
     return HttpResponse(status=405)
@@ -97,7 +94,11 @@ def authors_get_remote(request: HttpRequest, remote_authors: str):
 
 # get a single author
 def single_author_get(request: HttpRequest, author_id: str):
-    author = Author.objects.get(pk=author_id)
+    author: Author | None = Author.objects.all().filter(pk=author_id).first()
+
+    if author is None:
+        return HttpResponse(status=404)
+
     serialized_author = AuthorSerializer(author).data
     
     res = json.dumps(serialized_author)
