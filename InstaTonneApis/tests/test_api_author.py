@@ -48,8 +48,7 @@ class AuthorAPI(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.get('Content-Type'), 'application/json')
-        self.assertEqual(response.json()['type'], 'authors')
-        self.assertEqual(response.json()['items'], [serialized_expected_author])
+        self.assertEqual(response.json(), {'type': 'authors', 'items': [serialized_expected_author]})
 
 
     @patch('requests.get')

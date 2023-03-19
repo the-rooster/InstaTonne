@@ -6,6 +6,7 @@ import requests
 from typing import Tuple
 import urllib.parse
 from InstaTonne.settings import HOSTNAME, FRONTEND
+from urllib.parse import quote
 import copy
 
 PUBLIC = "PUBLIC"
@@ -88,35 +89,40 @@ def send_to_single_inbox(author_url : str, data : dict):
         return 404
     return response.status_code
 
-def send_to_inboxes(author_id: str, author_url: str, data : dict, item_visibility: str):
+def send_to_inboxes(author_id: str, author_url: str, data: dict, item_visibility: str):
     follows = Follow.objects.all().filter(object=author_id, accepted=True)
+
     if item_visibility == PUBLIC:
         for follow in follows:
             if not post_to_follower_inbox(follow.follower_url, data):
                 print("ERROR: bad inbox response, public")
+
     elif item_visibility == PRIVATE:
         for follow in follows:
             if not author_follows_follower(author_url, follow.follower_url):
                 continue
             if not post_to_follower_inbox(follow.follower_url, data):
                 print("ERROR: bad inbox response, private")
+
     else:
         print("ERROR: invalid visibility")
 
 
 def author_follows_follower(author_url: str, follower_url: str) -> bool:
-    encoded_author_url = urllib.parse.quote(author_url, safe='')
-    check_url: str = follower_url + '/follower/' + encoded_author_url
-    check_response: requests.Response = requests.get(check_url)
-    return check_response.status_code == 200
+    encoded_follower_url = quote(follower_url, safe='').replace('.', '%2E')
+    check_url: str = author_url + '/followers/' + encoded_follower_url
+    try:
+        check_response: requests.Response = requests.get(check_url, headers=get_auth_headers(follower_url))
+        return check_response.status_code >= 200 and check_response.status_code < 300
+    except:
+        return False
 
 
 def post_to_follower_inbox(follower_url: str, data: dict) -> bool:
     follower_url = follower_url.strip("/")
     inbox_url: str = follower_url + '/inbox/'
     try:
-        response: requests.Response = requests.post(inbox_url,json.dumps(data),headers={"Origin":HOSTNAME,
-                                                                                        "Authorization" : get_auth_header_for_server(follower_url)}) # this will probs have to get changed when the inbox endpoints get updated
+        response: requests.Response = requests.post(inbox_url, json.dumps(data), headers=get_auth_headers(follower_url))
     except Exception as e:
         print("SERVER DOWN!")
         return True
@@ -174,7 +180,7 @@ def valid_requesting_user(request: HttpRequest, required_author_id: str) -> bool
 
 
 def make_author_url(request_host: str, author_id: str) -> str:
-    return "http://" + request_host + "/authors/" + author_id
+    return request_host + "/authors/" + author_id
 
 
 def make_post_url(request_host: str, author_id: str, post_id: str) -> str:
@@ -194,12 +200,8 @@ def make_inbox_url(request_host: str, author_id: str) -> str:
 # checks that the request is authenticated either with our connected servers table in the DB,
 # or the request is coming from our frontend/backend
 def check_auth_header(request : HttpRequest):
-
-    print("CHECKING AUTH HEADER")
     
     origin = request.META.get('HTTP_ORIGIN')
-
-    print("ORIGIN:",origin)
 
     #check if the request is from us
     if origin == FRONTEND or origin == HOSTNAME:
