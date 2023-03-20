@@ -136,7 +136,7 @@ import { onBeforeUpdate } from 'vue';
   // fetch all authors from a remote server
   async function fetchRemoteAuthors(server : string){
 
-    let total_remote_author_urls = encodeURI("https://" + server + `/authors?page=${pageNum.page}&size=${pageSize}/`);
+    let total_remote_author_urls = encodeURI("http://" + server + `/authors?page=${pageNum.page}&size=${pageSize}/`);
     await createHTTP(`remote-authors/${total_remote_author_urls}`).get().then( (response) => {
       console.log("YUP");
       console.log(response);
