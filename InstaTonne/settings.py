@@ -105,9 +105,7 @@ TEMPLATES = [
     },
 ]
 
-STATICFILES_DIRS = [
-    BASE_DIR / "templates/assets",
-]
+
 
 WSGI_APPLICATION = 'InstaTonne.wsgi.application'
 
