@@ -1,48 +1,25 @@
-<style>
-.viewBox {
-  width: 80%;
-  margin: 0 auto;
-  margin-top: 20;
-  text-align: center;
-  background-color: #f9f9f9;
-  padding: 2rem;
-  border-radius: 10pt;
-  font-family: Arial, sans-serif;
-  color: #333;
-}
+<!-- InstaTonne-FrontEnd/src/components/AboutPage.vue -->
+<!--
+  Copyright (c) 2023 CMPUT 404 W2023 Group 6
 
-.viewBox h1 {
-  font-size: 2.5rem;
-  color: #4a90e2;
-  margin-bottom: 1rem;
-}
+  This file is part of InstaTonne.
 
-.viewBox p {
-  font-size: 1.1rem;
-  line-height: 1.5;
-  max-width: 90%;
-  margin: 0 auto;
-  margin-bottom: 1.5rem;
-}
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
 
-.viewBox a {
-  color: #4a90e2;
-  text-decoration: none;
-}
+      http://www.apache.org/licenses/LICENSE-2.0
 
-.viewBox a:hover {
-  text-decoration: underline;
-}
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
 
-.viewBox strong {
-  font-size: 1.2rem;
-  font-weight: bold;
-}
+  Description:
+  This component is part of InstaTonne and provides authentication functionality.
+-->
 
-.viewBox p:last-child {
-  margin-bottom: 0;
-}
-</style>
 <template>
   <div class="viewBox">
     <h1>Welcome to InstaTonne!</h1>
@@ -101,5 +78,49 @@ const count = ref(0);
 <style scoped>
 .read-the-docs {
   color: #888;
+}
+
+.viewBox {
+  width: 80%;
+  margin: 0 auto;
+  margin-top: 20;
+  text-align: center;
+  background-color: #f9f9f9;
+  padding: 2rem;
+  border-radius: 10pt;
+  font-family: Arial, sans-serif;
+  color: #333;
+}
+
+.viewBox h1 {
+  font-size: 2.5rem;
+  color: #4a90e2;
+  margin-bottom: 1rem;
+}
+
+.viewBox p {
+  font-size: 1.1rem;
+  line-height: 1.5;
+  max-width: 90%;
+  margin: 0 auto;
+  margin-bottom: 1.5rem;
+}
+
+.viewBox a {
+  color: #4a90e2;
+  text-decoration: none;
+}
+
+.viewBox a:hover {
+  text-decoration: underline;
+}
+
+.viewBox strong {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.viewBox p:last-child {
+  margin-bottom: 0;
 }
 </style>

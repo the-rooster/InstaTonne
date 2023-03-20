@@ -1,8 +1,27 @@
+# InstaTonne/tests.py
+# Copyright (c) 2023 CMPUT 404 W2023 Group 6
+#
+# This file is part of InstaTonne.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+ 
+
 from collections import OrderedDict
 from django.test import TestCase
 from ..models import Author, Follow, Post, Request, Comment, Like, Inbox, AuthorSerializer, FollowSerializer, PostSerializer, RequestSerializer, CommentSerializer, LikeSerializer
 
 def get_author_object(index: int):
+    """Returns an Author object with different data depending on the index."""
     if index == 1:
         return Author.objects.create(
             type='author',
@@ -41,6 +60,7 @@ def get_author_object(index: int):
         )
     
 def get_author_data(index: int):
+    """Returns a dictionary with Author data with different data depending on the index."""
     if index == 1:
         return {
             'type': 'author',
@@ -68,6 +88,7 @@ def get_author_data(index: int):
 
     
 def get_post_object(author: Author):
+    """Returns a Post object."""
     return Post.objects.create(
         type='post',
         id_url='http://localhost:8000/posts/1/',
@@ -85,6 +106,7 @@ def get_post_object(author: Author):
     )
 
 def get_post_data(index: int, author: Author):
+        """Returns a dictionary with Post data with different data depending on the index."""
         if index == 1:
             return {
                 'type': 'post',
@@ -102,6 +124,7 @@ def get_post_data(index: int, author: Author):
             }
 
 def get_comment_object(author: Author, post: Post):
+    """"""
     return Comment.objects.create(
         type='comment',
         id_url='http://localhost:8000/comments/1/',

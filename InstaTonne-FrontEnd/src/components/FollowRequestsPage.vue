@@ -1,4 +1,4 @@
-<!-- InstaTonne-FrontEnd/src/components/EditPostPage.vue -->
+<!-- InstaTonne-FrontEnd/src/components/FollowRequestsPage.vue -->
 <!--
   Copyright (c) 2023 CMPUT 404 W2023 Group 6
 
@@ -30,55 +30,51 @@
       style="margin: 10em"
       class="loadingIcon"
     />
-    <div v-else-if="errorMessage.length > 0">
-      <ErrorPage :error-message="errorMessage" />
+    <div v-else>
+      {{}}
+      <div style="display: flex">
+        <FollowRequestCard
+          v-for="request in followRequests"
+          :key="request.displayName"
+          :request-data="request"
+          :author-id="authorId"
+          @update="removeRequest(request)"
+        />
+      </div>
     </div>
-    <PostEditor
-      v-else
-      :post-data="postData"
-      :save-function="savePost"
-      :require-extra="false"
-    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onBeforeMount } from "vue";
-import { useRoute } from "vue-router";
-import PostEditor from "./PostEditor.vue";
-import ErrorPage from "./ErrorPage.vue";
+import { ref, onBeforeMount, computed } from "vue";
+import FollowRequestCard from "./stream_cards/FollowRequestCard.vue";
 import { createHTTP, USER_AUTHOR_ID_COOKIE } from "../axiosCalls";
 import Cookies from "js-cookie";
 
 const loading = ref(true);
-const errorMessage = ref("");
 const postData = ref({});
 
-let route = useRoute();
 const authorId = Cookies.get(USER_AUTHOR_ID_COOKIE);
 
+const removeRequest = (request) => {
+  const index = postData.value.items.indexOf(request);
+  postData.value.items.splice(index, 1);
+};
+
 onBeforeMount(async () => {
-  await createHTTP(`authors/${authorId}/posts/${route.params.postid}/`)
+  await createHTTP(`authors/${authorId}/inbox/`)
     .get()
     .then((response: { data: object }) => {
       postData.value = response.data;
       loading.value = false;
-    })
-    .catch(() => {
-      errorMessage.value = "404 Post Not Found";
-      loading.value = false;
     });
 });
 
-async function savePost(updatedPost) {
-  loading.value = true;
-  console.log("POST: ",updatedPost);
-  await createHTTP(`authors/${authorId}/posts/${route.params.postid}/`)
-    .post(JSON.stringify(updatedPost))
-    .then((response: { data: object }) => {
-      loading.value = false;
-    });
-}
+const followRequests = computed(() =>
+  postData.value?.items?.filter(
+    (item) => item.type == "Follow" && item.accepted == false
+  )
+);
 </script>
 
 <style scoped></style>
