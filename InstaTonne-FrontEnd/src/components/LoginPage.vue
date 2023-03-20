@@ -58,6 +58,7 @@
         <div>
           <v-btn
             class="button"
+            id="loginButton"
             :disabled="!canLogin"
             @click="registerMode ? register() : login()"
           >
@@ -147,7 +148,7 @@ async function login() {
       Cookies.set(USER_AUTHOR_ID_COOKIE, response.authorId, { expires: 0.5 });
       emits("LoggedIn", response.authorId);
       loading.value = false;
-      router.go();
+      // router.go();
     })
     .catch((response) => {
       console.log(response);
@@ -188,14 +189,10 @@ async function register() {
 
 const loading = ref(false);
 const postData = ref({});
-// onBeforeMount(async () => {
-//   await createHTTP("authors/1/posts/1/")
-//     .get()
-//     .then((response: { data: object }) => {
-//       postData.value = response.data;
-//       loading.value = false;
-//     });
-// });
+onBeforeMount(async () => {
+  // create http request to retrieve csrf token
+  await createHTTP("csrf/").get();
+});
 </script>
 
 <style scoped>

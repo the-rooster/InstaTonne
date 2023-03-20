@@ -92,10 +92,6 @@ const props = defineProps({
     type: Function,
     required: true,
   },
-  requireExtra: {
-    type: Boolean,
-    required: true,
-  },
 });
 
 const postData = ref(props.postData);

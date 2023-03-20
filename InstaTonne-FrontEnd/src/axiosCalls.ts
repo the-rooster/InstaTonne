@@ -42,9 +42,6 @@ function createHTTP(url: string) {
   };
 }
 
-// create http request to retrieve csrf token
-createHTTP("csrf/").get();
-
 function createFormBody(credentials: any[]) {
   const formBody: string[] = [];
   for (const property in credentials) {
