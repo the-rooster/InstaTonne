@@ -29,8 +29,10 @@ def get_all_urls(urls):
                 result.append({"error" : "url not connected to this server"})
                 inbox_lock.release()
             try:
+                print("TRYING TO GET URL get_all_urls",url)
                 response : requests.Response = requests.get(url,headers={"Origin":HOSTNAME,
                                                                          "Authentication" : get_auth_header_for_server(url)})
+                print("GOT URL")
                 print("STATUS: ",response.status_code)
                 if response.status_code >= 200 and response.status_code < 300:
                     print(response.text)
@@ -62,8 +64,10 @@ def get_one_url(url: str) -> Tuple[int, str]:
         return (401,str("NOT IN LIST OF ACCEPTED SERVERS"))
     
     try:
+        print("TRYING TO GET URL, get_one_url",url)
         response: requests.Response = requests.get(url,headers={"Origin":HOSTNAME,
                                                                 "Authentication" : get_auth_header_for_server(url)})
+        print("GOT URL")
         return (response.status_code, response.text)
     except Exception as e:
         print("ERROR GETTING URL: ",e)
@@ -78,9 +82,11 @@ def send_to_single_inbox(author_url : str, data : dict):
     
     inbox_url: str = author_url + '/inbox/'
     try:
+        print("TRYING TO SEND TO INBOX!",inbox_url)
         response: requests.Response = requests.post(inbox_url,
                                                     json.dumps(data),headers={"Origin" : HOSTNAME, 
                                                                             "Authentication" : get_auth_header_for_server(author_url)})
+        print("SENT TO INBOX")
     except Exception as e:
         print(e)
         print("SERVER DOWN! Returning 404")
@@ -173,7 +179,7 @@ def valid_requesting_user(request: HttpRequest, required_author_id: str) -> bool
 
 
 def make_author_url(request_host: str, author_id: str) -> str:
-    return "http://" + request_host + "/authors/" + author_id
+    return "https://" + request_host + "/authors/" + author_id
 
 
 def make_post_url(request_host: str, author_id: str, post_id: str) -> str:

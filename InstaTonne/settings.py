@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 import os
 import sys
+import django_on_heroku
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,7 +32,7 @@ SECRET_KEY = os.environ["SECRET_KEY"] if "SECRET_KEY" in os.environ else 'django
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['instatonne-cmput404.herokuapp.com','127.0.0.1']
 
 
 # Application definition
@@ -105,9 +106,7 @@ TEMPLATES = [
     },
 ]
 
-STATICFILES_DIRS = [
-    BASE_DIR / "templates/assets",
-]
+
 
 WSGI_APPLICATION = 'InstaTonne.wsgi.application'
 
@@ -157,7 +156,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
+print("BASE DIR",BASE_DIR)
 STATIC_URL = 'assets/'
+STATIC_ROOT = BASE_DIR / 'assets_go_here'
+print("STATIC ROOT",STATIC_ROOT)
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'templates/assets',
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -171,3 +177,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ]
 }
+
+
+django_on_heroku.settings(locals(),staticfiles=False)

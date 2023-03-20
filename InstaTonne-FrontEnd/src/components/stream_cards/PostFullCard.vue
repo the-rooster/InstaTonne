@@ -155,7 +155,7 @@ async function likePost() {
     return;
   }
   await createHTTP(
-    `/authors/${encodeURI(props.postData.author.id)}/posts/${encodeURI(
+    `/authors/${encodeURIComponent(props.postData.author.id)}/posts/${encodeURIComponent(
       props.postData.id
     )}/likes/`
   )
@@ -191,7 +191,7 @@ async function saveComment() {
   }
   console.log("newComment", newComment.value);
   await createHTTP(
-    `/authors/${encodeURI(props.postData.author.id)}/posts/${encodeURI(
+    `/authors/${encodeURIComponent(props.postData.author.id)}/posts/${encodeURIComponent(
       props.postData.id
     )}/comments/`
   )

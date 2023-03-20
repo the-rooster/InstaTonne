@@ -8,7 +8,7 @@
     <br />
     <v-btn
       v-if="profileId === Cookies.get(USER_AUTHOR_ID_COOKIE)"
-      v-bind:href="`/authors/${profileId}/edit`"
+      v-bind:href="`/app/authors/${profileId}/edit`"
       >Edit Profile</v-btn
     >
     <a v-bind:href="profileData.github"
