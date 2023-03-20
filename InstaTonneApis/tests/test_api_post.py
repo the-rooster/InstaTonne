@@ -1,42 +1,12 @@
-from django.test import TestCase
 from rest_framework import status
-from rest_framework.test import APIClient
 from InstaTonneApis.models import Author, Follow, Post, PostSerializer, Comment
 from django.http import HttpResponse
 import json
 from unittest.mock import patch, ANY, MagicMock
-import requests
+from InstaTonneApis.tests.test_api_abstract import AbstractApiTestCase, ORIGIN, HOST, AUTHORIZATION, HOST_ENCODED
 
 
-ORIGIN = 'http://127.0.0.1:5173'
-HOST = 'http://127.0.0.1:8000'
-HOST_ENCODED = 'http%3A%2F%2F127%2E0%2E0%2E1%3A8000'
-AUTHORIZATION = ''
-
-
-class PostAPI(TestCase):
-    fixtures = ['InstaTonneApis/fixtures/initial_data.json']
-
-
-    def setUp(self):
-        self.client = APIClient()
-        self.client.login(username='username1', password='password1')
-
-
-    def generic_mock_response(self) -> requests.Response:
-        mock_response = requests.Response()
-        mock_response.status_code = 200
-        mock_response.headers['Content-Type'] = 'application/json'
-        mock_response._content = '{"mock_key": "mock_value"}'.encode('utf-8')
-        return mock_response
-
-
-    def assert_generic_mock_response(self, response: HttpResponse) -> None:
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.get('Content-Type'), 'application/json')
-        self.assertEqual(response.json(), {'mock_key': 'mock_value'})
-
-
+class PostApiTestCase(AbstractApiTestCase):
     def test_get_author_posts(self):
         author: Author | None = Author.objects.all().filter(id_url=HOST + '/authors/1').first()
 

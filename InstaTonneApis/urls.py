@@ -41,7 +41,9 @@ urlpatterns = [
     re_path(r"^remote-authors\/(.+?)\/?$",remote_authors),
     re_path(r"^authors\/.+?\/inbox\/?$",inbox_endpoint),
     re_path(r"^authors\/.+?\/liked\/?$", single_author_likes),
+    re_path(r"^authors\/.+?\/followers\/.+?\/request\/?$", get_request_object),
     re_path(r"^authors\/(.*?)\/posts\/(.*?)\/image\/?$", single_author_post_image),
+
     re_path(r"^authors\/(.+?)\/posts\/(.+?)\/comments\/(.+?)\/likes\/(.+?)\/?$", single_comment_like),
     re_path(r"^authors\/(.+?)\/posts\/(.+?)\/comments\/(.+?)\/likes\/?$", single_comment_likes),
     re_path(r"^authors\/(.+?)\/posts\/(.+?)\/comments\/(.+?)\/?$", single_post_comment),
@@ -50,11 +52,10 @@ urlpatterns = [
     re_path(r"^authors\/(.+?)\/posts\/(.+?)\/likes\/?$", single_post_likes),
     re_path(r"^authors\/(.+?)\/posts\/(.+?)\/?$", single_author_post),
     re_path(r"^authors\/(.+?)\/posts\/?$", single_author_posts),
-    re_path(r"^authors\/.+?\/inbox\/?$",inbox_endpoint),
-    re_path(r"^authors\/.+?\/followers\/.+?\/request\/?$", get_request_object),
     re_path(r"^authors\/(.+?)\/followers\/(.+?)\/?$", single_author_follower),
     re_path(r"^authors\/(.+?)\/followers\/?$", single_author_followers),
     re_path(r"^authors\/(.+?)\/?$", single_author),
     re_path(r"^authors\/?$", authors),
+    
     path("csrf/", get_csrf)
 ]
