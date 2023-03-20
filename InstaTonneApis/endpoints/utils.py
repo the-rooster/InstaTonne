@@ -179,7 +179,7 @@ def valid_requesting_user(request: HttpRequest, required_author_id: str) -> bool
 
 
 def make_author_url(request_host: str, author_id: str) -> str:
-    return "https://" + request_host + "/authors/" + author_id
+    return "http://" + request_host + "/authors/" + author_id
 
 
 def make_post_url(request_host: str, author_id: str, post_id: str) -> str:
