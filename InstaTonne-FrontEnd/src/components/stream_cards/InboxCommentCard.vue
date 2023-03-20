@@ -58,7 +58,7 @@ onBeforeMount(() => {
 
   let commentId : string = props.commentData.id
 
-  let groups = commentId.match(/http:\/\/(.*)\/authors\/(?<authorId>.*)\/posts\/(?<postId>.*)\/comments\//)?.groups;
+  let groups = commentId.match(/(.*)\/authors\/(?<authorId>.*)\/posts\/(?<postId>.*)\/comments\//)?.groups;
 
 
   

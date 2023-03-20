@@ -33,7 +33,7 @@ def get_inbox(request : HttpRequest, id : str):
 
     result = {
         "type" : "inbox",
-        "author" : "http://" + request.get_host() + "/authors/" + str(id) + "/",
+        "author" : "https://" + request.get_host() + "/authors/" + str(id) + "/",
         "items" : []
     }
     

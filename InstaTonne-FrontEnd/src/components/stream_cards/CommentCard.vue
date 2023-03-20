@@ -37,7 +37,7 @@ const props = defineProps({
 
 async function likeComment() {
   await createHTTP(
-    `/authors/${encodeURI(props.postData.author.id)}/posts/${encodeURI(
+    `/authors/${encodeURIComponent(props.postData.author.id)}/posts/${encodeURI(
       props.postData.id
     )}/comments/${props.commentData.id}/likes/`
   )
