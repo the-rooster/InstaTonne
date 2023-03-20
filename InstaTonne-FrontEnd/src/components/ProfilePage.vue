@@ -30,7 +30,7 @@
     <div class="flex-container">
       <div v-for="post in posts" :key="post.id" class="post-tiny">
         <a
-          v-bind:href="`/authors/${encodeURIComponent(
+          v-bind:href="`/app/authors/${encodeURIComponent(
             profileData.id
           )}/posts/${encodeURIComponent(post.id)}/`"
         >

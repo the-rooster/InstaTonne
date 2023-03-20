@@ -3,7 +3,7 @@
     <br>
     <div>
       <PostFullCard
-        v-if="(post.type = 'post')"
+        v-if="(post.type == 'post') && post"
         :post-data="post"
       />
     </div>

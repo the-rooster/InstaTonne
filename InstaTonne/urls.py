@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.contrib.auth.models import User
 from rest_framework import routers, serializers, viewsets
 from rest_framework.schemas import get_schema_view
@@ -37,7 +37,8 @@ router.register(r'users', UserViewSet)
 
 urlpatterns = [
     path('', include("InstaTonneApis.urls")),
-    path('',views.index),
+    path('',views.go_to_the_app),
+    re_path(r'app/.*',views.index),
     path('admin/', admin.site.urls),
 ]
 

@@ -133,7 +133,7 @@ const canLogin = computed(
 
 async function login() {
   loading.value = true;
-  const credentials = {
+  const credentials : any = {
     username: username.value,
     password: password.value,
   };
@@ -167,7 +167,7 @@ async function register() {
   loading.value = true;
   // await createHTTP('login/').post('').then((response: { data: object }) => {
   // NOT WORKING YET
-  const credentials = {
+  const credentials : any = {
     username: username.value,
     password: password.value,
     check_password: confirmPassword.value,

@@ -42,23 +42,29 @@ const authorData = ref({});
 
 const disableSaving = computed(() => authorData.value.displayName === "");
 
-let profileId = route.params.id;
+const profileId  = ref("");
 
-if (!profileId) {
-  profileId = Cookies.get(USER_AUTHOR_ID_COOKIE);
-}
+onBeforeMount(() => {
+  if(route.params.id){
+    profileId.value = route.params.id;
+  }
+  if (!profileId.value) {
+    profileId.value = Cookies.get(USER_AUTHOR_ID_COOKIE);
+  }
 
-createHTTP("authors/" + profileId + "/")
+  createHTTP("authors/" + profileId.value + "/")
   .get()
   .then((response) => {
     console.log(response.data, 51515);
     authorData.value = response.data;
     console.log(response.data, 567);
   });
+})
+
 
 async function savePost() {
   loading.value = true;
-  await createHTTP(`authors/${profileId}`)
+  await createHTTP(`authors/${profileId.value}`)
     .post(JSON.stringify(authorData.value))
     .then((response: { data: object }) => {
       loading.value = false;

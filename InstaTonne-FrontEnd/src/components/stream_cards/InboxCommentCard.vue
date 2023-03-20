@@ -45,7 +45,8 @@ import { createHTTP } from "../../axiosCalls";
   
   const postData = ref({});
   const postUrl = ref({});
-
+  let author = ref({});
+  
   const props = defineProps({
     commentData: {
       type: Object,
@@ -77,17 +78,16 @@ import { createHTTP } from "../../axiosCalls";
         console.log("POST",result.data)
         postData.value = result.data;
     })
-  })
-  
-  console.log(toRaw(props.commentData).id, 555);
-  
-  
-  let author = ref({});
-  createHTTP(toRaw(props.commentData).author)
+
+    createHTTP(toRaw(props.commentData).author)
     .get()
     .then((response) => {
       author.value = response.data;
     });
+  })
+  
+  
+
   // defineProps<{ msg: string }>();
   </script>
   
