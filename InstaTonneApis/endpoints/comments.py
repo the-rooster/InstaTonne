@@ -135,7 +135,9 @@ def single_post_comments_post(request: HttpRequest, author_id: str, post_id: str
             "post" : post.id_url
         }
 
-        status_code = send_to_single_inbox(author.id_url, comment)
+        author_inbox_url = make_author_url(HOSTNAME, author_id)
+
+        status_code = send_to_single_inbox(author_inbox_url, comment)
 
         return HttpResponse(status=status_code)
     except Exception as e:

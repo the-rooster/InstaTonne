@@ -130,7 +130,7 @@
       "contentType" : "contentType2",
       "comment" : "comment2",
       "published" : "2022-01-01 00:00:01",
-      "author" : "http://127.0.0.1:8000/authors/1",
+      "author" : "http://127.0.0.1:8001/authors/1",
       "post" : "1"
     }
   },
@@ -141,7 +141,7 @@
       "type" : "like",
       "summary" : "summary1",
       "published" : "2022-01-01 00:00:01",
-      "author" : "http://127.0.0.1:8000/authors/1",
+      "author" : "http://127.0.0.1:8001/authors/1",
       "post" : "1"
     }
   },

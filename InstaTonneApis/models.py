@@ -141,6 +141,7 @@ class Like(models.Model):
 class LikeSerializer(serializers.ModelSerializer):
     comment = CommentSerializer()
     post = PostSerializer()
+    
     class Meta:
         model = Like
         fields = ['type', 'summary', 'author', 'comment', 'post']

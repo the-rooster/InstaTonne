@@ -14,7 +14,7 @@ HOST_ENCODED = 'http%3A%2F%2F127%2E0%2E0%2E1%3A8000'
 AUTHORIZATION = ''
 
 
-class FollowerAPI(TestCase):
+class CommentAPI(TestCase):
     fixtures = ['InstaTonneApis/fixtures/initial_data.json']
 
 
