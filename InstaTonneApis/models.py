@@ -151,6 +151,8 @@ class Inbox(models.Model):
     author = models.ForeignKey(Author,on_delete=models.CASCADE)
     url = models.TextField()
 
+    published = models.DateTimeField(auto_now_add=True)
+
 
 class ConnectedServer(models.Model):
     host = models.TextField()

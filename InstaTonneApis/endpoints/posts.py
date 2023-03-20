@@ -16,7 +16,6 @@ def single_author_post(request: HttpRequest, author_id: str, post_id: str):
     if not check_auth_header(request):
         return HttpResponse(status=401)
 
-
     if isaURL(post_id) and request.method == "GET":
         return single_author_post_get_remote(request, author_id, post_id)
 

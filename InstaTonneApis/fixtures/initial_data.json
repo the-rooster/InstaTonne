@@ -165,5 +165,77 @@
       "post" : null,
       "comment" : "1"
     }
+  },
+  {
+    "model": "InstaTonneApis.Inbox",
+    "fields": {
+      "id" : "1",
+      "author" : "1",
+      "url" : "http://127.0.0.1:8000/authors/1/posts/1/likes/1",
+      "published" : "2022-01-01 00:00:01"
+    }
+  },
+  {
+    "model": "InstaTonneApis.Inbox",
+    "fields": {
+      "id" : "2",
+      "author" : "1",
+      "url" : "http://127.0.0.1:8000/authors/1/posts/1/comments/1/likes/2",
+      "published" : "2022-01-01 00:00:01"
+    }
+  },
+  {
+    "model": "InstaTonneApis.Inbox",
+    "fields": {
+      "id" : "3",
+      "author" : "1",
+      "url" : "http://127.0.0.1:8000/authors/1/posts/1/comments/1",
+      "published" : "2022-01-01 00:00:01"
+    }
+  },
+  {
+    "model": "InstaTonneApis.Inbox",
+    "fields": {
+      "id" : "4",
+      "author" : "1",
+      "url" : "http://127.0.0.1:8000/authors/1/posts/1/comments/2",
+      "published" : "2022-01-01 00:00:01"
+    }
+  },
+  {
+    "model": "InstaTonneApis.Inbox",
+    "fields": {
+      "id" : "5",
+      "author" : "1",
+      "url" : "http://127.0.0.1:8000/authors/1/posts/1",
+      "published" : "2022-01-01 00:00:01"
+    }
+  },
+  {
+    "model": "InstaTonneApis.Inbox",
+    "fields": {
+      "id" : "6",
+      "author" : "1",
+      "url" : "http://127.0.0.1:8000/authors/1/posts/2",
+      "published" : "2022-01-01 00:00:01"
+    }
+  },
+  {
+    "model": "InstaTonneApis.Inbox",
+    "fields": {
+      "id" : "7",
+      "author" : "1",
+      "url" : "http://127.0.0.1:8000/authors/1/followers/http%3A%2F%2F127%2E0%2E0%2E1%3A8000%2Fauthors%2F2",
+      "published" : "2022-01-01 00:00:01"
+    }
+  },
+  {
+    "model": "InstaTonneApis.Inbox",
+    "fields": {
+      "id" : "8",
+      "author" : "1",
+      "url" : "http://127.0.0.1:8000/authors/1/followers/http%3A%2F%2F127%2E0%2E0%2E1%3A8001%2Fauthors%2F1",
+      "published" : "2022-01-01 00:00:01"
+    }
   }
 ]
