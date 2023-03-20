@@ -111,6 +111,7 @@ def single_post_likes_post_remote(request : HttpRequest,author_id : str,post_id 
         return HttpResponse(status=status_code)
     except Exception as e:
         print(e)
+        print("ERROR IN SINGLE POST LIKES POST REMOTE")
         return HttpResponse(status=400)
 
 

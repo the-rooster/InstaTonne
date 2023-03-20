@@ -29,11 +29,11 @@ const vuetify = createVuetify({
 import HomePage from "./components/HomePage.vue";
 import AboutPage from "./components/AboutPage.vue";
 import EditPostPage from "./components/EditPostPage.vue";
-import FollowRequestsPage from "./components/FollowRequestsPage.vue";
 import CreatePostPage from "./components/CreatePostPage.vue";
 import ProfilePage from "./components/ProfilePage.vue";
 import UserSearch from "./components/UserSearch.vue";
 import UserPost from "./components/UserPost.vue";
+import FriendsPage from "./components/FriendsPage.vue";
 import EditProfilePage from "./components/EditProfilePage.vue";
 import { USER_AUTHOR_ID_COOKIE } from "./axiosCalls";
 // 2. Define some routes
@@ -43,14 +43,10 @@ const routes = [
   { path: "/", name: "Home", component: HomePage },
   { path: "/about", name: "About", component: AboutPage },
   { path: "/editPost/:postid/", name: "EditPost", component: EditPostPage },
-  {
-    path: "/FollowRequests",
-    name: "FollowRequests",
-    component: FollowRequestsPage,
-  },
   { path: "/CreatePost", name: "Create New Post", component: CreatePostPage },
   { path: "/ProfilePage/:id", name: "ProfilePage", component: ProfilePage },
   { path: "/UserSearch", name: "UserSearch", component: UserSearch },
+  { path: "/FriendsPage", name: "FriendsPage", component: FriendsPage },
   { path: "/authors/:id/posts/:postid", name: "UserPost", component: UserPost },
   {
     path: "/authors/:id/edit",
@@ -62,11 +58,6 @@ const routes = [
 export const nav_bar_routes = [
   { path: "/", name: "Home", component: HomePage },
   { path: "/about", name: "About", component: AboutPage },
-  {
-    path: "/FollowRequests",
-    name: "FollowRequests",
-    component: FollowRequestsPage,
-  },
   { path: "/CreatePost", name: "Create New Post", component: CreatePostPage },
   {
     path: `/ProfilePage/${Cookies.get(USER_AUTHOR_ID_COOKIE)}`,
@@ -74,6 +65,7 @@ export const nav_bar_routes = [
     component: ProfilePage,
   },
   { path: "/UserSearch", name: "UserSearch", component: UserSearch },
+  { path: "/FriendsPage", name: "FriendsPage", component: FriendsPage },
 ];
 
 // 3. Create the router instance and pass the `routes` option
@@ -81,9 +73,19 @@ export const nav_bar_routes = [
 // keep it simple for now.
 export const router = createRouter({
   // 4. Provide the history implementation to use. We are using the hash history for simplicity here.
-  history: createWebHistory(),
+  history: createWebHistory("/app"),
   routes, // short for `routes: routes`
 });
+
+router.beforeEach((to, from, next) => {
+  if (to.path != "/" && !Cookies.get(USER_AUTHOR_ID_COOKIE)) {
+    next({
+      path: "/",
+      params: { nextUrl: to.fullPath },
+    })
+  }
+  next()
+})
 
 // 5. Create and mount the root instance.
 // Make sure to _use_ the router instance to make the

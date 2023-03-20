@@ -8,7 +8,7 @@
     <br />
     <v-btn
       v-if="profileId === Cookies.get(USER_AUTHOR_ID_COOKIE)"
-      v-bind:href="`/authors/${profileId}/edit`"
+      v-bind:href="`/app/authors/${profileId}/edit`"
       >Edit Profile</v-btn
     >
     <a v-bind:href="profileData.github"
@@ -30,7 +30,7 @@
     <div class="flex-container">
       <div v-for="post in posts" :key="post.id" class="post-tiny">
         <a
-          v-bind:href="`/authors/${encodeURIComponent(
+          v-bind:href="`/app/authors/${encodeURIComponent(
             profileData.id
           )}/posts/${encodeURIComponent(post.id)}/`"
         >
@@ -160,12 +160,9 @@ function follow() {
   color: #888;
 }
 .flex-container {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  flex-basis: 0;
+  display: grid;
+  grid-template-columns: auto auto auto;
   max-width: 36em;
-  justify-content: space-around;
 }
 .flex-content {
   width: 10em;

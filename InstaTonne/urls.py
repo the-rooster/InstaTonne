@@ -14,12 +14,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
+from django.conf.urls.static import static
 from django.contrib.auth.models import User
 from rest_framework import routers, serializers, viewsets
 from rest_framework.schemas import get_schema_view
-from . import views
-
+from . import views, settings
 # Serializers define the API representation.
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -37,9 +37,10 @@ router.register(r'users', UserViewSet)
 
 urlpatterns = [
     path('', include("InstaTonneApis.urls")),
-    path('',views.index),
+    path('',views.go_to_the_app),
+    re_path(r'app/.*',views.index),
     path('admin/', admin.site.urls),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # schema_generator.get_schema() can be used to get a JSON object containing the same data, in case we need to export it:
 # (This JSON is identical to the one generated above with get_schema_view)

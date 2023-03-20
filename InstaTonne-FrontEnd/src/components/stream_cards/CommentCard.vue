@@ -17,32 +17,46 @@
 </template>
 
 <script setup lang="ts">
+import { onBeforeMount } from "vue";
 import { createHTTP } from "../../axiosCalls";
 import { defineProps, ref, toRaw } from "vue";
+
+let author = ref({});
 
 const props = defineProps({
   commentData: {
     type: Object,
     required: true,
   },
+  postData: {
+    type: Object,
+    required: true,
+  },
 });
 
-console.log(toRaw(props.commentData).id);
 
 async function likeComment() {
-  await createHTTP(toRaw(props.commentData).id + "/likes")
+  await createHTTP(
+    `/authors/${encodeURIComponent(props.postData.author.id)}/posts/${encodeURI(
+      props.postData.id
+    )}/comments/${props.commentData.id}/likes/`
+  )
     .post("")
-    .then((response: { data: object }) => {
-      console.log(response.data);
+    .then((resp) => {
+      return;
     });
 }
 
-let author = ref({});
-createHTTP(toRaw(props.commentData).author)
+onBeforeMount(() => {
+  createHTTP(toRaw(props.commentData).author)
   .get()
   .then((response) => {
     author.value = response.data;
   });
+})
+
+
+
 // defineProps<{ msg: string }>();
 </script>
 
