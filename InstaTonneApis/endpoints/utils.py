@@ -70,7 +70,7 @@ def get_one_url(url: str) -> Tuple[int, str, str|None]:
         return (response.status_code, response.text, response.headers['Content-Type'])
     except Exception as e:
         print("ERROR GETTING URL: ",e)
-        return (500, str(e), None)
+        return (410, str(e), None)
 
 
 def send_to_single_inbox(author_url : str, data : dict):
