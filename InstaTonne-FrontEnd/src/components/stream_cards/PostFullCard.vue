@@ -87,7 +87,7 @@
         <v-card-text>
           <div v-for="item in comments" v-bind:key="item.id_url">
             <CommentCard
-              v-if="(item.type = 'comment')"
+              v-if="(item.type == 'comment')"
               v-bind:commentData="item"
               v-bind:postData="postData"
             />

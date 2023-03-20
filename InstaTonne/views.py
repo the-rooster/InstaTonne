@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from .forms import *
@@ -6,4 +6,8 @@ from .forms import *
 
 def index(request):
 
-    return HttpResponse(content="instatonne backend. go away")
+    return render(request,"index.html")
+
+def go_to_the_app(request):
+
+    return redirect("app/")
