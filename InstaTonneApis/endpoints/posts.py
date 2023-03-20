@@ -1,10 +1,9 @@
 from django.http import HttpRequest, HttpResponse
 import json
-from ..models import Post, PostSerializer, Comment, Author
+from InstaTonneApis.models import Post, PostSerializer, Comment, Author
 from django.core.paginator import Paginator
-from .utils import make_comments_url, make_post_url, valid_requesting_user, get_all_urls, get_one_url, send_to_inboxes, check_auth_header, isaURL, get_auth_headers
+from InstaTonneApis.endpoints.utils import make_comments_url, make_post_url, valid_requesting_user, send_to_inboxes, check_auth_header, isaURL, get_auth_headers
 import requests
-import re
 import base64
 from InstaTonne.settings import HOSTNAME
 
@@ -84,9 +83,9 @@ def single_author_post_image_get(request: HttpRequest, author_id: str, post_id: 
     res : str = serialized_post["content"]
     res = res.split(",")[-1]
 
-    res = base64.decodebytes(res.encode("UTF-8"))
+    res_bytes = base64.decodebytes(res.encode("UTF-8"))
 
-    return HttpResponse(content=res, content_type=serialized_post["contentType"], status=200)
+    return HttpResponse(content=res_bytes, content_type=serialized_post["contentType"], status=200)
 
 
 # get a single post

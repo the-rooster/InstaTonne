@@ -126,7 +126,7 @@ def post_to_follower_inbox(follower_url: str, data: dict) -> bool:
     except Exception as e:
         print("SERVER DOWN!")
         return True
-    print("RESPONSE STATUS CODE!",response.status_code)
+    #print("RESPONSE STATUS CODE!",response.status_code)
     return response.status_code >= 200 and response.status_code < 300
 
 
@@ -151,7 +151,6 @@ def check_authenticated(request : HttpRequest, id : str):
         return None
     
     user = user[0]
-    print(user.userID,request.user.pk)
     if str(user.userID) != str(request.user.pk):
         print('requesting wrong user!!')
         print(request.user.pk,user.userID)
@@ -165,7 +164,6 @@ def valid_requesting_user(request: HttpRequest, required_author_id: str) -> bool
         print('here1')
         return False
 
-    print(request.user.pk)
     author: Author | None = Author.objects.all().filter(userID=request.user.pk).first()
 
     if author is None:
@@ -229,23 +227,22 @@ def check_auth_header(request : HttpRequest):
 #check if the url is in our list of allowed servers to make requests to. otherwise, return 401
 def can_send_request(url : str):
 
-    print("TEST: ",urllib.parse.urlparse(url).netloc)
-    print("URL: ",url)
+    #print("TEST: ",urllib.parse.urlparse(url).netloc)
+    #print("URL: ",url)
     parsed_url = copy.copy(urllib.parse.urlparse(url).netloc)
 
     parsed_hostname = urllib.parse.urlparse(HOSTNAME).netloc
-    print("HOSTNAME PARSED",parsed_hostname)
-    print("HERE2","HOST:" + parsed_hostname + " URL: " + parsed_url)
-    print("WHAT " + parsed_url)
+    #print("HOSTNAME PARSED",parsed_hostname)
+    #print("HERE2","HOST:" + parsed_hostname + " URL: " + parsed_url)
+    #print("WHAT " + parsed_url)
     if parsed_url == parsed_hostname:
-        print("REQUEST TO SELF")
+        #print("REQUEST TO SELF")
         return True
     
     connected = ConnectedServer.objects.filter(host=parsed_url)
 
-    print(connected)
     if connected:
-        print("SUCCESS. THIS URL IS CONNECTED")
+        #print("SUCCESS. THIS URL IS CONNECTED")
         return True
     
     print("FAIL!")

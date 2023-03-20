@@ -1,10 +1,10 @@
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
-from InstaTonneApis.models import Author, AuthorSerializer, Follow, Post, PostSerializer, Comment
+from InstaTonneApis.models import Author, Follow, Post, PostSerializer, Comment
 from django.http import HttpResponse
 import json
-from unittest.mock import patch, ANY, MagicMock, call
+from unittest.mock import patch, ANY, MagicMock
 import requests
 
 
