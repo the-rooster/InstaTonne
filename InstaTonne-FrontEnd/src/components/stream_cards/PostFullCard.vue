@@ -87,7 +87,7 @@
         <v-card-text>
           <div v-for="item in comments" v-bind:key="item.id_url">
             <CommentCard
-              v-if="(item.type = 'comment')"
+              v-if="(item.type == 'comment')"
               v-bind:commentData="item"
               v-bind:postData="postData"
             />
@@ -109,6 +109,11 @@ import DOMPurify from "dompurify";
 
 import { USER_AUTHOR_ID_COOKIE, createHTTP } from "../../axiosCalls";
 import { vModelCheckbox } from "vue";
+import { onMounted } from "vue";
+
+let comments = ref({});
+const isImage = ref(false);
+const show = ref(false);
 
 const props = defineProps({
   postData: {
@@ -141,10 +146,14 @@ let content = computed(() => {
   return props.postData.content;
 });
 
-console.log(toRaw(props.postData).id, 1000);
-console.log(toRaw(props.postData));
+// console.log(toRaw(props.postData).id, 1000);
+// console.log(toRaw(props.postData));
 
 async function likePost() {
+
+  if (!props.postData.author){
+    return;
+  }
   await createHTTP(
     `/authors/${encodeURI(props.postData.author.id)}/posts/${encodeURI(
       props.postData.id
@@ -160,6 +169,9 @@ const authorId = Cookies.get(USER_AUTHOR_ID_COOKIE);
 const loading = ref(true);
 
 async function sharePost() {
+  if (!authorId){
+    return;
+  }
   loading.value = true;
   var updatedPost = toRaw(props.postData);
   console.log(updatedPost, 1002);
@@ -174,6 +186,9 @@ async function sharePost() {
 
 const newComment = ref("");
 async function saveComment() {
+  if (!props.postData.author){
+    return;
+  }
   console.log("newComment", newComment.value);
   await createHTTP(
     `/authors/${encodeURI(props.postData.author.id)}/posts/${encodeURI(
@@ -189,30 +204,36 @@ async function saveComment() {
     )
     .then((response: { data: object }) => {
       loading.value = false;
-      // gotta do what you gotta do
-      window.history.go();
+      getComments();
     });
 
 
 }
 
-let comments = ref({});
-createHTTP(
+onMounted(() => {
+  console.log("POSTDATA",props.postData);
+  getComments();
+
+  isImage.value = props.postData.author.contentType === "image/png;base64" ||
+  props.postData.author.contentType === "image/jpeg;base64";
+})
+
+function getComments(){
+    createHTTP(
   `/authors/${encodeURI(props.postData.author.id)}/posts/${encodeURI(
     props.postData.id
   )}/comments/`
-)
+  )
   .get()
   .then((response) => {
     console.log(response.data, 4567);
     comments.value = response.data.comments;
   });
+}
+
 
 // defineProps<{ msg: string }>()
-const isImage =
-  props.postData.author.contentType === "image/png;base64" ||
-  props.postData.author.contentType === "image/jpeg;base64";
-const show = ref(false);
+
 </script>
 
 <style scoped>

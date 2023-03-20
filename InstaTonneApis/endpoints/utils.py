@@ -1,4 +1,5 @@
 from django.http import HttpRequest, HttpResponse
+from django.middleware.csrf import CsrfViewMiddleware
 from ..models import Author, Follow, FollowSerializer, ConnectedServer
 from threading import Thread, Lock
 import json
@@ -193,34 +194,45 @@ def make_inbox_url(request_host: str, author_id: str) -> str:
 # or the request is coming from our frontend/backend
 def check_auth_header(request : HttpRequest):
 
-    print("CHECKING AUTH HEADER")
+    # print("CHECKING AUTH HEADER")
     
     origin = request.META.get('HTTP_ORIGIN')
 
     print("ORIGIN:",origin)
+    print("SHOULD BE",HOSTNAME,FRONTEND)
 
     #check if the request is from us
     if origin == FRONTEND or origin == HOSTNAME:
+        print("SUCCESS")
         return True
 
-    if 'HTTP_AUTHORIZATION' not in request.META:
+    if 'HTTP_AUTHORIZATION'  in request.META:
         print("MISSING AUTH HEADER")
-        return False
+        
     
-    #check if the request is from a connected server
-    auth_header = request.META['HTTP_AUTHORIZATION']
+        #check if the request is from a connected server
+        auth_header = request.META['HTTP_AUTHORIZATION']
 
-    connected = ConnectedServer.objects.filter(accepted_creds=auth_header)
+        connected = ConnectedServer.objects.filter(accepted_creds=auth_header)
 
-    print("CHECKING AUTH HEADER!")
-    print(auth_header,origin,HOSTNAME)
+        print("CHECKING AUTH HEADER!")
 
-    #if there is no connection object in the db
-    if not connected:
-        print("UNAUTHORIZED ORIGIN TRIED TO SEND US STUFF")
-        return False
+        if connected:
+            return True
+    else:
+        #check csrf token
+
+        reason = CsrfViewMiddleware(lambda x : print(x)).process_view(request, None, (), {})
+        if reason:
+            # CSRF failed
+            print("CSRF FAILED IN CHECK AUTH HEADER")
+            return False
+        
+        return True
+
+
     
-    return True
+    return False
 
 #check if the url is in our list of allowed servers to make requests to. otherwise, return 401
 def can_send_request(url : str):
