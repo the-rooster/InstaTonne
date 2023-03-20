@@ -31,7 +31,7 @@ SECRET_KEY = os.environ["SECRET_KEY"] if "SECRET_KEY" in os.environ else 'django
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['instatonne-cmput404.herokuapp.com']
 
 
 # Application definition
