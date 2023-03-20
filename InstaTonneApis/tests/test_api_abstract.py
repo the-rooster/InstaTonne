@@ -5,7 +5,7 @@ from django.http import HttpResponse
 import requests
 
 
-ORIGIN = 'http://127.0.0.1:5173'
+ORIGIN = 'http://127.0.0.1:8000'
 HOST = 'http://127.0.0.1:8000'
 HOST_FOREIGN = 'http://127.0.0.1:8001'
 HOST_ENCODED = 'http%3A%2F%2F127%2E0%2E0%2E1%3A8000'
