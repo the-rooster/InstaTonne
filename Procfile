@@ -1,2 +1,2 @@
-worker: sh -c 'bash ./build.sh'
-web: gunicorn InstaTonne.wsgi
+
+web: sh -c 'bash ./build.sh' && gunicorn InstaTonne.wsgi
