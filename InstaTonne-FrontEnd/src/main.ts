@@ -24,17 +24,16 @@ const vuetify = createVuetify({
   },
 });
 
-
 // 1. Define route components.
 // These can be imported from other files
 import HomePage from "./components/HomePage.vue";
 import AboutPage from "./components/AboutPage.vue";
 import EditPostPage from "./components/EditPostPage.vue";
-import FollowRequestsPage from "./components/FollowRequestsPage.vue";
 import CreatePostPage from "./components/CreatePostPage.vue";
 import ProfilePage from "./components/ProfilePage.vue";
 import UserSearch from "./components/UserSearch.vue";
 import UserPost from "./components/UserPost.vue";
+import FriendsPage from "./components/FriendsPage.vue";
 import EditProfilePage from "./components/EditProfilePage.vue";
 import { USER_AUTHOR_ID_COOKIE } from "./axiosCalls";
 // 2. Define some routes
@@ -44,14 +43,10 @@ const routes = [
   { path: "/", name: "Home", component: HomePage },
   { path: "/about", name: "About", component: AboutPage },
   { path: "/editPost/:postid/", name: "EditPost", component: EditPostPage },
-  {
-    path: "/FollowRequests",
-    name: "FollowRequests",
-    component: FollowRequestsPage,
-  },
   { path: "/CreatePost", name: "Create New Post", component: CreatePostPage },
   { path: "/ProfilePage/:id", name: "ProfilePage", component: ProfilePage },
   { path: "/UserSearch", name: "UserSearch", component: UserSearch },
+  { path: "/FriendsPage", name: "FriendsPage", component: FriendsPage },
   { path: "/authors/:id/posts/:postid", name: "UserPost", component: UserPost },
   {
     path: "/authors/:id/edit",
@@ -63,11 +58,6 @@ const routes = [
 export const nav_bar_routes = [
   { path: "/", name: "Home", component: HomePage },
   { path: "/about", name: "About", component: AboutPage },
-  {
-    path: "/FollowRequests",
-    name: "FollowRequests",
-    component: FollowRequestsPage,
-  },
   { path: "/CreatePost", name: "Create New Post", component: CreatePostPage },
   {
     path: `/ProfilePage/${Cookies.get(USER_AUTHOR_ID_COOKIE)}`,
@@ -75,6 +65,7 @@ export const nav_bar_routes = [
     component: ProfilePage,
   },
   { path: "/UserSearch", name: "UserSearch", component: UserSearch },
+  { path: "/FriendsPage", name: "FriendsPage", component: FriendsPage },
 ];
 
 // 3. Create the router instance and pass the `routes` option
