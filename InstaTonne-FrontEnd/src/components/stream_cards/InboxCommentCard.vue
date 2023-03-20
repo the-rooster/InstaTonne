@@ -69,17 +69,17 @@ onBeforeMount(() => {
       postId = groups.postId
   }
 
-  postUrl.value=`authors/${authorId}/posts/${postId}`;
+  postUrl.value=`authors/${encodeURIComponent(authorId)}/posts/${encodeURIComponent(postId)}`;
 
   console.log("POSTID",postId)
   console.log("AUTHORID",authorId)
-  createHTTP(`authors/${authorId}/posts/${postId}`).get()
+  createHTTP(`authors/${encodeURIComponent(authorId)}/posts/${encodeURIComponent(postId)}`).get()
   .then((result) => {
       console.log("POST",result.data)
       postData.value = result.data;
   })
 
-  createHTTP(toRaw(props.commentData).author)
+  createHTTP(`authors/${encodeURIComponent(props.commentData.author)}`)
   .get()
   .then((response) => {
     author.value = response.data;

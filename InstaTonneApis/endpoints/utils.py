@@ -7,13 +7,14 @@ import requests
 from typing import Tuple
 import urllib.parse
 from InstaTonne.settings import HOSTNAME, FRONTEND
+from urllib.parse import quote
 import copy
 
 PUBLIC = "PUBLIC"
 PRIVATE = "PRIVATE"
 
 
-def get_all_urls(urls):
+def get_all_urls(urls: list[str]):
     inbox_lock = Lock()
     threads : list[Thread] = []
     result = []
@@ -28,11 +29,10 @@ def get_all_urls(urls):
                 inbox_lock.acquire()
                 result.append({"error" : "url not connected to this server"})
                 inbox_lock.release()
+                return
             try:
-                print("TRYING TO GET URL get_all_urls",url)
                 response : requests.Response = requests.get(url,headers={"Origin":HOSTNAME,
                                                                          "Authentication" : get_auth_header_for_server(url)})
-                print("GOT URL")
                 print("STATUS: ",response.status_code)
                 if response.status_code >= 200 and response.status_code < 300:
                     print(response.text)
@@ -56,22 +56,21 @@ def get_all_urls(urls):
     return result
 
 
-def get_one_url(url: str) -> Tuple[int, str]:
+def get_one_url(url: str) -> Tuple[int, str, str|None]:
 
     # check if requested hostname in valid hosts here
     if not can_send_request(url):
         print("NOT IN LIST OF ACCEPTED SERVERS")
-        return (401,str("NOT IN LIST OF ACCEPTED SERVERS"))
+        return (401, str("NOT IN LIST OF ACCEPTED SERVERS"), None)
     
     try:
-        print("TRYING TO GET URL, get_one_url",url)
         response: requests.Response = requests.get(url,headers={"Origin":HOSTNAME,
                                                                 "Authentication" : get_auth_header_for_server(url)})
-        print("GOT URL")
-        return (response.status_code, response.text)
+        
+        return (response.status_code, response.text, response.headers['Content-Type'])
     except Exception as e:
         print("ERROR GETTING URL: ",e)
-        return (500, str(e))
+        return (410, str(e), None)
 
 
 def send_to_single_inbox(author_url : str, data : dict):
@@ -82,50 +81,53 @@ def send_to_single_inbox(author_url : str, data : dict):
     
     inbox_url: str = author_url + '/inbox/'
     try:
-        print("TRYING TO SEND TO INBOX!",inbox_url)
         response: requests.Response = requests.post(inbox_url,
                                                     json.dumps(data),headers={"Origin" : HOSTNAME, 
                                                                             "Authentication" : get_auth_header_for_server(author_url)})
-        print("SENT TO INBOX")
     except Exception as e:
         print(e)
         print("SERVER DOWN! Returning 404")
         return 404
     return response.status_code
 
-def send_to_inboxes(author_id: str, author_url: str, data : dict, item_visibility: str):
+def send_to_inboxes(author_id: str, author_url: str, data: dict, item_visibility: str):
     follows = Follow.objects.all().filter(object=author_id, accepted=True)
+
     if item_visibility == PUBLIC:
         for follow in follows:
             if not post_to_follower_inbox(follow.follower_url, data):
                 print("ERROR: bad inbox response, public")
+
     elif item_visibility == PRIVATE:
         for follow in follows:
             if not author_follows_follower(author_url, follow.follower_url):
                 continue
             if not post_to_follower_inbox(follow.follower_url, data):
                 print("ERROR: bad inbox response, private")
+
     else:
         print("ERROR: invalid visibility")
 
 
 def author_follows_follower(author_url: str, follower_url: str) -> bool:
-    encoded_author_url = urllib.parse.quote(author_url, safe='')
-    check_url: str = follower_url + '/follower/' + encoded_author_url
-    check_response: requests.Response = requests.get(check_url)
-    return check_response.status_code == 200
+    encoded_follower_url = quote(follower_url, safe='').replace('.', '%2E')
+    check_url: str = author_url + '/followers/' + encoded_follower_url
+    try:
+        check_response: requests.Response = requests.get(check_url, headers=get_auth_headers(follower_url))
+        return check_response.status_code >= 200 and check_response.status_code < 300
+    except:
+        return False
 
 
 def post_to_follower_inbox(follower_url: str, data: dict) -> bool:
     follower_url = follower_url.strip("/")
     inbox_url: str = follower_url + '/inbox/'
     try:
-        response: requests.Response = requests.post(inbox_url,json.dumps(data),headers={"Origin":HOSTNAME,
-                                                                                        "Authorization" : get_auth_header_for_server(follower_url)}) # this will probs have to get changed when the inbox endpoints get updated
+        response: requests.Response = requests.post(inbox_url, json.dumps(data), headers=get_auth_headers(follower_url))
     except Exception as e:
         print("SERVER DOWN!")
         return True
-    print("RESPONSE STATUS CODE!",response.status_code)
+    #print("RESPONSE STATUS CODE!",response.status_code)
     return response.status_code >= 200 and response.status_code < 300
 
 
@@ -150,7 +152,6 @@ def check_authenticated(request : HttpRequest, id : str):
         return None
     
     user = user[0]
-    print(user.userID,request.user.pk)
     if str(user.userID) != str(request.user.pk):
         print('requesting wrong user!!')
         print(request.user.pk,user.userID)
@@ -164,7 +165,6 @@ def valid_requesting_user(request: HttpRequest, required_author_id: str) -> bool
         print('here1')
         return False
 
-    print(request.user.pk)
     author: Author | None = Author.objects.all().filter(userID=request.user.pk).first()
 
     if author is None:
@@ -179,7 +179,7 @@ def valid_requesting_user(request: HttpRequest, required_author_id: str) -> bool
 
 
 def make_author_url(request_host: str, author_id: str) -> str:
-    return "http://" + request_host + "/authors/" + author_id
+    return request_host + "/authors/" + author_id
 
 
 def make_post_url(request_host: str, author_id: str, post_id: str) -> str:
@@ -243,23 +243,22 @@ def check_auth_header(request : HttpRequest):
 #check if the url is in our list of allowed servers to make requests to. otherwise, return 401
 def can_send_request(url : str):
 
-    print("TEST: ",urllib.parse.urlparse(url).netloc)
-    print("URL: ",url)
+    #print("TEST: ",urllib.parse.urlparse(url).netloc)
+    #print("URL: ",url)
     parsed_url = copy.copy(urllib.parse.urlparse(url).netloc)
 
     parsed_hostname = urllib.parse.urlparse(HOSTNAME).netloc
-    print("HOSTNAME PARSED",parsed_hostname)
-    print("HERE2","HOST:" + parsed_hostname + " URL: " + parsed_url)
-    print("WHAT " + parsed_url)
+    #print("HOSTNAME PARSED",parsed_hostname)
+    #print("HERE2","HOST:" + parsed_hostname + " URL: " + parsed_url)
+    #print("WHAT " + parsed_url)
     if parsed_url == parsed_hostname:
-        print("REQUEST TO SELF")
+        #print("REQUEST TO SELF")
         return True
     
     connected = ConnectedServer.objects.filter(host=parsed_url)
 
-    print(connected)
     if connected:
-        print("SUCCESS. THIS URL IS CONNECTED")
+        #print("SUCCESS. THIS URL IS CONNECTED")
         return True
     
     print("FAIL!")
@@ -275,3 +274,9 @@ def get_auth_header_for_server(url : str):
         return connected[0].our_creds
     
     return ""
+
+def get_auth_headers(url: str):
+    return {"Origin": HOSTNAME, "Authentication": get_auth_header_for_server(url)}
+
+def isaURL(s: str):
+    return "/" in s

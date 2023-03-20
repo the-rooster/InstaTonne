@@ -48,7 +48,7 @@ async function likeComment() {
 }
 
 onBeforeMount(() => {
-  createHTTP(toRaw(props.commentData).author)
+  createHTTP(`/authors/${encodeURIComponent(props.postData.author.id)}/`)
   .get()
   .then((response) => {
     author.value = response.data;

@@ -220,7 +220,7 @@ onMounted(() => {
 
 function getComments(){
     createHTTP(
-  `/authors/${encodeURI(props.postData.author.id)}/posts/${encodeURI(
+  `authors/${encodeURI(props.postData.author.id)}/posts/${encodeURI(
     props.postData.id
   )}/comments/`
   )
