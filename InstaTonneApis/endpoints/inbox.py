@@ -192,6 +192,7 @@ def parse_inbox_follow_request(data : dict, user: Author):
 """
 Post an item to a users inbox!
 """
+@csrf_exempt
 def post_inbox(request : HttpRequest, id : str):
 
     #check that request is authenticated. remote or local
