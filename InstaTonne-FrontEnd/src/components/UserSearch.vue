@@ -6,19 +6,9 @@
     <div class="server-list">
       <div v-for="server in servers" :key="server.host" class="server-display">
         <v-btn
-<<<<<<< HEAD
         class="server-display"
         @click="() => {setServerShown(server)}"
         :disabled="servershown.host==server.host"
-=======
-          class="server-display"
-          @click="
-            () => {
-              setServerShown(server.host);
-            }
-          "
-          :disabled="servershown == server.host"
->>>>>>> main
         >
           <h4>{{ server.host }}</h4>
         </v-btn>
