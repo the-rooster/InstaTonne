@@ -2,12 +2,13 @@
   <v-card class="mx-auto" color="#fff" theme="light" max-width="90%" style="margin:5%">
     <v-card-actions>
       <v-list-item class="w-100">
-        <v-list-item-title>{{ author.displayName }} commented on your post</v-list-item-title>
+        <v-list-item-title><a :href="`/app/ProfilePage/${encodeURIComponent(author.url)}/`">{{ author.displayName }}</a> commented on your post</v-list-item-title>
         <template v-slot:append>
           <div class="justify-self-end">
           </div>
         </template>
         <div style="display:flex;flex-direction:row;justify-content:space-between">
+          <img :src="author.profileImage" class="profile-picture">
           <v-list-item>{{ props.commentData.comment }}</v-list-item>
           <a v-bind:href="postUrl">
               <div class="post-tiny" >
@@ -94,6 +95,12 @@ onBeforeMount(() => {
 <style scoped>
 .read-the-docs {
   color: #888;
+}
+
+.profile-picture {
+  width: 10vw;
+  height: 10vw;
+  border-radius: 100%;
 }
 
 .post-tiny {

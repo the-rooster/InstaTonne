@@ -11,9 +11,9 @@
           ></v-avatar>
         </template> -->
 
-        <v-list-item-title>{{
+        <v-list-item-title><a :href="`/app/ProfilePage/${encodeURIComponent(props.postData.author?.url)}/`">{{
           props.postData.author?.displayName
-        }}</v-list-item-title>
+        }}</a></v-list-item-title>
 
         <v-list-item-subtitle>{{
           props.postData.author?.host
@@ -110,6 +110,7 @@
 
 <script setup lang="ts">
 import { ref, toRaw, onBeforeMount, computed } from "vue";
+import {router} from "../../main";
 import CommentCard from "./CommentCard.vue";
 import Cookies from "js-cookie";
 import { marked } from "marked";
@@ -209,6 +210,8 @@ async function deletePost() {
     .delete()
     .then((response: { data: object }) => {
       loading.value = false;
+      router.go(0);
+      router.back();
     });
 }
 

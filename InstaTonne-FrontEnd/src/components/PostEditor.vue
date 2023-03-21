@@ -1,9 +1,9 @@
 <template>
   <div class="viewBox">
     <div>
-      <div style="display: flex">
-        <AuthorCard :author-info="postData.author" />
-      </div>
+
+      <AuthorCard :author-info="postData.author" />
+
       <v-text-field
         v-model="postData.title"
         label="Title"

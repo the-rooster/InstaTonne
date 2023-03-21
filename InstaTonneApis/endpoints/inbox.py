@@ -188,6 +188,8 @@ def post_inbox(request: HttpRequest, author_id: str):
     if not url:
         return HttpResponse(status=400)
     
+    print("TEST: ",author,url)
+    
     obj = Inbox.objects.create(author=author,url=url)
 
     obj.save()
