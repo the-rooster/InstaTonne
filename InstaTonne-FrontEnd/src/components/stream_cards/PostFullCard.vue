@@ -21,9 +21,13 @@
 
         <template v-slot:append>
           <div class="justify-self-end">
-            <v-btn v-if="isAuthorsPost" @click="editPost"
-              ><v-icon class="me-1" icon="mdi-pencil"></v-icon
-            ></v-btn>
+            <router-link
+              v-bind:to="`/editPost/${encodeURIComponent(getPostId())}/`"
+            >
+              <v-btn v-if="isAuthorsPost"
+                ><v-icon class="me-1" icon="mdi-pencil"></v-icon
+              ></v-btn>
+            </router-link>
             <v-btn v-if="isAuthorsPost" @click="deletePost"
               ><v-icon class="me-1" icon="mdi-delete"></v-icon
             ></v-btn>
@@ -138,6 +142,10 @@ const props = defineProps({
   },
 });
 
+const postId = props.postData.id.substring(
+  props.postData.id.lastIndexOf("/") + 1
+);
+
 const isAuthorsPost = computed(() => {
   if (!props.postData.author) {
     return false;
@@ -208,20 +216,6 @@ async function deletePost() {
     });
 }
 
-async function editPost() {
-  if (!props.postData.author) {
-    return;
-  }
-  loading.value = true;
-  let postId = props.postData.id;
-  postId = postId.substring(postId.lastIndexOf("/") + 1);
-  await createHTTP(`/authors/${authorId}/posts/${postId}`)
-    .put(JSON.stringify(toRaw(props.postData)))
-    .then((response: { data: object }) => {
-      loading.value = false;
-    });
-}
-
 const newComment = ref("");
 async function saveComment() {
   if (!props.postData.author) {
@@ -266,6 +260,10 @@ function getComments() {
       console.log(response.data, 4567);
       comments.value = response.data.comments;
     });
+}
+
+function getPostId() {
+  return props.postData.id.substring(props.postData.id.lastIndexOf("/") + 1);
 }
 
 // defineProps<{ msg: string }>()
