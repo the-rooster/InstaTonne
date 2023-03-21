@@ -148,6 +148,7 @@ class LikeSerializer(serializers.ModelSerializer):
 
 
 class Inbox(models.Model):
+    id = models.TextField(primary_key=True, default=default_id_generator, editable=False)
     author = models.ForeignKey(Author,on_delete=models.CASCADE)
     url = models.TextField()
 

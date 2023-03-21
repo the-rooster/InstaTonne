@@ -57,19 +57,20 @@ def single_author_posts(request: HttpRequest, author_id: str):
     return HttpResponse(status=405)
 
 
+# handle requests for an image post
 def single_author_post_image(request: HttpRequest, author_id: str, post_id: str):
-    print("HEREEEEE")
+    if not check_auth_header(request):
+        return HttpResponse(status=401)
 
     if request.method == "GET":
         return single_author_post_image_get(request, author_id, post_id)
+    
     return HttpResponse(status=405)
 
 
 # get a the encoded image from a single post
 def single_author_post_image_get(request: HttpRequest, author_id: str, post_id: str):
-
-
-    post: Post | None = Post.objects.all().filter(author=author_id, pk=post_id).first()
+    post: Post | None = Post.objects.all().filter(pk=post_id).first()
 
     if post is None:
         return HttpResponse(status=404)

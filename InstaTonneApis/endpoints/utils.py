@@ -212,20 +212,18 @@ def valid_requesting_user(request: HttpRequest, required_author_id: str) -> bool
 def make_author_url(request_host: str, author_id: str) -> str:
     return request_host + "/authors/" + author_id
 
-
 def make_post_url(request_host: str, author_id: str, post_id: str) -> str:
     return make_author_url(request_host, author_id) + "/posts/" + post_id
 
-
 def make_comments_url(request_host: str, author_id: str, post_id: str) -> str:
     return make_post_url(request_host, author_id, post_id) + "/comments"
-
 
 def make_comment_url(request_host: str, author_id: str, post_id: str, comment_id: str) -> str:
     return make_post_url(request_host, author_id, post_id) + "/comments/" + comment_id
 
 def make_inbox_url(request_host: str, author_id: str) -> str:
     return make_author_url(request_host,author_id) + "/inbox"
+
 
 # checks that the request is authenticated either with our connected servers table in the DB,
 # or the request is coming from our frontend/backend
@@ -235,12 +233,12 @@ def check_auth_header(request : HttpRequest):
     
     origin = request.META.get('HTTP_ORIGIN')
 
-    print("ORIGIN:",origin)
-    print("SHOULD BE",HOSTNAME,FRONTEND)
+    #print("ORIGIN:",origin)
+    #print("SHOULD BE",HOSTNAME,FRONTEND)
 
     #check if the request is from us
     if origin == FRONTEND or origin == HOSTNAME:
-        print("SUCCESS")
+        #print("SUCCESS")
         return True
 
     if 'HTTP_AUTHORIZATION'  in request.META:
