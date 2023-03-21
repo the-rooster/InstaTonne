@@ -75,19 +75,20 @@ def single_comment_likes(request: HttpRequest, author_id: str, post_id: str, com
     return HttpResponse(status=405)
 
 
-def single_author_likes(request: HttpRequest):
-    matched = re.search(r"^\/authors\/(.*?)\/liked\/?$", request.path)
-    if matched:
-        author_id: str = matched.group(1)
-    else:
-        return HttpResponse(status=405)
+# handle requests for the likes of an author
+def single_author_likes(request: HttpRequest, author_id: str):
+    if not check_auth_header(request):
+        return HttpResponse(status=401)
 
-    if "/" in author_id and request.method == "GET":
-        return single_author_likes_get_remote(request, author_id,)
-    elif "/" in author_id:
+    if isaURL(author_id) and request.method == "GET":
+        return single_author_likes_get_remote(request, author_id)
+    
+    if isaURL(author_id):
         return HttpResponse(status=405)
+    
     if request.method == "GET":
         return single_author_likes_get(request, author_id)
+    
     return HttpResponse(status=405)
 
 
@@ -243,7 +244,7 @@ def single_comment_likes_get(request: HttpRequest, author_id: str, post_id: str,
     if comment is None:
         return HttpResponse(status=404)
 
-    likes = Like.objects.all().filter(post=post_id).order_by("published")
+    likes = Like.objects.all().filter(comment=comment_id).order_by("published")
 
     serialized_data = []
     for like in likes:
@@ -274,24 +275,23 @@ def single_comment_likes_get_remote(request: HttpRequest, author_id: str, post_i
     )
 
 
-# get the likes from an author
+# get the likes of an author on this server
 def single_author_likes_get(request: HttpRequest, author_id: str):
-    
-    #check that request is authenticated. remote or local
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
-    
-    likes = Like.objects.all().filter(author=make_author_url(request.get_host(), author_id)).order_by("published")
+    author: Author | None = Author.objects.all().filter(pk=author_id).first()
+
+    if author is None:
+        return HttpResponse(status=404)
+
+    likes = Like.objects.all().filter(author=author.id_url).order_by("published")
 
     serialized_data = []
     for like in likes:
         serialized_like = LikeSerializer(like).data
 
-        if serialized_like["post"]:
-            serialized_like["object"] = Post.objects.all().filter(pk=serialized_like["post"]).first().id_url #type: ignore
-        elif serialized_like["comment"]:
-            serialized_like["object"] = Comment.objects.all().filter(pk=serialized_like["comment"]).first().id_url #type: ignore
-
+        if like.post is not None:
+            serialized_like["object"] = like.post.id_url
+        if like.comment is not None:
+            serialized_like["object"] = like.comment.id_url
         del serialized_like["post"]
         del serialized_like["comment"]
 
@@ -305,10 +305,15 @@ def single_author_likes_get(request: HttpRequest, author_id: str):
     return HttpResponse(content=res, content_type="application/json", status=200)
 
 
+# get the likes of an author on a remote server
 def single_author_likes_get_remote(request: HttpRequest, author_id: str):
-    remote_url = author_id + '/liked'
-    status_code, text, _ = get_one_url(remote_url)
-    return HttpResponse(status=status_code, content_type="application/json", content=text)
+    url = author_id + '/liked'
+    response: requests.Response = requests.get(url, headers=get_auth_headers(url))
+    return HttpResponse(
+        status=response.status_code,
+        content_type=response.headers['Content-Type'],
+        content=response.content.decode('utf-8')
+    )
 
 
 def get_single_like_post_local(request: HttpRequest,author_id : str,post_id : str, like_id : str):
