@@ -12,7 +12,7 @@ try{
 
 }
 catch (e) {
-  backend_url = 'http://127.0.0.1:8000/';
+  backend_url = "https://cmput404-group6-instatonne.herokuapp.com//";//'http://127.0.0.1:8000/';
 }
 
 const HTTP = axios.create({
