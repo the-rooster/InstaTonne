@@ -87,8 +87,9 @@
           return
       }
 
-      fetchRemoteAuthors(servershown.value.api);
+    fetchRemoteAuthors(servershown.value.api);
   }
+ 
 
 
   function previousPage() {
@@ -125,11 +126,11 @@
       fetchAuthors();
       return;
     }
-    
     fetchRemoteAuthors(server.api);
   }
 
 
+    
 
 
   async function fetchAuthors() {
@@ -146,14 +147,14 @@
   // fetch all authors from a remote server
   async function fetchRemoteAuthors(server : string){
 
-      let total_remote_author_urls = encodeURI(server + `/authors?page=${pageNum.page}&size=${pageSize}/`);
-      await createHTTP(`remote-authors/${total_remote_author_urls}`).get().then( (response) => {
-        console.log("YUP");
-        console.log(response);
-        authorsList.value = response.data.items;
-        loading.value = false;
-      });
-  }
+    let total_remote_author_urls = encodeURI(server + `/authors?page=${pageNum.page}&size=${pageSize}/`);
+    await createHTTP(`remote-authors/${total_remote_author_urls}`).get().then( (response) => {
+      console.log("YUP");
+      console.log(response);
+      authorsList.value = response.data.items;
+      loading.value = false;
+    });
+}
 
   onBeforeMount(() => {
     fetchAuthors();

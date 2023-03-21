@@ -3,7 +3,20 @@ import vue from '@vitejs/plugin-vue'
 import eslint from 'vite-plugin-eslint'
 import vuetify from "vite-plugin-vuetify";
 
-let backend_url ="https://cmput404-group6-instatonne.herokuapp.com"; //http://127.0.0.1:8000";//"https://instatonne-cmput404.herokuapp.com";
+let backend_url = "";
+
+try{
+  if(import.meta.env.DEV){
+    backend_url = import.meta.env.VITE_BACKEND_URL;
+  }
+  else if(import.meta.env.PROD){
+    backend_url = import.meta.env.VITE_BACKEND_URL_PROD;
+  }
+
+}
+catch (e) {
+  backend_url = 'http://127.0.0.1:8000/';
+}
 
 let server = {};
 
