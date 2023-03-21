@@ -18,11 +18,14 @@ def single_author_post(request: HttpRequest):
     else:
         return HttpResponse(status=405)
 
+    print("post_id", post_id)
+
     # get a remote authors post
     if "/" in post_id and request.method == "GET":
         return single_author_post_get_remote(request, author_id, post_id)
     #can only get for remote posts
     elif "/" in post_id:
+        print("Single author post cannot be called with a remote post id")
         return HttpResponse(status=405)
     #get local post
     elif request.method == "GET":
@@ -32,6 +35,7 @@ def single_author_post(request: HttpRequest):
         return single_author_post_post(request, author_id, post_id)
     #delete local post
     elif request.method == "DELETE":
+        print("Deleting post")
         return single_author_post_delete(request, author_id, post_id)
     #put local post
     elif request.method == "PUT":
