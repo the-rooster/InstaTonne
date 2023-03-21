@@ -157,6 +157,7 @@ class Inbox(models.Model):
 
 class ConnectedServer(models.Model):
     host = models.TextField()
+    api = models.TextField()
     accepted_creds = models.TextField()
     our_creds = models.TextField()
 
@@ -164,4 +165,4 @@ class ConnectedServerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model=ConnectedServer
-        fields = ['host']
+        fields = ['host','api']

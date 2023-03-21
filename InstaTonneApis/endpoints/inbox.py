@@ -166,6 +166,7 @@ def parse_inbox_follow_request(data : dict, user: Author):
 
 
 # add a post to an inbox
+@csrf_exempt
 def post_inbox(request: HttpRequest, author_id: str):
     #parse request body
     data = request.body

@@ -109,7 +109,7 @@ onMounted(() => {
       canFollow.value = true;
     });
 
-  createHTTP(`authors/${profileId}/followers/`)
+  createHTTP(`authors/${profileId}/followers`)
     .get()
     .then((response) => {
       console.log(response, 123123123);
@@ -120,7 +120,7 @@ onMounted(() => {
       console.log(response.data, 567);
     });
 
-  createHTTP(`authors/${profileId}/posts/`)
+  createHTTP(`authors/${profileId}/posts`)
     .get()
     .then((response) => {
       let data = response.data;
