@@ -142,10 +142,6 @@ const props = defineProps({
   },
 });
 
-const postId = props.postData.id.substring(
-  props.postData.id.lastIndexOf("/") + 1
-);
-
 const isAuthorsPost = computed(() => {
   if (!props.postData.author) {
     return false;

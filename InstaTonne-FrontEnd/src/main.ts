@@ -82,10 +82,10 @@ router.beforeEach((to, from, next) => {
     next({
       path: "/",
       params: { nextUrl: to.fullPath },
-    })
+    });
   }
-  next()
-})
+  next();
+});
 
 // 5. Create and mount the root instance.
 // Make sure to _use_ the router instance to make the
