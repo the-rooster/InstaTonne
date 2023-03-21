@@ -118,11 +118,10 @@ def single_author_post_get_remote(request: HttpRequest, author_id: str, post_id:
 # get all the posts of an author
 def single_author_posts_get(request: HttpRequest, author_id: str):
     author: Author | None = Author.objects.all().filter(pk=author_id).first()
-
     if author is None:
         return HttpResponse(status=404)
 
-    posts = Post.objects.all().filter(author=author_id).order_by("published")
+    posts = Post.objects.all().filter(author=author_id, unlisted=False).order_by("published")
     page_num = request.GET.get("page")
     page_size = request.GET.get("size")
 
