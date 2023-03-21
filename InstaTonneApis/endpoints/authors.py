@@ -1,68 +1,55 @@
 from django.http import HttpRequest, HttpResponse
 import json
-from ..models import Author, AuthorSerializer
+from InstaTonneApis.models import Author, AuthorSerializer
+from InstaTonneApis.endpoints.utils import valid_requesting_user, check_auth_header, isaURL, get_auth_headers
 from django.core.paginator import Paginator
-from .utils import valid_requesting_user, get_one_url, check_auth_header
-import re
+import requests
 
 
-def get_author_id(request : HttpRequest):
-    if request.method != "POST":
-        return HttpResponse(status=405)
-    
-    author = Author.objects.filter(userID=request.user.id) #type: ignore
+# handle requests for remote authors
+def remote_authors(request: HttpRequest, remote_authors: str):
+    if not check_auth_header(request):
+        return HttpResponse(status=401)
 
-    if not author:
-        return HttpResponse(status=404)
-    
-    author = author[0]
-
-    res = {"id" : author.id}
-
-    return HttpResponse(content=json.dumps(res),status=200)
-
-# get remote authors from url
-def remote_authors(request: HttpRequest,remote_authors : str):
-    
     if request.method == "GET":
-        status, resp = get_one_url(remote_authors)
-        return HttpResponse(status=status,content=resp)
+        return authors_get_remote(request, remote_authors)
     
     return HttpResponse(status=405)
 
+
+# handle requests for authors
 def authors(request: HttpRequest):
+    if not check_auth_header(request):
+        return HttpResponse(status=401)
+
     if request.method == "GET":
         return authors_get(request)
+    
     return HttpResponse(status=405)
 
 
-def single_author(request: HttpRequest):
-    matched = re.search(r"^\/authors\/(.*?)\/?$", request.path)
-    if matched:
-        author_id: str = matched.group(1)
-    else:
-        return HttpResponse(status=400)
+# handle requests for a single author
+def single_author(request: HttpRequest, author_id: str):
+    if not check_auth_header(request):
+        return HttpResponse(status=401)
 
-    if "/" in author_id and request.method == "GET":
+    if isaURL(author_id) and request.method == "GET":
         return single_author_get_remote(request, author_id)
-    elif "/" in author_id:
+    
+    if isaURL(author_id):
         return HttpResponse(status=405)
+    
     if request.method == "GET":
         return single_author_get(request, author_id)
+    
     if request.method == "POST":
-        print("Getting into single_author_post")
-        print(request)
-        print(author_id)
         return single_author_post(request, author_id)
+    
     return HttpResponse(status=405)
 
 
 # get all authors
 def authors_get(request : HttpRequest):
-
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
-    
     authors = Author.objects.all().order_by("id")
     page_num = request.GET.get("page")
     page_size = request.GET.get("size")
@@ -84,29 +71,43 @@ def authors_get(request : HttpRequest):
     return HttpResponse(content=res, content_type="application/json", status=200)
 
 
+# get all remote authors
+def authors_get_remote(request: HttpRequest, remote_authors: str):
+    url = remote_authors
+    response: requests.Response = requests.get(url, headers=get_auth_headers(url))
+    return HttpResponse(
+        status=response.status_code,
+        content_type=response.headers['Content-Type'],
+        content=response.content.decode('utf-8')
+    )
+
+
 # get a single author
 def single_author_get(request: HttpRequest, author_id: str):
+    author: Author | None = Author.objects.all().filter(pk=author_id).first()
 
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
-    
-    author = Author.objects.get(pk=author_id)
+    if author is None:
+        return HttpResponse(status=404)
+
     serialized_author = AuthorSerializer(author).data
-    # serialized_author["id"] = serialized_author["id_url"]
-    # del serialized_author["id_url"]
+    
     res = json.dumps(serialized_author)
     return HttpResponse(content=res, content_type="application/json", status=200)
 
 
 # get a single remote author
 def single_author_get_remote(request: HttpRequest, author_id: str):
-    status_code, text = get_one_url(author_id)
-    return HttpResponse(content=text, content_type="application/json", status=status_code)
+    url = author_id
+    response: requests.Response = requests.get(url, headers=get_auth_headers(url))
+    return HttpResponse(
+        status=response.status_code,
+        content_type=response.headers['Content-Type'],
+        content=response.content.decode('utf-8')
+    )
 
 
 # update a single author
 def single_author_post(request: HttpRequest, author_id: str):
-    
     if not valid_requesting_user(request, author_id):
         return HttpResponse(status=401)
 
@@ -130,3 +131,19 @@ def single_author_post(request: HttpRequest, author_id: str):
     except Exception as e:
         print(e)
         return HttpResponse(status=400)
+
+
+def get_author_id(request : HttpRequest):
+    if request.method != "POST":
+        return HttpResponse(status=405)
+    
+    author = Author.objects.filter(userID=request.user.id) #type: ignore
+
+    if not author:
+        return HttpResponse(status=404)
+    
+    author = author[0]
+
+    res = {"id" : author.id}
+
+    return HttpResponse(content=json.dumps(res),status=200)

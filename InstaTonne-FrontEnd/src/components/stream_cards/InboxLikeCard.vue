@@ -67,7 +67,7 @@ onBeforeMount(() => {
   if (groups){
       authorId = groups.authorId;
   }
-
+  postUrl.value=`authors/${encodeURIComponent(authorId)}/posts/${encodeURIComponent(postId)}/`;
   
 
   console.log("POSTID",postId);
@@ -78,13 +78,13 @@ onBeforeMount(() => {
       postData.value = result.data;
   })
 
-  createHTTP(`authors/${props.likeData.author}/`)
+  createHTTP(`authors/${encodeURIComponent(props.likeData.author)}/`)
   .get()
   .then((response) => {
     console.log(response.data, 51515);
     author.value = response.data;
     console.log(response.data, 567);
-    postUrl.value=`authors/${encodeURIComponent(author.value.id)}/posts/${encodeURIComponent(postId)}/`;
+    
   });
 })
 
