@@ -55,56 +55,57 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onBeforeMount, computed } from 'vue'
-import AuthorCard from './AuthorCard.vue'
-import { createHTTP } from '../axiosCalls'
-import { reactive } from 'vue';
-import { onBeforeUpdate } from 'vue';
-import { List } from 'postcss/lib/list';
+  import { ref, onBeforeMount, computed } from 'vue'
+  import AuthorCard from './AuthorCard.vue'
+  import { createHTTP } from '../axiosCalls'
+  import { reactive } from 'vue';
+  import { onBeforeUpdate } from 'vue';
+  import { List } from 'postcss/lib/list';
 
-const loading = ref(true);
-const result: any[] = [];
-const authorsList = ref(result);
-const search = ref("");
+  const loading = ref(true);
+  const result: any[] = [];
+  const authorsList = ref(result);
+  const search = ref("");
 
-const pageSize = 5;
-const pageNum = reactive({ page: 1 });
+  const pageSize = 5;
+  const pageNum = reactive({ page: 1 });
 
-type ConnectedServer = {
-    host : string,
-    api : string
-}
-
-
-const servers : any = ref([]);
-const servershown : any = ref({});
-
-function nextPage(){
-
-    pageNum.page++;
-    if (servershown.value == "local"){
-        fetchAuthors();
-        return
-    }
-
-    fetchRemoteAuthors(servershown.api);
-}
+  type ConnectedServer = {
+      host : string,
+      api : string
+  }
 
 
-function previousPage() {
-  if (pageNum.page > 1) {
-    pageNum.page--;
+  const servers : any = ref([]);
+  const servershown : any = ref({});
 
-    if (pageNum.page > 1){
+  function nextPage(){
+
+      pageNum.page++;
+      if (servershown.value == "local"){
+          fetchAuthors();
+          return
+      }
+
+      fetchRemoteAuthors(servershown.value.api);
+  }
+
+
+  function previousPage() {
+    if (pageNum.page > 1) {
       pageNum.page--;
 
-      if (servershown.value.host == "local"){
-        fetchAuthors();
-        return
-      }
-      fetchRemoteAuthors(servershown.value.api);
-    }
+      if (pageNum.page > 1){
+        pageNum.page--;
 
+        if (servershown.value.host == "local"){
+          fetchAuthors();
+          return
+        }
+        fetchRemoteAuthors(servershown.value.api);
+      }
+
+    }
   }
 
   async function getAllServers(){
@@ -127,62 +128,51 @@ function previousPage() {
     
     fetchRemoteAuthors(server.api);
   }
-}
 
 
-async function setServerShown(server: string) {
-  servershown.value = server;
-  pageNum.page = 1;
 
-  if (server == "local") {
-    fetchAuthors();
-    return;
+
+  async function fetchAuthors() {
+    await createHTTP(`authors?page=${pageNum.page}&size=${pageSize}`)
+      .get()
+      .then((response: { data: object }) => {
+        console.log("YUP");
+        console.log(response);
+        authorsList.value = response.data.items;
+        loading.value = false;
+      });
   }
 
-  fetchRemoteAuthors(server);
-}
+  // fetch all authors from a remote server
+  async function fetchRemoteAuthors(server : string){
 
-async function fetchAuthors() {
-  await createHTTP(`authors?page=${pageNum.page}&size=${pageSize}`)
-    .get()
-    .then((response: { data: object }) => {
-      console.log("YUP");
-      console.log(response);
-      authorsList.value = response.data.items;
-      loading.value = false;
-    });
-}
+      let total_remote_author_urls = encodeURI(server + `/authors?page=${pageNum.page}&size=${pageSize}/`);
+      await createHTTP(`remote-authors/${total_remote_author_urls}`).get().then( (response) => {
+        console.log("YUP");
+        console.log(response);
+        authorsList.value = response.data.items;
+        loading.value = false;
+      });
+  }
 
-// fetch all authors from a remote server
-async function fetchRemoteAuthors(server : string){
+  onBeforeMount(() => {
+    fetchAuthors();
+    getAllServers();
+  });
 
-    let total_remote_author_urls = encodeURI(server + `/authors?page=${pageNum.page}&size=${pageSize}/`);
-    await createHTTP(`remote-authors/${total_remote_author_urls}`).get().then( (response) => {
-      console.log("YUP");
-      console.log(response);
-      authorsList.value = response.data.items;
-      loading.value = false;
-    });
-}
-
-onBeforeMount(() => {
-  fetchAuthors();
-  getAllServers();
-});
-
-const myVal = computed({
-  get() {
-    return authorsList.value.filter((u) => {
-      return (
-        u.displayName.toLowerCase().indexOf(search.value.toLowerCase()) != -1
-      );
-    });
-    // return authorsList.value
-  },
-  set(val) {
-    return;
-  },
-});
+  const myVal = computed({
+    get() {
+      return authorsList.value.filter((u) => {
+        return (
+          u.displayName.toLowerCase().indexOf(search.value.toLowerCase()) != -1
+        );
+      });
+      // return authorsList.value
+    },
+    set(val) {
+      return;
+    },
+  });
 
 // function filteredUsers() {
 //   // return authorsList.value.reduce((u: string) => {
