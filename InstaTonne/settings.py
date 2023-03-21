@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 #Configure this before deployment
 HOSTNAME = os.environ["HOSTNAME"] if "HOSTNAME" in os.environ else "http://127.0.0.1:8000"
-FRONTEND = os.environ["FRONTEND"] if "FRONTEND" in os.environ else "http://127.0.0.1:8000"
+FRONTEND = os.environ["FRONTEND"] if "FRONTEND" in os.environ else "http://127.0.0.1:5173"
 
 print(HOSTNAME,FRONTEND)
 # Quick-start development settings - unsuitable for production
@@ -32,7 +32,7 @@ SECRET_KEY = os.environ["SECRET_KEY"] if "SECRET_KEY" in os.environ else 'django
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['instatonne-cmput404.herokuapp.com','127.0.0.1']
+ALLOWED_HOSTS = ['cmput404-group6-instatonne.herokuapp.com','127.0.0.1']
 
 
 # Application definition
@@ -54,7 +54,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
