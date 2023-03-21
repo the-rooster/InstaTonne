@@ -21,16 +21,6 @@
 
         <template v-slot:append>
           <div class="justify-self-end">
-            <router-link
-              v-bind:to="`/editPost/${encodeURIComponent(getPostId())}/`"
-            >
-              <v-btn v-if="isAuthorsPost"
-                ><v-icon class="me-1" icon="mdi-pencil"></v-icon
-              ></v-btn>
-            </router-link>
-            <v-btn v-if="isAuthorsPost" @click="deletePost"
-              ><v-icon class="me-1" icon="mdi-delete"></v-icon
-            ></v-btn>
             <v-btn @click="likePost"
               ><v-icon class="me-1" icon="mdi-heart"></v-icon
             ></v-btn>
@@ -124,8 +114,6 @@ import { onMounted } from "vue";
 let comments = ref({});
 const isImage = ref(false);
 const show = ref(false);
-const authorId = Cookies.get(USER_AUTHOR_ID_COOKIE);
-const loading = ref(true);
 
 const props = defineProps({
   postData: {
@@ -140,15 +128,6 @@ const props = defineProps({
     type: Object,
     required: true,
   },
-});
-
-const isAuthorsPost = computed(() => {
-  if (!props.postData.author) {
-    return false;
-  }
-  let author_id = props.postData.author.id;
-  console.log(author_id.endsWith(authorId), 8988);
-  return author_id.endsWith(authorId);
 });
 
 let content = computed(() => {
@@ -167,20 +146,26 @@ let content = computed(() => {
   return props.postData.content;
 });
 
+// console.log(toRaw(props.postData).id, 1000);
+// console.log(toRaw(props.postData));
+
 async function likePost() {
   if (!props.postData.author) {
     return;
   }
   await createHTTP(
-    `/authors/${encodeURIComponent(
-      props.postData.author.id
-    )}/posts/${encodeURIComponent(props.postData.id)}/likes/`
+    `/authors/${encodeURI(props.postData.author.id)}/posts/${encodeURI(
+      props.postData.id
+    )}/likes/`
   )
     .post("")
     .then((response: { data: object }) => {
       console.log(response.data);
     });
 }
+
+const authorId = Cookies.get(USER_AUTHOR_ID_COOKIE);
+const loading = ref(true);
 
 async function sharePost() {
   if (!authorId) {
@@ -198,20 +183,6 @@ async function sharePost() {
     });
 }
 
-async function deletePost() {
-  if (!props.postData.author) {
-    return;
-  }
-  loading.value = true;
-  let postId = props.postData.id;
-  postId = postId.substring(postId.lastIndexOf("/") + 1);
-  await createHTTP(`/authors/${authorId}/posts/${postId}`)
-    .delete()
-    .then((response: { data: object }) => {
-      loading.value = false;
-    });
-}
-
 const newComment = ref("");
 async function saveComment() {
   if (!props.postData.author) {
@@ -219,9 +190,9 @@ async function saveComment() {
   }
   console.log("newComment", newComment.value);
   await createHTTP(
-    `/authors/${encodeURIComponent(
-      props.postData.author.id
-    )}/posts/${encodeURIComponent(props.postData.id)}/comments/`
+    `/authors/${encodeURI(props.postData.author.id)}/posts/${encodeURI(
+      props.postData.id
+    )}/comments/`
   )
     .post(
       JSON.stringify({
@@ -247,7 +218,7 @@ onMounted(() => {
 
 function getComments() {
   createHTTP(
-    `authors/${encodeURI(props.postData.author.id)}/posts/${encodeURI(
+    `/authors/${encodeURI(props.postData.author.id)}/posts/${encodeURI(
       props.postData.id
     )}/comments/`
   )
@@ -256,10 +227,6 @@ function getComments() {
       console.log(response.data, 4567);
       comments.value = response.data.comments;
     });
-}
-
-function getPostId() {
-  return props.postData.id.substring(props.postData.id.lastIndexOf("/") + 1);
 }
 
 // defineProps<{ msg: string }>()

@@ -1,5 +1,5 @@
 <template>
-  <v-card class="mx-auto" color="#fff" theme="light" max-width="100%">
+  <v-card class="mx-auto" color="#eee" theme="light" max-width="80%">
     <v-card-actions>
       <v-list-item class="w-100">
         <v-list-item-title>{{ author.displayName }}</v-list-item-title>
@@ -34,10 +34,9 @@ const props = defineProps({
   },
 });
 
-
 async function likeComment() {
   await createHTTP(
-    `/authors/${encodeURIComponent(props.postData.author.id)}/posts/${encodeURI(
+    `/authors/${encodeURI(props.postData.author.id)}/posts/${encodeURI(
       props.postData.id
     )}/comments/${props.commentData.id}/likes/`
   )
@@ -48,14 +47,12 @@ async function likeComment() {
 }
 
 onBeforeMount(() => {
-  createHTTP(`/authors/${encodeURIComponent(props.postData.author.id)}/`)
-  .get()
-  .then((response) => {
-    author.value = response.data;
-  });
-})
-
-
+  createHTTP(toRaw(props.commentData).author)
+    .get()
+    .then((response) => {
+      author.value = response.data;
+    });
+});
 
 // defineProps<{ msg: string }>();
 </script>

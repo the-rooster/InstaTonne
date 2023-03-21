@@ -6,8 +6,10 @@
           v-if="loggedIn"
           expand-on-hover
           rail
+          rail-width="50"
           absolute
-          width="500"
+          min-width="200"
+          width="300"
         >
           <v-list>
             <v-list-item
@@ -26,31 +28,25 @@
 
           <v-divider />
 
-          <v-list
-            density="compact"
-            nav
-          >
+          <v-list density="compact" nav>
             <v-list-item
               v-for="route in routes"
               :key="route.path"
               color="red"
               :title="route.name"
               :to="route.path"
+              :prepend-icon="route.icon"
             />
           </v-list>
           <v-list>
-            <v-list-item
-              v-if="loggedIn"
-              title="Logout"
-              @click="logout"
-            />
+            <v-list-item v-if="loggedIn" title="Logout" @click="logout" />
           </v-list>
-        </v-navigation-drawer>        
-        <v-main style="height: 100em;">
+        </v-navigation-drawer>
+        <v-main style="height: 100em">
           <router-view v-if="loggedIn" />
           <login-page
             v-else
-            @logged-in="(authorId) => activeUserId = authorId"
+            @logged-in="(authorId) => (activeUserId = authorId)"
           />
         </v-main>
       </v-layout>
@@ -59,46 +55,46 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onBeforeMount, computed, watch } from 'vue'
-import { RouterView, useRoute } from 'vue-router';
-import { nav_bar_routes as routes, router } from "./main"
-import { createHTTP, USER_AUTHOR_ID_COOKIE } from './axiosCalls'
-import LoginPage from './components/LoginPage.vue'
-import Cookies from 'js-cookie';
+import { ref, onBeforeMount, computed, watch } from "vue";
+import { RouterView, useRoute } from "vue-router";
+import { nav_bar_routes as routes, router } from "./main";
+import { createHTTP, USER_AUTHOR_ID_COOKIE } from "./axiosCalls";
+import LoginPage from "./components/LoginPage.vue";
+import Cookies from "js-cookie";
 
-const loading = ref(true)
+const loading = ref(true);
 const authorData = ref({});
-const activeUserId = ref("")
+const activeUserId = ref("");
 
 const loggedIn = computed(() => activeUserId.value != undefined);
 
 const logout = () => {
-  Cookies.remove(USER_AUTHOR_ID_COOKIE)
-  router.push({ path: "/" })
-}
+  Cookies.remove(USER_AUTHOR_ID_COOKIE);
+  router.push({ path: "/" });
+};
 
-const route = useRoute()
+const route = useRoute();
 watch(route, () => {
-  activeUserId.value = Cookies.get(USER_AUTHOR_ID_COOKIE)
-})
+  activeUserId.value = Cookies.get(USER_AUTHOR_ID_COOKIE);
+});
 
 onBeforeMount(async () => {
-  activeUserId.value = Cookies.get(USER_AUTHOR_ID_COOKIE)
+  activeUserId.value = Cookies.get(USER_AUTHOR_ID_COOKIE);
 
-  if (!activeUserId.value){
+  if (!activeUserId.value) {
     loading.value = false;
     return;
   }
 
-  await createHTTP(`authors/${activeUserId.value}`).get().then((response: { data: object }) => {
-    authorData.value = response.data;
-    loading.value = false;
-    console.log(response.data);
-    console.log("GOT AUTHOR DATA!");
-  });
-})
+  await createHTTP(`authors/${activeUserId.value}`)
+    .get()
+    .then((response: { data: object }) => {
+      authorData.value = response.data;
+      loading.value = false;
+      console.log(response.data);
+      console.log("GOT AUTHOR DATA!");
+    });
+});
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
