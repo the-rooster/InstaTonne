@@ -2,56 +2,53 @@ from django.http import HttpRequest, HttpResponse
 import json
 from ..models import Post, PostSerializer, Comment, Author, CommentSerializer
 from django.core.paginator import Paginator
-from .utils import make_comment_url, make_comments_url, get_one_url, make_author_url, send_to_single_inbox, check_authenticated, check_auth_header
+from .utils import make_comment_url, make_comments_url, get_one_url, make_author_url, send_to_single_inbox, check_authenticated, check_auth_header, isaURL, get_auth_headers
+import requests
 import re
 from InstaTonne.settings import HOSTNAME
 
 
-def single_post_comments(request: HttpRequest):
-    matched = re.search(r"^\/authors\/(.*?)\/posts\/(.*?)\/comments\/?$", request.path)
-    if matched:
-        author_id: str = matched.group(1)
-        post_id: str = matched.group(2)
-    else:
-        return HttpResponse(status=405)
+# handle requests for the comments of a post
+def single_post_comments(request: HttpRequest, author_id: str, post_id: str):
+    if not check_auth_header(request):
+        return HttpResponse(status=401)
 
-    if "/" in post_id and request.method == "GET":
+    if isaURL(post_id) and request.method == "GET":
         return single_post_comments_get_remote(request, author_id, post_id)
-    elif "/" in post_id and request.method == "POST":
-        print("POSTING COMMENT to remote")
+    
+    if isaURL(post_id) and request.method == "POST":
         return single_post_comments_post_remote(request,author_id,post_id)
-    elif "/" in post_id or "/" in author_id:
+    
+    if isaURL(post_id):
         return HttpResponse(status=405)
-    elif request.method == "GET":
+    
+    if request.method == "GET":
         return single_post_comments_get(request, author_id, post_id)
-    elif request.method == "POST":
-        print("POSTING COMMENT to local")
+    
+    if request.method == "POST":
         return single_post_comments_post(request, author_id, post_id)
+    
     return HttpResponse(status=405)
 
 
-def single_post_comment(request: HttpRequest):
-    matched = re.search(r"^\/authors\/(.*?)\/posts\/(.*?)\/comments\/(.*?)\/?$", request.path)
-    if matched:
-        author_id: str = matched.group(1)
-        post_id: str = matched.group(2)
-        comment_id: str = matched.group(3)
-    else:
-        return HttpResponse(status=405)
+# handle requests for a single comment of a post
+def single_post_comment(request: HttpRequest, author_id: str, post_id: str, comment_id: str):
+    if not check_auth_header(request):
+        return HttpResponse(status=401)
 
     if request.method == "GET":
         return get_single_comment_local(request, author_id, post_id, comment_id)
+    
     return HttpResponse(status=405)
 
 
 # get the comments from a post
 def single_post_comments_get(request: HttpRequest, author_id: str, post_id: str):
+    post: Post | None = Post.objects.all().filter(pk=post_id).first()
 
-    #check that request is authenticated. remote or local
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
+    if post is None:
+        return HttpResponse(status=404)
     
-    post_url = Post.objects.all().filter(pk=post_id).first().id_url #type: ignore
     comments = Comment.objects.all().filter(post=post_id).order_by("published")
     page_num = request.GET.get("page")
     page_size = request.GET.get("size")
@@ -70,32 +67,28 @@ def single_post_comments_get(request: HttpRequest, author_id: str, post_id: str)
         "type": "comments",
         "page": page_num,
         "size": page_size,
-        "post": post_url,
-        "id": make_comments_url(request.get_host(), author_id, post_id),
+        "post": post.id_url,
+        "id": make_comments_url(HOSTNAME, author_id, post_id),
         "comments": serialized_data
     })
 
     return HttpResponse(content=res, content_type="application/json", status=200)
 
 
+# get the comments from a remote post
 def single_post_comments_get_remote(request: HttpRequest, author_id: str, post_id: str):
-
     query = request.META.get('QUERY_STRING', '')
-    if query:
-        query = '?' + query
-    remote_url = post_id + '/comments' + query
+    if query: query = '?' + query
+    url = post_id + '/comments' + query
+    response: requests.Response = requests.get(url, headers=get_auth_headers(url))
+    return HttpResponse(
+        status=response.status_code,
+        content_type=response.headers['Content-Type'],
+        content=response.content.decode('utf-8')
+    )
 
 
-    status_code, text = get_one_url(remote_url)
-
-    if status_code != 200:
-        print("GETTING REMOTE COMMENTS FAILED:")
-        print(status_code,text)
-        return HttpResponse(status=404)
-
-    return HttpResponse(status=status_code, content_type="application/json", content=text)
-
-
+# add a comment to a remote post
 def single_post_comments_post_remote(request: HttpRequest, author_id : str, post_id : str):
     author: Author | None = Author.objects.all().filter(userID=request.user.pk).first()
     
@@ -103,38 +96,19 @@ def single_post_comments_post_remote(request: HttpRequest, author_id : str, post
         return HttpResponse(status=401)
     
     try:
-        
         body: dict = json.loads(request.body)
         print("BODY for single_post_comments_post_remote: ",body)
         comment: dict = {
             "type" : "comment",
             "contentType" : body["contentType"],
             "content" : body["comment"],
-            "author" : make_author_url(request.get_host(), author.id),
+            "author" : author.id_url,
             "post" : post_id
         }
 
-        print("COMMENT for single_post_comments_post_remote: ",comment)
+        status_code = send_to_single_inbox(post_id.split('/posts')[0], comment)
 
-        # comment_id = comment.id #type: ignore
-        # comment.id_url = make_comment_url(request.get_host(), author_id, post_id, comment_id)
-        # comment.save()
-
-        #get post information to recover author url
-        res = get_one_url(post_id)
-
-        if not res:
-            print("POST NOT FOUND WHEN TRYING TO MAKE COMMENT!")
-            return HttpResponse(status=400)
-        
-        #assume author.id field. might need adapter for this boy
-        res_content = json.loads(res[1])
-        print("CONTENT for single_post_comments_post_remote: ",res_content)
-        print("AUTHOR for single_post_comments_post_remote: ",res_content["author"])
-        author_inbox_url = res_content["author"]["id"]
-        send_to_single_inbox(author_inbox_url,comment)
-
-        return HttpResponse(status=204)
+        return HttpResponse(status=status_code)
     except Exception as e:
         print(e)
         return HttpResponse(status=400)
@@ -142,43 +116,38 @@ def single_post_comments_post_remote(request: HttpRequest, author_id : str, post
 
 # add a comment to a post
 def single_post_comments_post(request: HttpRequest, author_id: str, post_id: str):
-    #get requester author object (this endpoint should be called from local!)
     author: Author | None = Author.objects.all().filter(userID=request.user.pk).first()
 
     if not author:
         return HttpResponse(status=401)
     
-    try:
-        post: Post | None = Post.objects.all().filter(pk=post_id).first()
+    post: Post | None = Post.objects.all().filter(pk=post_id).first()
 
-        if post is None:
-            return HttpResponse(status=404)
-        print("SENDING COMMENT ON POST ",post.id_url)
+    if post is None:
+        return HttpResponse(status=404)
+    
+    try:
         body: dict = json.loads(request.body)
         comment: dict = {
             "type" : "comment",
             "contentType" : body["contentType"],
             "content" : body["comment"],
-            "author" : make_author_url(request.get_host(), author.id),
+            "author" : author.id_url,
             "post" : post.id_url
         }
 
-        # comment_id = comment.id #type: ignore
-        # comment.id_url = make_comment_url(request.get_host(), author_id, post_id, comment_id)
-        # comment.save()
+        author_inbox_url = make_author_url(HOSTNAME, author_id)
 
-        author_inbox_url = make_author_url(request.get_host(),author_id)
+        status_code = send_to_single_inbox(author_inbox_url, comment)
 
-        send_to_single_inbox(author_inbox_url,comment)
-
-        return HttpResponse(status=204)
+        return HttpResponse(status=status_code)
     except Exception as e:
         print(e)
         return HttpResponse(status=400)
 
 
-#THIS SHOULD ONLY BE CALLED BY OUR LOCAL SERVER. kinda wack but ya
-def get_single_comment_local(request:HttpRequest,author_id : str,post_id : str, comment_id : str):
+# get a single comment from a post
+def get_single_comment_local(request: HttpRequest, author_id: str, post_id: str, comment_id: str):
     comment = Comment.objects.filter(id=comment_id).first()
 
     if comment is None:

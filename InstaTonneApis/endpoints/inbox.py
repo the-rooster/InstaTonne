@@ -4,55 +4,59 @@ import json
 import requests
 from InstaTonne.settings import HOSTNAME
 from django.views.decorators.csrf import csrf_exempt
-from .utils import check_authenticated, get_author, get_all_urls, check_auth_header
+from .utils import check_authenticated, get_author, get_all_urls, check_auth_header, get_auth_headers
 import time
 from threading import Thread, Lock
 from InstaTonne.settings import HOSTNAME
 from urllib.parse import quote
 import re
 
-@csrf_exempt
-def inbox_endpoint(request : HttpRequest):
 
-    matched = re.search(r"^\/authors\/(.*?)\/inbox\/?$", request.path)
-    if matched:
-        author_id: str = matched.group(1)
-    else:
-        return HttpResponse(status=405)
+# handle requests to the inbox
+def inbox_endpoint(request: HttpRequest, author_id: str):
+    if not check_auth_header(request):
+        return HttpResponse(status=401)
     
     if request.method == "GET":
-        return get_inbox(request,author_id)
-    elif request.method == "POST":
-        return post_inbox(request,author_id)
-    elif request.method == "DELETE":
-        return delete_inbox(request,author_id)
+        return get_inbox(request, author_id)
+    
+    if request.method == "POST":
+        return post_inbox(request, author_id)
+    
+    if request.method == "DELETE":
+        return delete_inbox(request, author_id)
     
     return HttpResponse(status=405)
 
-def get_inbox(request : HttpRequest, id : str):
 
-    result = {
+# get the items in an authors inbox
+def get_inbox(request: HttpRequest, author_id: str):
+    author: Author | None = Author.objects.all().filter(pk=author_id).first()
+
+    if author is None:
+        return HttpResponse(status=404)
+
+    inboxes = Inbox.objects.all().filter(author=author.id).order_by('published')
+
+    serialized_data = []
+    for inbox in inboxes:
+        try:
+            response: requests.Response = requests.get(inbox.url, headers=get_auth_headers(inbox.url))
+            if response.status_code == 204:
+                serialized_data.append({"found url": inbox.url})
+            else:
+                serialized_data.append(response.json())
+        except Exception as e:
+            serialized_data.append({"error url": inbox.url})
+
+    res = json.dumps({
         "type" : "inbox",
-        "author" : "https://" + request.get_host() + "/authors/" + str(id) + "/",
-        "items" : []
-    }
-    
-    # user = check_authenticated(request,id)
-    user = get_author(id)
-    if not user:
-        return HttpResponse(status=401)
-    
-
-    inbox = Inbox.objects.filter(author=user)
-    
-    urls = [item.url for item in inbox]
-
-    print(urls)
-
-    result['items'] = get_all_urls(urls)
+        "author" : author.id_url,
+        "items" : serialized_data
+    })
         
-    print(result)
-    return HttpResponse(content=json.dumps(result),status=200,content_type="application/json")
+    return HttpResponse(content=res, status=200, content_type="application/json")
+
 
 def parse_inbox_post(data : dict, user : Author):
 

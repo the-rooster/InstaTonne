@@ -44,10 +44,11 @@ class Follow(models.Model):
 
 class FollowSerializer(serializers.ModelSerializer):
     object = AuthorSerializer()
+    actor = serializers.CharField(source='follower_url')
 
     class Meta:
         model = Follow
-        fields = ['object','summary','accepted']
+        fields = ['object','summary','accepted','actor']
 
 
 class Post(models.Model):
@@ -140,6 +141,7 @@ class Like(models.Model):
 class LikeSerializer(serializers.ModelSerializer):
     comment = CommentSerializer()
     post = PostSerializer()
+    
     class Meta:
         model = Like
         fields = ['type', 'summary', 'author', 'comment', 'post']
@@ -148,6 +150,8 @@ class LikeSerializer(serializers.ModelSerializer):
 class Inbox(models.Model):
     author = models.ForeignKey(Author,on_delete=models.CASCADE)
     url = models.TextField()
+
+    published = models.DateTimeField(auto_now_add=True)
 
 
 class ConnectedServer(models.Model):

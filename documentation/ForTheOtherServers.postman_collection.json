@@ -1,0 +1,483 @@
+{
+	"info": {
+		"_postman_id": "c11c5f2d-646a-4e9c-ac21-281a28fd9085",
+		"name": "ForTheOtherServers",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25954543"
+	},
+	"item": [
+		{
+			"name": "single author",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Origin",
+						"value": "{{host}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/authors",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"authors"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "all authors",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Origin",
+						"value": "{{host}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/authors?page=1&size=2",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"authors"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "size",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "all followers",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Origin",
+						"value": "{{host}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/authors/1/followers",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"authors",
+						"1",
+						"followers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check follower",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Origin",
+						"value": "{{host}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/authors/1/followers/{{hostencoded}}%2Fauthors%2F2",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"authors",
+						"1",
+						"followers",
+						"{{hostencoded}}%2Fauthors%2F2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "single post",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Origin",
+						"value": "{{host}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/authors/1/posts/1",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"authors",
+						"1",
+						"posts",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "all posts",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Origin",
+						"value": "{{host}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/authors/1/posts?page=1&size=2",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"authors",
+						"1",
+						"posts"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "size",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "single image",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Origin",
+						"value": "{{host}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/authors/1/posts/1/image",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"authors",
+						"1",
+						"posts",
+						"1",
+						"image"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "all comments",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Origin",
+						"value": "{{host}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/authors/1/posts/1/comments?page=1&size=2",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"authors",
+						"1",
+						"posts",
+						"1",
+						"comments"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "size",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "all likes from post",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Origin",
+						"value": "{{host}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/authors/1/posts/1/likes",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"authors",
+						"1",
+						"posts",
+						"1",
+						"likes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "all likes from comment",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Origin",
+						"value": "{{host}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/authors/1/posts/1/comments/1/likes",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"authors",
+						"1",
+						"posts",
+						"1",
+						"comments",
+						"1",
+						"likes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "all likes from author",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Origin",
+						"value": "{{host}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/authors/{{hostencoded}}%2Fauthors%2F1/liked",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"authors",
+						"{{hostencoded}}%2Fauthors%2F1",
+						"liked"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add post to inbox",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-CSRFToken",
+						"value": "{{csrftoken}}",
+						"type": "text"
+					},
+					{
+						"key": "Origin",
+						"value": "{{host}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"type\": \"post\",\r\n    \"title\": \"title...\",\r\n    \"id\": \"http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e/posts/de305d54-75b4-431b-adb2-eb6b9e546013\",\r\n    \"source\": \"http://lastplaceigotthisfrom.com/posts/yyyyy\",\r\n    \"origin\": \"http://whereitcamefrom.com/posts/zzzzz\",\r\n    \"description\": \"description...\",\r\n    \"contentType\": \"text/plain\",\r\n    \"content\": \"content...\",\r\n    \"author\": {\r\n        \"type\": \"author\",\r\n        \"id\": \"http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e\",\r\n        \"host\": \"http://127.0.0.1:5454/\",\r\n        \"displayName\": \"Lara Croft\",\r\n        \"url\": \"http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e\",\r\n        \"github\": \"http://github.com/laracroft\",\r\n        \"profileImage\": \"https://i.imgur.com/k7XVwpB.jpeg\"\r\n    },\r\n    \"categories\": [\"web\", \"tutorial\"],\r\n    \"comments\": \"http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e/posts/de305d54-75b4-431b-adb2-eb6b9e546013/comments\",\r\n    \"published\": \"2015-03-09T13:07:04+00:00\",\r\n    \"visibility\": \"FRIENDS\",\r\n    \"unlisted\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/authors/1/inbox/",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"authors",
+						"1",
+						"inbox",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add follow request to inbox",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-CSRFToken",
+						"value": "{{csrftoken}}",
+						"type": "text"
+					},
+					{
+						"key": "Origin",
+						"value": "{{host}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"type\": \"follow\",\r\n    \"actor\": \"http://yourserver/authors/yourauthorid\",\r\n    \"object\": \"http://ourserver/authors/ourauthorid\",\r\n    \"summary\": \"user wants to follow user\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/authors/1/inbox/",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"authors",
+						"1",
+						"inbox",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add like to inbox",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-CSRFToken",
+						"value": "{{csrftoken}}",
+						"type": "text"
+					},
+					{
+						"key": "Origin",
+						"value": "{{host}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"summary\": \"summary...\",\r\n    \"type\": \"like\",\r\n    \"author\": {\r\n        \"type\": \"author\",\r\n        \"id\": \"http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e\",\r\n        \"host\": \"http://127.0.0.1:5454/\",\r\n        \"displayName\": \"Lara Croft\",\r\n        \"url\": \"http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e\",\r\n        \"github\": \"http://github.com/laracroft\",\r\n        \"profileImage\": \"https://i.imgur.com/k7XVwpB.jpeg\"\r\n    },\r\n    \"object\": \"http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e/posts/764efa883dda1e11db47671c4a3bbd9e\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/authors/1/inbox/",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"authors",
+						"1",
+						"inbox",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add comment to inbox",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-CSRFToken",
+						"value": "{{csrftoken}}",
+						"type": "text"
+					},
+					{
+						"key": "Origin",
+						"value": "{{host}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"type\":\"comment\",\r\n    \"author\":{\r\n        \"type\":\"author\",\r\n        \"id\":\"http://127.0.0.1:5454/authors/1d698d25ff008f7538453c120f581471\",\r\n        \"url\":\"http://127.0.0.1:5454/authors/1d698d25ff008f7538453c120f581471\",\r\n        \"host\":\"http://127.0.0.1:5454/\",\r\n        \"github\": \"http://github.com/gjohnson\",\r\n        \"profileImage\": \"https://i.imgur.com/k7XVwpB.jpeg\"\r\n    },\r\n    \"post\":\"http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e/posts/764efa883dda1e11db47671c4a3bbd9e\",\r\n    \"comment\":\"comment...\",\r\n    \"contentType\":\"text/markdown\",\r\n    \"published\":\"2015-03-09T13:07:04+00:00\",\r\n    \"id\":\"http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e/posts/de305d54-75b4-431b-adb2-eb6b9e546013/comments/f6255bb01c648fe967714d52a89e8e9c\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/authors/1/inbox/",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"authors",
+						"1",
+						"inbox",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
