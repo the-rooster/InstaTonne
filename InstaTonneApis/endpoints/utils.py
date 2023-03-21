@@ -249,16 +249,8 @@ def check_auth_header(request : HttpRequest):
 
         if connected:
             return True
-    else:
-        #check csrf token
 
-        reason = CsrfViewMiddleware(lambda x : print(x)).process_view(request, None, (), {})
-        if reason:
-            # CSRF failed
-            print("CSRF FAILED IN CHECK AUTH HEADER")
-            return False
         
-        return True
 
 
     

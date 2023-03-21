@@ -93,6 +93,13 @@ def single_author_post_get(request: HttpRequest, author_id: str, post_id: str):
 
     if post is None:
         return HttpResponse(status=404)
+    
+    requesting_author : Author | None = Author.objects.all().filter(userID=request.user.pk).first()
+
+    if requesting_author and post["visibility"] == "FRIENDS" and not check_if_friends_local(post.author,requesting_author) or \
+        not check_auth_header(request):
+        print('DO NOT SHOW')
+        return HttpResponse(status=401)
 
     serialized_post = PostSerializer(post).data
     comments_url = make_comments_url(HOSTNAME, author_id, post_id)
@@ -108,6 +115,16 @@ def single_author_post_get(request: HttpRequest, author_id: str, post_id: str):
 def single_author_post_get_remote(request: HttpRequest, author_id: str, post_id: str):
     url = post_id
     response: requests.Response = requests.get(url, headers=get_auth_headers(url))
+
+    requesting_author : Author | None = Author.objects.all().filter(userID=request.user.pk).first()
+    post = json.loads(response.content)
+
+    if requesting_author and post["visibility"] == "FRIENDS" and not check_if_friends_remote(requesting_author,post["author"]["id"]) or \
+        not check_auth_header(request):
+        print('DO NOT SHOW')
+        return HttpResponse(status=401)
+    
+    
     return HttpResponse(
         status=response.status_code,
         content_type=response.headers['Content-Type'],
