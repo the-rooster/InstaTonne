@@ -6,11 +6,6 @@
     <div class="server-list">
       <div v-for="server in servers" :key="server.host" class="server-display">
         <v-btn
-<<<<<<< HEAD
-        class="server-display"
-        @click="() => {setServerShown(server)}"
-        :disabled="servershown.host==server.host"
-=======
           class="server-display"
           @click="
             () => {
@@ -18,7 +13,6 @@
             }
           "
           :disabled="servershown == server.host"
->>>>>>> main
         >
           <h4>{{ server.host }}</h4>
         </v-btn>
@@ -39,10 +33,7 @@
         src="ProfilePage.vue"
       >
         <router-link v-bind:to="`ProfilePage/${encodeURIComponent(user.url)}/`">
-          <AuthorCard
-            :author-info="user"
-            class="authorCard"
-          />
+          <AuthorCard :author-info="user" class="authorCard" />
         </router-link>
       </div>
     </div>
@@ -65,20 +56,11 @@
 </template>
 
 <script setup lang="ts">
-<<<<<<< HEAD
-  import { ref, onBeforeMount, computed } from 'vue'
-  import AuthorCard from './AuthorCard.vue'
-  import { createHTTP } from '../axiosCalls'
-import { reactive } from 'vue';
-import { onBeforeUpdate } from 'vue';
-import { List } from 'postcss/lib/list';
-=======
 import { ref, onBeforeMount, computed } from "vue";
 import AuthorCard from "./AuthorCard.vue";
 import { createHTTP } from "../axiosCalls";
 import { reactive } from "vue";
 import { onBeforeUpdate } from "vue";
->>>>>>> main
 
 const loading = ref(true);
 const result: any[] = [];
@@ -88,26 +70,6 @@ const search = ref("");
 const pageSize = 5;
 const pageNum = reactive({ page: 1 });
 
-<<<<<<< HEAD
-  type ConnectedServer = {
-    host : string,
-    api : string
-  }
-
-
-  const servers : any = ref([]);
-  const servershown : any = ref({});
-
-  function nextPage(){
-
-    pageNum.page++;
-    if (servershown.value == "local"){
-        fetchAuthors();
-        return
-    }
-
-    fetchRemoteAuthors(servershown.value);
-=======
 const servers = ref([]);
 const servershown = ref("local");
 
@@ -116,7 +78,6 @@ function nextPage() {
   if (servershown.value == "local") {
     fetchAuthors();
     return;
->>>>>>> main
   }
   fetchRemoteAuthors(servershown.value);
 }
@@ -125,36 +86,7 @@ function previousPage() {
   if (pageNum.page > 1) {
     pageNum.page--;
 
-<<<<<<< HEAD
-    if (pageNum.page > 1){
-      pageNum.page--;
-
-      if (servershown.value.host == "local"){
-        fetchAuthors();
-        return
-      }
-      fetchRemoteAuthors(servershown.value.api);
-    }
-
-  }
-
-  async function getAllServers(){
-    await createHTTP("connected-servers/").get().then((response : object) => {
-      console.log("GOT CONNECTED SERVERS!!!!",response.data.servers);
-      servers.value = [...response.data.servers,{"host" : "local", "api" : ""}];
-    });
-  }
-
-
-  async function setServerShown(server : ConnectedServer){
-
-    servershown.value = server;
-    pageNum.page = 1;
-
-    if (server.host == "local"){
-=======
     if (servershown.value == "local") {
->>>>>>> main
       fetchAuthors();
       return;
     }
@@ -162,9 +94,6 @@ function previousPage() {
   }
 }
 
-<<<<<<< HEAD
-    fetchRemoteAuthors(server.api);
-=======
 async function getAllServers() {
   await createHTTP("connected-servers/")
     .get()
@@ -173,7 +102,6 @@ async function getAllServers() {
       servers.value = [...response.data.servers, { host: "local" }];
     });
 }
->>>>>>> main
 
 async function setServerShown(server: string) {
   servershown.value = server;
@@ -198,13 +126,6 @@ async function fetchAuthors() {
     });
 }
 
-<<<<<<< HEAD
-  // fetch all authors from a remote server
-  async function fetchRemoteAuthors(server : string){
-
-    let total_remote_author_urls = encodeURI(server + `/authors?page=${pageNum.page}&size=${pageSize}/`);
-    await createHTTP(`remote-authors/${total_remote_author_urls}`).get().then( (response) => {
-=======
 // fetch all authors from a remote server
 async function fetchRemoteAuthors(server: string) {
   let total_remote_author_urls = encodeURI(
@@ -213,7 +134,6 @@ async function fetchRemoteAuthors(server: string) {
   await createHTTP(`remote-authors/${total_remote_author_urls}`)
     .get()
     .then((response) => {
->>>>>>> main
       console.log("YUP");
       console.log(response);
       authorsList.value = response.data.items;
