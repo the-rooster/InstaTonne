@@ -1,0 +1,252 @@
+openapi: 3.0.0
+info:
+  title: ForTheOtherServers
+  version: 1.0.0
+servers:
+  - url: http://{{host}}
+paths:
+  /authors:
+    get:
+      tags:
+        - default
+      summary: all authors
+      parameters:
+        - name: Origin
+          in: header
+          schema:
+            type: string
+          example: '{{host}}'
+        - name: page
+          in: query
+          schema:
+            type: integer
+          example: '1'
+        - name: size
+          in: query
+          schema:
+            type: integer
+          example: '2'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/1/followers:
+    get:
+      tags:
+        - default
+      summary: all followers
+      parameters:
+        - name: Origin
+          in: header
+          schema:
+            type: string
+          example: '{{host}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/1/followers/{hostencoded}/authors/2:
+    get:
+      tags:
+        - default
+      summary: check follower
+      parameters:
+        - name: Origin
+          in: header
+          schema:
+            type: string
+          example: '{{host}}'
+        - name: hostencoded
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/1/posts/1:
+    get:
+      tags:
+        - default
+      summary: single post
+      parameters:
+        - name: Origin
+          in: header
+          schema:
+            type: string
+          example: '{{host}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/1/posts:
+    get:
+      tags:
+        - default
+      summary: all posts
+      parameters:
+        - name: Origin
+          in: header
+          schema:
+            type: string
+          example: '{{host}}'
+        - name: page
+          in: query
+          schema:
+            type: integer
+          example: '1'
+        - name: size
+          in: query
+          schema:
+            type: integer
+          example: '2'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/1/posts/1/image:
+    get:
+      tags:
+        - default
+      summary: single image
+      parameters:
+        - name: Origin
+          in: header
+          schema:
+            type: string
+          example: '{{host}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/1/posts/1/comments:
+    get:
+      tags:
+        - default
+      summary: all comments
+      parameters:
+        - name: Origin
+          in: header
+          schema:
+            type: string
+          example: '{{host}}'
+        - name: page
+          in: query
+          schema:
+            type: integer
+          example: '1'
+        - name: size
+          in: query
+          schema:
+            type: integer
+          example: '2'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/1/posts/1/likes:
+    get:
+      tags:
+        - default
+      summary: all likes from post
+      parameters:
+        - name: Origin
+          in: header
+          schema:
+            type: string
+          example: '{{host}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/1/posts/1/comments/1/likes:
+    get:
+      tags:
+        - default
+      summary: all likes from comment
+      parameters:
+        - name: Origin
+          in: header
+          schema:
+            type: string
+          example: '{{host}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/{hostencoded}/authors/1/liked:
+    get:
+      tags:
+        - default
+      summary: all likes from author
+      parameters:
+        - name: Origin
+          in: header
+          schema:
+            type: string
+          example: '{{host}}'
+        - name: hostencoded
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /authors/1/inbox/:
+    post:
+      tags:
+        - default
+      summary: add comment to inbox
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                type: comment
+                author:
+                  type: author
+                  id: >-
+                    http://127.0.0.1:5454/authors/1d698d25ff008f7538453c120f581471
+                  url: >-
+                    http://127.0.0.1:5454/authors/1d698d25ff008f7538453c120f581471
+                  host: http://127.0.0.1:5454/
+                  github: http://github.com/gjohnson
+                  profileImage: https://i.imgur.com/k7XVwpB.jpeg
+                post: >-
+                  http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e/posts/764efa883dda1e11db47671c4a3bbd9e
+                comment: comment...
+                contentType: text/markdown
+                published: '2015-03-09T13:07:04+00:00'
+                id: >-
+                  http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e/posts/de305d54-75b4-431b-adb2-eb6b9e546013/comments/f6255bb01c648fe967714d52a89e8e9c
+      parameters:
+        - name: X-CSRFToken
+          in: header
+          schema:
+            type: string
+          example: '{{csrftoken}}'
+        - name: Origin
+          in: header
+          schema:
+            type: string
+          example: '{{host}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+
