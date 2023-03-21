@@ -1,8 +1,14 @@
 <template>
   <div class="viewBox">
-    <h1>Your Stream</h1>
+    <div style="justify-content:center;align-items:center;position:relative;top:0%;left:43%;z-index:100">
+    <v-card height="5vh" width="10vw">
+      <h3>Your Stream</h3>
+      <br>
+    </v-card>
+    </div>
+
     <br />
-    <div style="overflow-y: scroll; max-height: 90em">
+    <div style="padding-bottom:5em">
       <div v-for="item in posts" v-bind:key="item.id_url">
         <PostFullCard
           v-bind:postData="item"
@@ -69,6 +75,6 @@ function getInbox(){
   background-color: red;
   position:fixed;
   bottom:5%;
-  right:5%;
+  right:1%;
 }
 </style>

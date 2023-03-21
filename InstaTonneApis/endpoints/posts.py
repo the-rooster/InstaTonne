@@ -96,7 +96,7 @@ def single_author_post_get(request: HttpRequest, author_id: str, post_id: str):
     
     requesting_author : Author | None = Author.objects.all().filter(userID=request.user.pk).first()
 
-    if requesting_author and post["visibility"] == "FRIENDS" and not check_if_friends_local(post.author,requesting_author) or \
+    if requesting_author and post.visibility == "FRIENDS" and not check_if_friends_local(post.author,requesting_author) or \
         not check_auth_header(request):
         print('DO NOT SHOW')
         return HttpResponse(status=401)

@@ -149,6 +149,10 @@ def check_if_friends_local(author1 : Author,author2: Author):
     if followers_author1 and followers_author2:
         print('they was local friends')
         return True
+    
+    if author1.pk == author2.pk:
+        return True
+    
     print("THEY WAS NOT FRIENDS")
     return False
 
@@ -159,6 +163,9 @@ def check_if_friends_remote(local_author : Author,remote_author_url : str):
 
     if followers_local and local_is_following_remote:
         print('they was friends')
+        return True
+    
+    if local_author.url == remote_author_url:
         return True
     print("THEY WAS NOT FRIENDS")
     return False

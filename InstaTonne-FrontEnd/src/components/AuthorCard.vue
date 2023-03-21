@@ -43,8 +43,8 @@ authorInfo: {
     background-color: rgb(214, 227, 222);
 }
 .profile-picture {
-  width: 10vw;
-  height: 10vw;
+  width: 30vh;
+  height: 30vh;
   border-radius: 100%;
 }
 </style>
