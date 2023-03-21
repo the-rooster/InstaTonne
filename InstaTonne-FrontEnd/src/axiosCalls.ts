@@ -1,19 +1,19 @@
 import axios from "axios";
 
-let backend_url = "";
+const backend_url = "https://cmput404-group6-instatonne.herokuapp.com";
 
-try{
-  if(import.meta.env.DEV){
-    backend_url = import.meta.env.VITE_BACKEND_URL;
-  }
-  else if(import.meta.env.PROD){
-    backend_url = import.meta.env.VITE_BACKEND_URL_PROD;
-  }
+// try{
+//   if(import.meta.env.DEV){
+//     backend_url = import.meta.env.VITE_BACKEND_URL;
+//   }
+//   else if(import.meta.env.PROD){
+//     backend_url = import.meta.env.VITE_BACKEND_URL_PROD;
+//   }
 
-}
-catch (e) {
-  backend_url = 'http://127.0.0.1:8000/';
-}
+// }
+// catch (e) {
+//   backend_url = 'http://127.0.0.1:8000/';
+// }
 
 const HTTP = axios.create({
   baseURL: backend_url,
