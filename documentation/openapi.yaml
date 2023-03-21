@@ -249,4 +249,3 @@ paths:
           description: Successful response
           content:
             application/json: {}
-
