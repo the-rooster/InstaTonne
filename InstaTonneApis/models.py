@@ -32,6 +32,11 @@ class AuthorSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return Author.objects.create(**validated_data)
+    
+
+class AuthorsResponseSerializer(serializers.Serializer):
+    type = serializers.CharField(default='authors')
+    items = AuthorSerializer(many=True)
 
 
 class Follow(models.Model):
@@ -49,6 +54,11 @@ class FollowSerializer(serializers.ModelSerializer):
     class Meta:
         model = Follow
         fields = ['object','summary','accepted','actor']
+
+
+class FollowersResponseSerializer(serializers.Serializer):
+    type = serializers.CharField(default='followers')
+    items = AuthorSerializer(many=True)
 
 
 class Post(models.Model):

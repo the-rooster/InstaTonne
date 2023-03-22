@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'InstaTonneApis.apps.InstatonneapisConfig'
+    'InstaTonneApis.apps.InstatonneapisConfig',
+    'drf_yasg'
 ]
 
 MIDDLEWARE = [

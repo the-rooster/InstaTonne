@@ -1,55 +1,140 @@
 from django.http import HttpRequest, HttpResponse
 import json
-from InstaTonneApis.models import Follow, FollowSerializer, Author, AuthorSerializer
+from InstaTonneApis.models import Follow, FollowSerializer, Author, AuthorSerializer, FollowersResponseSerializer
 from InstaTonneApis.endpoints.utils import valid_requesting_user, get_all_urls, get_author, check_auth_header, isaURL, get_auth_headers
 from urllib.parse import quote
 import requests
-import re
+from InstaTonneApis.endpoints.permissions import CustomPermission
+from InstaTonne.settings import HOSTNAME
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import status, permissions, serializers
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 
-# handle requests for the followers of an author
-def single_author_followers(request: HttpRequest, author_id: str):
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
+class SingleAuthorFollowersAPIView(APIView):
+    #permission_classes = (permissions.AllowAny,CustomPermission,)
+    permission_classes = (permissions.AllowAny,)
 
-    if isaURL(author_id) and request.method == "GET":
-        return single_author_followers_get_remote(request, author_id)
-    
-    if isaURL(author_id):
-        print('asdasd')
-        return HttpResponse(status=405)
-    
-    if request.method == "GET":
-        return single_author_followers_get(request, author_id)  
-    print("YOOOO")
-    return HttpResponse(status=405)
+    @swagger_auto_schema(
+        operation_description="get the followers of author_id",
+        responses={200: FollowersResponseSerializer(),},
+        manual_parameters=[
+            openapi.Parameter(
+                'author_id',
+                in_=openapi.IN_PATH,
+                description='- ID of the author stored on this server\n\nOR\n\n- URL to a followers endpoint [FOR LOCAL USE]',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+        ],
+    )
+    def get(self, request: HttpRequest, author_id: str):
+        if isaURL(author_id):
+            return single_author_followers_get_remote(request, author_id)
+        else:
+            return single_author_followers_get(request, author_id)
 
 
-# handle requests for a follower of an author
-def single_author_follower(request: HttpRequest, author_id: str, foreign_author_id: str):
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
+class SingleAuthorFollowerAPIView(APIView):
+    #permission_classes = (permissions.AllowAny,CustomPermission,)
+    permission_classes = (permissions.AllowAny,)
 
-    if isaURL(author_id) and request.method == "GET":
-        return check_author_follower_remote(request, author_id, foreign_author_id)
-
-    if isaURL(author_id):
-        return HttpResponse(status=405)
-    
-    if request.method == "GET":
-        return check_author_follower(request, author_id, foreign_author_id)
-    
-    if request.method == "POST":
+    @swagger_auto_schema(
+        operation_description="check if foreign_author_id is following author_id",
+        responses={204: 'success',},
+        manual_parameters=[
+            openapi.Parameter(
+                'author_id',
+                in_=openapi.IN_PATH,
+                description='- ID of an author stored on this server\n\nOR\n\n- URL to an author [FOR LOCAL USE]',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+            openapi.Parameter(
+                'foreign_author_id',
+                in_=openapi.IN_PATH,
+                description='a URL to an author',
+                type=openapi.TYPE_STRING,
+                default=HOSTNAME + '/authors/2',
+            ),
+        ],
+    )
+    def get(self, request: HttpRequest, author_id: str, foreign_author_id: str):
+        if isaURL(author_id):
+            return check_author_follower_remote(request, author_id, foreign_author_id)
+        else:
+            return check_author_follower(request, author_id, foreign_author_id)
+        
+    @swagger_auto_schema(
+        operation_description="send a follow request to foreign_author_id from author_id ",
+        responses={204: 'success',},
+        manual_parameters=[
+            openapi.Parameter(
+                'author_id',
+                in_=openapi.IN_PATH,
+                description='ID of an author stored on this server',
+                type=openapi.TYPE_STRING,
+                default='2',
+            ),
+            openapi.Parameter(
+                'foreign_author_id',
+                in_=openapi.IN_PATH,
+                description='a URL to an author',
+                type=openapi.TYPE_STRING,
+                default=HOSTNAME + '/authors/1',
+            ),
+        ],
+    )
+    def post(self, request: HttpRequest, author_id: str, foreign_author_id: str):
         return post_author_follower(request, author_id, foreign_author_id)
 
-    if request.method == "DELETE":
+    @swagger_auto_schema(
+        operation_description="remove foreign_author_id as a follower of author_id",
+        responses={204: 'success',},
+        manual_parameters=[
+            openapi.Parameter(
+                'author_id',
+                in_=openapi.IN_PATH,
+                description='ID of an author stored on this server',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+            openapi.Parameter(
+                'foreign_author_id',
+                in_=openapi.IN_PATH,
+                description='a URL to an author',
+                type=openapi.TYPE_STRING,
+                default=HOSTNAME + '/authors/2',
+            ),
+        ],
+    )
+    def delete(self, request: HttpRequest, author_id: str, foreign_author_id: str):
         return delete_author_follower(request, author_id, foreign_author_id)
-    
-    if request.method == "PUT":
+
+    @swagger_auto_schema(
+        operation_description="accept a follow request from foreign_author_id as author_id",
+        responses={204: 'success',},
+        manual_parameters=[
+            openapi.Parameter(
+                'author_id',
+                in_=openapi.IN_PATH,
+                description='ID of an author stored on this server',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+            openapi.Parameter(
+                'foreign_author_id',
+                in_=openapi.IN_PATH,
+                description='a URL to an author',
+                type=openapi.TYPE_STRING,
+                default=HOSTNAME + '/authors/2',
+            ),
+        ],
+    )
+    def put(self, request: HttpRequest, author_id: str, foreign_author_id: str):
         return put_author_follower(request, author_id, foreign_author_id)
-    
-    print("405 HERE?")
-    return HttpResponse(status=405)
 
 
 # author_id makes follow request to foreign_author_id
@@ -184,20 +269,13 @@ def check_author_follower_remote(request : HttpRequest, author_id : str, foreign
 
 
 #get the actual request object. this is for our local front end ONLY (for the inbox to retrieve follow requests)
-def get_request_object(request: HttpRequest):
+def get_request_object(request: HttpRequest, author_id: str, foreign_author_id: str):
+    if not check_auth_header(request):
+        return HttpResponse(status=401)
 
     print("GETTING REQUEST OBJECT")
     if request.method != "GET":
         print('yahoo?')
-        return HttpResponse(status=405)
-
-    matched = re.search(r"^\/authors\/(.*?)\/followers\/(.*?)\/request\/?$", request.path)
-    print(request.path)
-    if matched:
-        author_id: str = matched.group(1)
-        foreign_author_id: str = matched.group(2)
-    else:
-        print("id broken")
         return HttpResponse(status=405)
     
     user: Author | None = get_author(author_id)
