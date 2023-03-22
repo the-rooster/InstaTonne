@@ -244,6 +244,7 @@ def check_auth_header(request : HttpRequest):
     author = Author.objects.filter(userID=request.user.pk).first()
 
     if author:
+        print("REQUEST IS FROM AN AUTHOR!")
         return True
 
     if 'HTTP_AUTHORIZATION'  in request.META:
