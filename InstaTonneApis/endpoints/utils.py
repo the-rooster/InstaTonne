@@ -240,6 +240,11 @@ def check_auth_header(request : HttpRequest):
     if origin == FRONTEND or origin == HOSTNAME:
         #print("SUCCESS")
         return True
+    
+    author = Author.objects.filter(userID=request.user.pk).first()
+
+    if author:
+        return True
 
     if 'HTTP_AUTHORIZATION'  in request.META:
         print("MISSING AUTH HEADER")
