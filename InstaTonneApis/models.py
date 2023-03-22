@@ -98,6 +98,11 @@ class PostSerializer(serializers.ModelSerializer):
         return Post.objects.create(**validated_data)
 
 
+class PostsResponseSerializer(serializers.Serializer):
+    type = serializers.CharField(default='posts')
+    items = PostSerializer(many=True)
+
+
 class Request(models.Model):
     type = models.TextField()
     summary = models.TextField()
