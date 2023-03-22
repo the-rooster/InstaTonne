@@ -298,13 +298,14 @@ def get_auth_header_for_server(url : str):
     connected = ConnectedServer.objects.filter(host=parsed_url.hostname)
 
     if connected:
-
+        print("GOT THE CREDS!")
+        print(connected[0].our_creds)
         return connected[0].our_creds
     
     return ""
 
 def get_auth_headers(url: str):
-    return {"Origin": HOSTNAME, "Authentication": get_auth_header_for_server(url)}
+    return {"Origin": HOSTNAME, "Authorization": get_auth_header_for_server(url)}
 
 def isaURL(s: str):
     return "/" in s
