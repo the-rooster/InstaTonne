@@ -120,6 +120,9 @@ def single_author_post_get_remote(request: HttpRequest, author_id: str, post_id:
     requesting_author : Author | None = Author.objects.all().filter(userID=request.user.pk).first()
     post = json.loads(response.content)
 
+    if "visibility" not in post:
+        return HttpResponse(status=401)
+
     if requesting_author and post["visibility"] == "FRIENDS" and not check_if_friends_remote(requesting_author,post["author"]["id"]) or \
         not check_auth_header(request):
         print('DO NOT SHOW')
@@ -185,9 +188,15 @@ def single_author_posts_get_remote(request: HttpRequest, author_id: str):
 
     print(requesting_author)
     def filter(post):
+        if "visibility" not in post:
+            return False
         return not requesting_author or (requesting_author and post["visibility"] == "FRIENDS" and check_if_friends_remote(requesting_author,author_id)) \
                 or (requesting_author and post["visibility"] == "PUBLIC")
 
+    if "items" not in response_decoded:
+        print("NO ITEMS FIELD IN AUTHORS")
+        return HttpResponse(status=404)
+    
     response_decoded["items"] = [post for post in response_decoded["items"] if filter(post)]
 
     print(str([(x["title"],x["visibility"]) for x in response_decoded["items"]]))
