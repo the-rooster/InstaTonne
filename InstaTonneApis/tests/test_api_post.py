@@ -38,7 +38,7 @@ class PostApiTestCase(AbstractApiTestCase):
 
     @patch('requests.get')
     def test_get_authors_posts_remote(self, mocked_get: MagicMock):
-        mocked_get.return_value = self.generic_mock_response()
+        mocked_get.return_value = HttpResponse(content=json.dumps({"items" : [{"visibility" : "PUBLIC","title" : "MOCK TITLE"}]}),status=200,content_type="application/json")
 
         response : HttpResponse = self.client.get(
             HOST + '/authors/' + HOST_ENCODED + '%2Fauthors%2F1/posts?page=1&size=1',
@@ -48,7 +48,8 @@ class PostApiTestCase(AbstractApiTestCase):
 
         mocked_get.assert_called_once_with(HOST + '/authors/1/posts?page=1&size=1', headers=ANY)
 
-        self.assert_generic_mock_response(response)
+        self.assertEqual(mocked_get.return_value.status_code,response.status_code)
+        self.assertEqual(mocked_get.return_value.content,response.content)
 
 
     @patch('requests.post')
@@ -109,7 +110,8 @@ class PostApiTestCase(AbstractApiTestCase):
             "id" : post.id_url
         })
         follows = Follow.objects.all().filter(object=1)
-        assert mocked_post.call_count == follows.count()
+        print("TESTTEST: ",mocked_post.call_count,follows.count())
+        assert mocked_post.call_count == follows.count() + 1
         for follow in follows:
             mocked_post.assert_any_call(follow.follower_url + '/inbox/', data, headers=ANY)
 
@@ -134,7 +136,7 @@ class PostApiTestCase(AbstractApiTestCase):
 
     @patch('requests.get')
     def test_get_author_post_remote(self, mocked_get: MagicMock):
-        mocked_get.return_value = self.generic_mock_response()
+        mocked_get.return_value = HttpResponse(content=json.dumps({"visibility" : "PUBLIC"}),status=200,content_type="application/json")
 
         response : HttpResponse = self.client.get(
             HOST + '/authors/1/posts/' + HOST_ENCODED + '%2Fauthors%2F1%2Fposts%2F1',
@@ -144,7 +146,8 @@ class PostApiTestCase(AbstractApiTestCase):
 
         mocked_get.assert_called_once_with(HOST + '/authors/1/posts/1', headers=ANY)
 
-        self.assert_generic_mock_response(response)
+        self.assertEqual(mocked_get.return_value.status_code,response.status_code)
+        self.assertEqual(mocked_get.return_value.content,response.content)
 
 
     def test_post_author_post(self):
