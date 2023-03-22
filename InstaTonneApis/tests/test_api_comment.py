@@ -78,7 +78,7 @@ class CommentApiTestCase(AbstractApiTestCase):
         data = json.dumps({
             "type": "comment",
             "contentType": "contentType3",
-            "content": "comment3",
+            "comment": "comment3",
             "author": HOST + '/authors/1',
             "post": HOST + '/authors/1/posts/1'
         })
@@ -105,7 +105,7 @@ class CommentApiTestCase(AbstractApiTestCase):
         data = json.dumps({
             "type": "comment",
             "contentType": "contentType3",
-            "content": "comment3",
+            "comment": "comment3",
             "author": HOST + '/authors/1',
             "post": HOST + '/authors/1/posts/1'
         })

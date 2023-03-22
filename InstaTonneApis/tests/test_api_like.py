@@ -1,5 +1,5 @@
 from rest_framework import status
-from InstaTonneApis.models import Like, LikeSerializer
+from InstaTonneApis.models import Like, LikeSerializer, Post, Comment
 from django.http import HttpResponse
 import json
 from unittest.mock import patch, ANY, MagicMock
@@ -8,11 +8,18 @@ from InstaTonneApis.tests.test_api_abstract import AbstractApiTestCase, ORIGIN, 
 
 class LikeApiTestCase(AbstractApiTestCase):
     def test_get_post_likes(self):
-        expected_like = Like.objects.all().filter(pk=1).first()
-        serialized_expected_like = LikeSerializer(expected_like).data
-        serialized_expected_like['object'] = HOST + '/authors/1/posts/1'
-        del serialized_expected_like['post']
-        del serialized_expected_like['comment']
+        expected_likes = Like.objects.all().filter(post=1)
+
+        serialized_data = []
+        for like in expected_likes:
+            serialized_like = LikeSerializer(like).data
+
+            if like.post is not None:
+                serialized_like["object"] = like.post.id_url
+            del serialized_like["post"]
+            del serialized_like["comment"]
+
+            serialized_data.append(serialized_like)
     
         response : HttpResponse = self.client.get(
             HOST + '/authors/1/posts/1/likes',
@@ -24,16 +31,23 @@ class LikeApiTestCase(AbstractApiTestCase):
         self.assertEqual(response.get('Content-Type'), 'application/json')
         self.assertEqual(response.json(), {
             'type': 'likes',
-            'items': [serialized_expected_like]
+            'items': serialized_data
         })
 
     
     def test_get_comment_likes(self):
-        expected_like = Like.objects.all().filter(pk=2).first()
-        serialized_expected_like = LikeSerializer(expected_like).data
-        serialized_expected_like['object'] = HOST + '/authors/1/posts/1/comments/1'
-        del serialized_expected_like['post']
-        del serialized_expected_like['comment']
+        expected_likes = Like.objects.all().filter(comment=1)
+
+        serialized_data = []
+        for like in expected_likes:
+            serialized_like = LikeSerializer(like).data
+
+            if like.comment is not None:
+                serialized_like["object"] = like.comment.id_url
+            del serialized_like["post"]
+            del serialized_like["comment"]
+
+            serialized_data.append(serialized_like)
     
         response : HttpResponse = self.client.get(
             HOST + '/authors/1/posts/1/comments/1/likes',
@@ -45,7 +59,7 @@ class LikeApiTestCase(AbstractApiTestCase):
         self.assertEqual(response.get('Content-Type'), 'application/json')
         self.assertEqual(response.json(), {
             'type': 'likes',
-            'items': [serialized_expected_like]
+            'items': serialized_data
         })
 
 
@@ -197,3 +211,47 @@ class LikeApiTestCase(AbstractApiTestCase):
         })
 
         mocked_post.assert_called_once_with(HOST + '/authors/1/inbox/', data, headers=ANY)
+
+
+    def test_get_author_likes(self):
+        expected_likes = Like.objects.all().filter(author=HOST + '/authors/1')
+
+        serialized_data = []
+        for like in expected_likes:
+            serialized_like = LikeSerializer(like).data
+
+            if like.post is not None:
+                serialized_like["object"] = like.post.id_url
+            if like.comment is not None:
+                serialized_like["object"] = like.comment.id_url
+            del serialized_like["post"]
+            del serialized_like["comment"]
+
+            serialized_data.append(serialized_like)
+    
+        response : HttpResponse = self.client.get(
+            HOST + '/authors/1/liked',
+            HTTP_AUTHORIZATION=AUTHORIZATION,
+            HTTP_ORIGIN=ORIGIN
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.get('Content-Type'), 'application/json')
+        self.assertEqual(response.json(), {
+            'type': 'likes',
+            'items': serialized_data
+        })
+
+    @patch('requests.get')
+    def test_get_author_likes_remote(self, mocked_get: MagicMock):
+        mocked_get.return_value = self.generic_mock_response()
+
+        response : HttpResponse = self.client.get(
+            HOST + '/authors/' + HOST_ENCODED + '%2Fauthors%2F1/liked',
+            HTTP_AUTHORIZATION=AUTHORIZATION,
+            HTTP_ORIGIN=ORIGIN
+        )
+
+        mocked_get.assert_called_once_with(HOST + '/authors/1/liked', headers=ANY)
+
+        self.assert_generic_mock_response(response)

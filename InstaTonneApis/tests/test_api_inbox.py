@@ -58,3 +58,190 @@ class InboxApiTestCase(AbstractApiTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.get('Content-Type'), 'application/json')
         self.assertEqual(response.json(), {'type': 'inbox', 'author': HOST + '/authors/1', 'items': serialized_data})
+
+
+    def test_post_author_inbox_post(self):
+        response : HttpResponse = self.client.post(
+            HOST + '/authors/1/inbox',
+            {
+                "type": "post",
+                "id": HOST + "/authors/1/posts/1"
+            },
+            format='json',
+            HTTP_AUTHORIZATION=AUTHORIZATION,
+            HTTP_ORIGIN=ORIGIN
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        inbox = Inbox.objects.all().filter(
+            url = HOST + "/authors/1/posts/1"
+        ).first()
+        assert inbox is not None
+
+
+    def test_post_author_inbox_like_post(self):
+        like = Like.objects.all().filter(
+            summary = "test_post_author_inbox_like_post"
+        ).first()
+        assert like is None
+
+        assert Inbox.objects.all().count() == 8
+    
+        response : HttpResponse = self.client.post(
+            HOST + '/authors/1/inbox',
+            {
+                "summary": "test_post_author_inbox_like_post",
+                "type": "like",
+                "author": HOST + "/authors/2",
+                "object": HOST + "/authors/1/posts/1"
+            },
+            format='json',
+            HTTP_AUTHORIZATION=AUTHORIZATION,
+            HTTP_ORIGIN=ORIGIN
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        assert Inbox.objects.all().count() == 9
+
+        like = Like.objects.all().filter(
+            type = "like",
+            summary = "test_post_author_inbox_like_post",
+            author = HOST + '/authors/2',
+            post = 1
+        ).first()
+        assert like is not None
+
+        inbox = Inbox.objects.all().filter(
+            url = HOST + '/authors/1/posts/1/likes/' + like.id
+        ).first()
+        assert inbox is not None
+
+
+    def test_post_author_inbox_like_comment(self):
+        like = Like.objects.all().filter(
+            summary = "test_post_author_inbox_like_comment"
+        ).first()
+        assert like is None
+
+        assert Inbox.objects.all().count() == 8
+    
+        response : HttpResponse = self.client.post(
+            HOST + '/authors/1/inbox',
+            {
+                "summary": "test_post_author_inbox_like_comment",
+                "type": "like",
+                "author": HOST + "/authors/2",
+                "object": HOST + "/authors/1/posts/1/comments/1"
+            },
+            format='json',
+            HTTP_AUTHORIZATION=AUTHORIZATION,
+            HTTP_ORIGIN=ORIGIN
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        assert Inbox.objects.all().count() == 9
+
+        like = Like.objects.all().filter(
+            type = "like",
+            summary = "test_post_author_inbox_like_comment",
+            author = HOST + '/authors/2',
+            comment = 1
+        ).first()
+        assert like is not None
+
+        inbox = Inbox.objects.all().filter(
+            url = HOST + '/authors/1/posts/1/comments/1/likes/' + like.id
+        ).first()
+        assert inbox is not None
+
+
+    def test_post_author_inbox_comment(self):
+        comment = Comment.objects.all().filter(
+            comment = "test_post_author_inbox_comment"
+        ).first()
+        assert comment is None
+
+        assert Inbox.objects.all().count() == 8
+    
+        response : HttpResponse = self.client.post(
+            HOST + '/authors/1/inbox',
+            {
+                "type": "comment",
+                "contentType": "content type",
+                "comment": "test_post_author_inbox_comment",
+                "author": HOST + "/authors/2",
+                "post": HOST + "/authors/1/posts/1"
+            },
+            format='json',
+            HTTP_AUTHORIZATION=AUTHORIZATION,
+            HTTP_ORIGIN=ORIGIN
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        assert Inbox.objects.all().count() == 9
+
+        comment = Comment.objects.all().filter(
+            type = "comment",
+            contentType = "content type",
+            comment = "test_post_author_inbox_comment",
+            author = HOST + '/authors/2',
+            post = 1
+        ).first()
+        assert comment is not None
+
+        inbox = Inbox.objects.all().filter(
+            url = HOST + '/authors/1/posts/1/comments/' + comment.id
+        ).first()
+        assert inbox is not None
+
+
+    def test_post_author_inbox_follow(self):
+        follow = Follow.objects.all().filter(
+            summary = "test_post_author_inbox_comment"
+        ).first()
+        assert follow is None
+
+        assert Inbox.objects.all().count() == 8
+    
+        response : HttpResponse = self.client.post(
+            HOST + '/authors/1/inbox',
+            {
+                "type": "follow",
+                "summary":"test_post_author_inbox_comment",
+                "actor":{
+                    "id": HOST + "/authors/2"
+                }
+            },
+            format='json',
+            HTTP_AUTHORIZATION=AUTHORIZATION,
+            HTTP_ORIGIN=ORIGIN
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        assert Inbox.objects.all().count() == 9
+
+        follow = Follow.objects.all().filter(
+            accepted = False,
+            summary = "test_post_author_inbox_comment",
+            follower_url = HOST + '/authors/2',
+            object = 1
+        ).first()
+        assert follow is not None
+
+        inbox = Inbox.objects.all().filter(
+            url = HOST + '/authors/1/followers/' + HOST_ENCODED + "%2Fauthors%2F2/request"
+        ).first()
+        assert inbox is not None
+
+
+    def test_delete_author_inbox(self):
+        assert Inbox.objects.all().filter(author=1).count() == 8
+    
+        response : HttpResponse = self.client.delete(
+            HOST + '/authors/1/inbox',
+            HTTP_AUTHORIZATION=AUTHORIZATION,
+            HTTP_ORIGIN=ORIGIN
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        assert Inbox.objects.all().filter(author=1).count() == 0

@@ -6,9 +6,13 @@
     <div class="server-list">
       <div v-for="server in servers" :key="server.host" class="server-display">
         <v-btn
-        class="server-display"
-        @click="() => {setServerShown(server)}"
-        :disabled="servershown.host==server.host"
+          class="server-display"
+          @click="
+            () => {
+              setServerShown(server);
+            }
+          "
+          :disabled="servershown.host == server.host"
         >
           <h4>{{ server.host }}</h4>
         </v-btn>
@@ -29,10 +33,7 @@
         src="ProfilePage.vue"
       >
         <router-link v-bind:to="`ProfilePage/${encodeURIComponent(user.url)}/`">
-          <AuthorCard
-            :author-info="user"
-            class="authorCard"
-          />
+          <AuthorCard :author-info="user" class="authorCard" />
         </router-link>
       </div>
     </div>
@@ -55,100 +56,94 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onBeforeMount, computed } from 'vue'
-  import AuthorCard from './AuthorCard.vue'
-  import { createHTTP } from '../axiosCalls'
-  import { reactive } from 'vue';
-  import { onBeforeUpdate } from 'vue';
-  import { List } from 'postcss/lib/list';
+import { ref, onBeforeMount, computed } from "vue";
+import AuthorCard from "./AuthorCard.vue";
+import { createHTTP } from "../axiosCalls";
+import { reactive } from "vue";
+import { onBeforeUpdate } from "vue";
+import { List } from "postcss/lib/list";
 
-  const loading = ref(true);
-  const result: any[] = [];
-  const authorsList = ref(result);
-  const search = ref("");
+const loading = ref(true);
+const result: any[] = [];
+const authorsList = ref(result);
+const search = ref("");
 
-  const pageSize = 5;
-  const pageNum = reactive({ page: 1 });
+const pageSize = 5;
+const pageNum = reactive({ page: 1 });
 
-  type ConnectedServer = {
-      host : string,
-      api : string
+type ConnectedServer = {
+  host: string;
+  api: string;
+};
+
+const servers: any = ref([]);
+const servershown: any = ref({});
+
+function nextPage() {
+  pageNum.page++;
+  if (servershown.value == "local") {
+    fetchAuthors();
+    return;
   }
 
+  fetchRemoteAuthors(servershown.value.api);
+}
 
-  const servers : any = ref([]);
-  const servershown : any = ref({});
+function previousPage() {
+  if (pageNum.page > 1) {
+    pageNum.page--;
 
-  function nextPage(){
-
-      pageNum.page++;
-      if (servershown.value == "local"){
-          fetchAuthors();
-          return
-      }
-
-    fetchRemoteAuthors(servershown.value.api);
-  }
- 
-
-
-  function previousPage() {
     if (pageNum.page > 1) {
       pageNum.page--;
 
-      if (pageNum.page > 1){
-        pageNum.page--;
-
-        if (servershown.value.host == "local"){
-          fetchAuthors();
-          return
-        }
-        fetchRemoteAuthors(servershown.value.api);
+      if (servershown.value.host == "local") {
+        fetchAuthors();
+        return;
       }
-
+      fetchRemoteAuthors(servershown.value.api);
     }
   }
+}
 
-  async function getAllServers(){
-    await createHTTP("connected-servers/").get().then((response : object) => {
-      console.log("GOT CONNECTED SERVERS!!!!",response.data.servers);
-      servers.value = [...response.data.servers,{"host" : "local", "api" : ""}];
+async function getAllServers() {
+  await createHTTP("connected-servers/")
+    .get()
+    .then((response: object) => {
+      console.log("GOT CONNECTED SERVERS!!!!", response.data.servers);
+      servers.value = [...response.data.servers, { host: "local", api: "" }];
     });
+}
+
+async function setServerShown(server: ConnectedServer) {
+  servershown.value = server;
+  pageNum.page = 1;
+
+  if (server.host == "local") {
+    fetchAuthors();
+    return;
   }
+  fetchRemoteAuthors(server.api);
+}
 
+async function fetchAuthors() {
+  await createHTTP(`authors?page=${pageNum.page}&size=${pageSize}`)
+    .get()
+    .then((response: { data: object }) => {
+      console.log("YUP");
+      console.log(response);
+      authorsList.value = response.data.items;
+      loading.value = false;
+    });
+}
 
-  async function setServerShown(server : ConnectedServer){
-
-    servershown.value = server;
-    pageNum.page = 1;
-
-    if (server.host == "local"){
-      fetchAuthors();
-      return;
-    }
-    fetchRemoteAuthors(server.api);
-  }
-
-
-    
-
-
-  async function fetchAuthors() {
-    await createHTTP(`authors?page=${pageNum.page}&size=${pageSize}`)
-      .get()
-      .then((response: { data: object }) => {
-        console.log("YUP");
-        console.log(response);
-        authorsList.value = response.data.items;
-        loading.value = false;
-      });
-  }
-
-  // fetch all authors from a remote server
-  async function fetchRemoteAuthors(server : string){
-
-    let total_remote_author_urls = encodeURI(server + `/authors?page=${pageNum.page}&size=${pageSize}/`);
-    await createHTTP(`remote-authors/${total_remote_author_urls}`).get().then( (response) => {
+// fetch all authors from a remote server
+async function fetchRemoteAuthors(server: string) {
+  let total_remote_author_urls = encodeURI(
+    server + `/authors?page=${pageNum.page}&size=${pageSize}/`
+  );
+  await createHTTP(`remote-authors/${total_remote_author_urls}`)
+    .get()
+    .then((response) => {
       console.log("YUP");
       console.log(response);
       authorsList.value = response.data.items;

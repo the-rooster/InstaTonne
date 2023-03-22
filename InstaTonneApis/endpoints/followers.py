@@ -16,11 +16,12 @@ def single_author_followers(request: HttpRequest, author_id: str):
         return single_author_followers_get_remote(request, author_id)
     
     if isaURL(author_id):
+        print('asdasd')
         return HttpResponse(status=405)
     
     if request.method == "GET":
         return single_author_followers_get(request, author_id)  
-    
+    print("YOOOO")
     return HttpResponse(status=405)
 
 
@@ -47,6 +48,7 @@ def single_author_follower(request: HttpRequest, author_id: str, foreign_author_
     if request.method == "PUT":
         return put_author_follower(request, author_id, foreign_author_id)
     
+    print("405 HERE?")
     return HttpResponse(status=405)
 
 
@@ -186,6 +188,7 @@ def get_request_object(request: HttpRequest):
 
     print("GETTING REQUEST OBJECT")
     if request.method != "GET":
+        print('yahoo?')
         return HttpResponse(status=405)
 
     matched = re.search(r"^\/authors\/(.*?)\/followers\/(.*?)\/request\/?$", request.path)

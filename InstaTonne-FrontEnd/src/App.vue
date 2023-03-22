@@ -6,7 +6,9 @@
           v-if="loggedIn"
           expand-on-hover
           rail
-          absolute
+          fixed
+          permanent
+          rail-width="60"
           width="500"
         >
           <v-list>
@@ -46,7 +48,7 @@
             />
           </v-list>
         </v-navigation-drawer>        
-        <v-main style="height: 100em;">
+        <v-main>
           <router-view v-if="loggedIn" />
           <login-page
             v-else

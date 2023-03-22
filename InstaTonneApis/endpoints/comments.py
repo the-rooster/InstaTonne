@@ -97,11 +97,10 @@ def single_post_comments_post_remote(request: HttpRequest, author_id : str, post
     
     try:
         body: dict = json.loads(request.body)
-        print("BODY for single_post_comments_post_remote: ",body)
         comment: dict = {
             "type" : "comment",
             "contentType" : body["contentType"],
-            "content" : body["comment"],
+            "comment" : body["comment"],
             "author" : author.id_url,
             "post" : post_id
         }
@@ -131,7 +130,7 @@ def single_post_comments_post(request: HttpRequest, author_id: str, post_id: str
         comment: dict = {
             "type" : "comment",
             "contentType" : body["contentType"],
-            "content" : body["comment"],
+            "comment" : body["comment"],
             "author" : author.id_url,
             "post" : post.id_url
         }
@@ -156,7 +155,5 @@ def get_single_comment_local(request: HttpRequest, author_id: str, post_id: str,
     serialized_comment = CommentSerializer(comment).data
 
     res = json.dumps(serialized_comment)
-
-    print("GETTING COMMENT: ",res)
 
     return HttpResponse(content=res, content_type="application/json", status=200)

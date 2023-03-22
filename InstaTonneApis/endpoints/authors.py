@@ -50,7 +50,7 @@ def single_author(request: HttpRequest, author_id: str):
 
 # get all authors
 def authors_get(request : HttpRequest):
-    authors = Author.objects.all().order_by("id")
+    authors = Author.objects.all().filter(active=True).order_by("id")
     page_num = request.GET.get("page")
     page_size = request.GET.get("size")
 

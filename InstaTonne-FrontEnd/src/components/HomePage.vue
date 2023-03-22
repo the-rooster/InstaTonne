@@ -1,8 +1,14 @@
 <template>
   <div class="viewBox">
-    <h1>Your Stream</h1>
+    <div style="justify-content:center;align-items:center;position:relative;top:0%;left:43%;z-index:100">
+    <v-card height="5vh" width="10vw">
+      <h3>Your Stream</h3>
+      <br>
+    </v-card>
+    </div>
+
     <br />
-    <div style="overflow-y: scroll; max-height: 90em">
+    <div style="padding-bottom:5em">
       <div v-for="item in posts" v-bind:key="item.id_url">
         <PostFullCard
           v-bind:postData="item"
@@ -18,12 +24,15 @@
         ></LikeCommentCard>
       </div>
     </div>
+    <v-btn class="mx-auto clear-inbox" @click="() => {clearInbox()}">
+      clear your inbox
+    </v-btn>
     <div id="app"></div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onBeforeMount } from "vue";
 import PostFullCard from "./stream_cards/PostFullCard.vue";
 import InboxCommentCard from "./stream_cards/InboxCommentCard.vue";
 import LikeCommentCard from "./stream_cards/InboxLikeCard.vue";
@@ -34,17 +43,38 @@ import { USER_AUTHOR_ID_COOKIE, createHTTP } from "../axiosCalls";
 
 let posts = ref({});
 
-createHTTP(`authors/${Cookies.get(USER_AUTHOR_ID_COOKIE)}/inbox/`)
+onBeforeMount(() => {
+  getInbox();
+})
+
+function clearInbox(){
+  createHTTP(`authors/${Cookies.get(USER_AUTHOR_ID_COOKIE)}/inbox/`).delete().then((msg) => {
+    getInbox();
+  })
+}
+
+function getInbox(){
+  createHTTP(`authors/${Cookies.get(USER_AUTHOR_ID_COOKIE)}/inbox/`)
   .get()
   .then((response) => {
     console.log(response.data, 3454545);
     posts.value = response.data.items;
     console.log(response.data.items,125125125);
-  });
+  })
+  }
+
 </script>
 
 <style scoped>
 .read-the-docs {
   color: #888;
+}
+
+.clear-inbox {
+  color: black;
+  background-color: red;
+  position:fixed;
+  bottom:5%;
+  right:1%;
 }
 </style>
