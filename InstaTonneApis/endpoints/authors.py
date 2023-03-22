@@ -9,6 +9,7 @@ import requests
 # handle requests for remote authors
 def remote_authors(request: HttpRequest, remote_authors: str):
     if not check_auth_header(request):
+        print("HERE???")
         return HttpResponse(status=401)
 
     if request.method == "GET":
@@ -75,6 +76,8 @@ def authors_get(request : HttpRequest):
 def authors_get_remote(request: HttpRequest, remote_authors: str):
     url = remote_authors
     response: requests.Response = requests.get(url, headers=get_auth_headers(url))
+
+    print(response.content)
     return HttpResponse(
         status=response.status_code,
         content_type=response.headers['Content-Type'],
