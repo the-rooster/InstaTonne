@@ -256,7 +256,7 @@ def check_auth_header(request : HttpRequest):
 
         connected = ConnectedServer.objects.filter(accepted_creds=auth_header)
 
-        print("CHECKING AUTH HEADER!")
+        print("CHECKING AUTH HEADER!: ",auth_header)
 
         if connected:
             return True
@@ -264,7 +264,7 @@ def check_auth_header(request : HttpRequest):
         
 
 
-    
+    print("AUTH FAILED!")
     return False
 
 #check if the url is in our list of allowed servers to make requests to. otherwise, return 401
