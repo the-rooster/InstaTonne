@@ -1,71 +1,235 @@
 from django.http import HttpRequest, HttpResponse
 import json
-from InstaTonneApis.models import Post, PostSerializer, Comment, Author, Follow
+from InstaTonneApis.models import Post, PostSerializer, Comment, Author, Follow, PostsResponseSerializer
 from django.core.paginator import Paginator
 from InstaTonneApis.endpoints.utils import make_comments_url, make_post_url, valid_requesting_user, send_to_inboxes, check_auth_header, isaURL, get_auth_headers, send_to_single_inbox, get_author, check_if_friends_local, check_if_friends_remote
 import requests
 import base64
 from InstaTonne.settings import HOSTNAME
+from InstaTonneApis.endpoints.permissions import CustomPermission
+
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import status, permissions, serializers
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 
 PNG_CONTENT_TYPE = "image/png;base64"
 JPEG_CONTENT_TYPE = "image/jpeg;base64"
 
 
-# handle requests for a single post of an author
-def single_author_post(request: HttpRequest, author_id: str, post_id: str):
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
+class SingleAuthorPostAPIView(APIView):
+    #permission_classes = (permissions.AllowAny,CustomPermission,)
+    permission_classes = (permissions.AllowAny,)
 
-    if isaURL(post_id) and request.method == "GET":
-        return single_author_post_get_remote(request, author_id, post_id)
+    @swagger_auto_schema(
+        operation_description="get a post of author_id",
+        operation_id="single_author_post_get",
+        responses={200: PostSerializer(),},
+        manual_parameters=[
+            openapi.Parameter(
+                'author_id',
+                in_=openapi.IN_PATH,
+                description='ID of an author stored on this server',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+            openapi.Parameter(
+                'post_id',
+                in_=openapi.IN_PATH,
+                description='- ID of a post stored on this server\n\nOR\n\n- URL to a post [FOR LOCAL USE]',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+        ],
+    )
+    def get(self, request: HttpRequest, author_id: str, post_id: str):
+        if isaURL(post_id):
+            return single_author_post_get_remote(request, author_id, post_id)
+        else:
+            return single_author_post_get(request, author_id, post_id)
 
-    if isaURL(post_id):
-        return HttpResponse(status=405)
-
-    if request.method == "GET":
-        return single_author_post_get(request, author_id, post_id)
-
-    if request.method == "POST":
+    @swagger_auto_schema(
+        operation_description="update a post of author_id",
+        operation_id="single_author_post_post",
+        responses={204: 'success',},
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "title" : openapi.Schema(type=openapi.TYPE_STRING),
+                "description" : openapi.Schema(type=openapi.TYPE_STRING),
+                "contentType" : openapi.Schema(type=openapi.TYPE_STRING),
+                "content" : openapi.Schema(type=openapi.TYPE_STRING),
+                "visibility" : openapi.Schema(type=openapi.TYPE_STRING, example="PUBLIC"),
+                "categories" : openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_STRING)),
+                "unlisted" : openapi.Schema(type=openapi.TYPE_BOOLEAN, example=False),
+            },
+        ),
+        manual_parameters=[
+            openapi.Parameter(
+                'author_id',
+                in_=openapi.IN_PATH,
+                description='ID of an author stored on this server',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+            openapi.Parameter(
+                'post_id',
+                in_=openapi.IN_PATH,
+                description='ID of a post stored on this server',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+        ],
+    )
+    def post(self, request: HttpRequest, author_id: str, post_id: str):
         return single_author_post_post(request, author_id, post_id)
 
-    if request.method == "DELETE":
+    @swagger_auto_schema(
+        operation_description="remote a post of author_id",
+        operation_id="single_author_post_delete",
+        responses={204: 'success',},
+        manual_parameters=[
+            openapi.Parameter(
+                'author_id',
+                in_=openapi.IN_PATH,
+                description='ID of an author stored on this server',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+            openapi.Parameter(
+                'post_id',
+                in_=openapi.IN_PATH,
+                description='ID of a post stored on this server',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+        ],
+    )
+    def delete(self, request: HttpRequest, author_id: str, post_id: str):
         return single_author_post_delete(request, author_id, post_id)
 
-    if request.method == "PUT":
+    @swagger_auto_schema(
+        operation_description="create a post of author_id",
+        operation_id="single_author_post_put",
+        responses={204: 'success',},
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "title" : openapi.Schema(type=openapi.TYPE_STRING),
+                "source" : openapi.Schema(type=openapi.TYPE_STRING),
+                "origin" : openapi.Schema(type=openapi.TYPE_STRING),
+                "description" : openapi.Schema(type=openapi.TYPE_STRING),
+                "contentType" : openapi.Schema(type=openapi.TYPE_STRING),
+                "content" : openapi.Schema(type=openapi.TYPE_STRING),
+                "visibility" : openapi.Schema(type=openapi.TYPE_STRING, example="PUBLIC"),
+                "categories" : openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_STRING)),
+                "unlisted" : openapi.Schema(type=openapi.TYPE_BOOLEAN, example=False),
+            },
+        ),
+        manual_parameters=[
+            openapi.Parameter(
+                'author_id',
+                in_=openapi.IN_PATH,
+                description='ID of an author stored on this server',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+            openapi.Parameter(
+                'post_id',
+                in_=openapi.IN_PATH,
+                description='ID of a post stored on this server',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+        ],
+    )
+    def put(self, request: HttpRequest, author_id: str, post_id: str):
         return single_author_post_put(request, author_id, post_id)
-    
-    return HttpResponse(status=405)
 
 
-# handle requests for the posts of an author
-def single_author_posts(request: HttpRequest, author_id: str):
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
-    
-    if isaURL(author_id) and request.method == "GET":
-        return single_author_posts_get_remote(request, author_id)
-    
-    if isaURL(author_id):
-        return HttpResponse(status=405)
-    
-    if request.method == "GET":
-        return single_author_posts_get(request, author_id)
-    
-    if request.method == "POST":
+class SingleAuthorPostsAPIView(APIView):
+    #permission_classes = (permissions.AllowAny,CustomPermission,)
+    permission_classes = (permissions.AllowAny,)
+
+    @swagger_auto_schema(
+        operation_description="get the posts of author_id",
+        responses={200: PostsResponseSerializer(),},
+        manual_parameters=[
+            openapi.Parameter(
+                'author_id',
+                in_=openapi.IN_PATH,
+                description='- ID of an author stored on this server\n\nOR\n\n- URL to an author [FOR LOCAL USE]',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+        ],
+    )
+    def get(self, request: HttpRequest, author_id: str):
+        if isaURL(author_id):
+            return single_author_posts_get_remote(request, author_id)
+        else:
+            return single_author_posts_get(request, author_id)
+
+    @swagger_auto_schema(
+        operation_description="create a post as author_id",
+        responses={204: 'success',},
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "title" : openapi.Schema(type=openapi.TYPE_STRING),
+                "source" : openapi.Schema(type=openapi.TYPE_STRING),
+                "origin" : openapi.Schema(type=openapi.TYPE_STRING),
+                "description" : openapi.Schema(type=openapi.TYPE_STRING),
+                "contentType" : openapi.Schema(type=openapi.TYPE_STRING),
+                "content" : openapi.Schema(type=openapi.TYPE_STRING),
+                "visibility" : openapi.Schema(type=openapi.TYPE_STRING, example="PUBLIC"),
+                "categories" : openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_STRING)),
+                "unlisted" : openapi.Schema(type=openapi.TYPE_BOOLEAN, example=False),
+            },
+        ),
+        manual_parameters=[
+            openapi.Parameter(
+                'author_id',
+                in_=openapi.IN_PATH,
+                description='ID of an author stored on this server',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+        ],
+    )
+    def post(self, request: HttpRequest, author_id: str):
         return single_author_posts_post(request, author_id)
-    
-    return HttpResponse(status=405)
 
 
-# handle requests for an image post
-def single_author_post_image(request: HttpRequest, author_id: str, post_id: str):
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
+class SingleAuthorPostImageAPIView(APIView):
+    #permission_classes = (permissions.AllowAny,CustomPermission,)
+    permission_classes = (permissions.AllowAny,)
 
-    if request.method == "GET":
+    @swagger_auto_schema(
+        operation_description="get the image in a post of author_id",
+        operation_id="single_author_post_image_get",
+        responses={200: PostSerializer(),},
+        manual_parameters=[
+            openapi.Parameter(
+                'author_id',
+                in_=openapi.IN_PATH,
+                description='ID of an author stored on this server',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+            openapi.Parameter(
+                'post_id',
+                in_=openapi.IN_PATH,
+                description='ID of a post stored on this server',
+                type=openapi.TYPE_STRING,
+                default='3',
+            ),
+        ],
+    )
+    def get(self, request: HttpRequest, author_id: str, post_id: str):
         return single_author_post_image_get(request, author_id, post_id)
-    
-    return HttpResponse(status=405)
 
 
 # get a the encoded image from a single post
@@ -97,8 +261,7 @@ def single_author_post_get(request: HttpRequest, author_id: str, post_id: str):
     
     requesting_author : Author | None = Author.objects.all().filter(userID=request.user.pk).first()
 
-    if requesting_author and post.visibility == "FRIENDS" and not check_if_friends_local(post.author,requesting_author) or \
-        not check_auth_header(request):
+    if requesting_author and post.visibility == "FRIENDS" and not check_if_friends_local(post.author,requesting_author):
         print('DO NOT SHOW')
         return HttpResponse(status=401)
 
