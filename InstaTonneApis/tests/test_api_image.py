@@ -25,11 +25,11 @@ class LikeApiTestCase(AbstractApiTestCase):
     def test_put_and_get_post_image(self, mocked_post: MagicMock):
         mocked_post.return_value = self.generic_mock_response()
 
-        post: Post | None = Post.objects.all().filter(pk=3).first()
+        post: Post | None = Post.objects.all().filter(pk=4).first()
         assert post is None
     
         response : HttpResponse = self.client.put(
-            HOST + '/authors/1/posts/3',
+            HOST + '/authors/1/posts/4',
             self.image_post_data,
             format='json',
             HTTP_AUTHORIZATION=AUTHORIZATION,
@@ -37,11 +37,11 @@ class LikeApiTestCase(AbstractApiTestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-        post: Post | None = Post.objects.all().filter(pk=3).first()
+        post: Post | None = Post.objects.all().filter(pk=4).first()
         assert post is not None
     
         response : HttpResponse = self.client.get(
-            HOST + '/authors/1/posts/3/image',
+            HOST + '/authors/1/posts/4/image',
             HTTP_AUTHORIZATION=AUTHORIZATION,
             HTTP_ORIGIN=ORIGIN
         )
