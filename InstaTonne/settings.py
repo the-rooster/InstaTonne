@@ -68,8 +68,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
     HOSTNAME,
     FRONTEND,
-    "group-13-epic-app.herokuapp.com",
-    "social-distribution-media.herokuapp.com"
+    "https://group-13-epic-app.herokuapp.com",
+    "https://social-distribution-media.herokuapp.com"
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -77,7 +77,9 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000", # allow tests
     "http://127.0.0.1:5173",
     HOSTNAME,
-    FRONTEND
+    FRONTEND,
+    "https://group-13-epic-app.herokuapp.com",
+    "https://social-distribution-media.herokuapp.com"
 ]
 
 CORS_ALLOW_HEADERS = [
