@@ -166,7 +166,7 @@ def single_author_post(request: HttpRequest, author_id: str):
         if author is None:
             return HttpResponse(status=404)
     
-        body: dict = json.loads(request.data)
+        body: dict = request.data
 
         if "displayName" in body:
             author.displayName = body["displayName"]

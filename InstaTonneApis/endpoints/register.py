@@ -11,7 +11,7 @@ def register_author(request : HttpRequest):
     if request.method != "POST":
         return HttpResponse(status=405)
 
-    form = RegisterForm(request.POST)
+    form = RegisterForm(request.data)
 
     if not form.is_valid():
         form.add_error("username","Form is invalid.")

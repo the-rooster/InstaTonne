@@ -28,7 +28,7 @@ function createHTTP(url: string) {
       console.log(data, 444);
       return HTTP.post(`${url}`, data, {
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
+          "Content-Type": "application/json",
         },
       }).then((response) => {
         return response.data;
