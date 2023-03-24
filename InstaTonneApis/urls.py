@@ -34,6 +34,9 @@ from drf_yasg import openapi
 from InstaTonneApis.endpoints.authors import AuthorsAPIView, RemoteAuthorsAPIView, SingleAuthorApiView
 from InstaTonneApis.endpoints.followers import SingleAuthorFollowersAPIView, SingleAuthorFollowerAPIView
 from InstaTonneApis.endpoints.posts import SingleAuthorPostsAPIView, SingleAuthorPostAPIView, SingleAuthorPostImageAPIView
+from InstaTonneApis.endpoints.comments import SingleAuthorPostCommentsAPIView
+from InstaTonneApis.endpoints.likes import SingleAuthorPostLikesAPIView, SingleAuthorPostCommentLikesAPIView, SingleAuthorLikesAPIView
+from InstaTonneApis.endpoints.inbox import InboxAPIView
 
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
@@ -58,17 +61,17 @@ urlpatterns = [
     path("connected-servers/",get_all_connected_servers),
 
     re_path(r"^remote-authors\/(?P<remote>.+?)\/?$", RemoteAuthorsAPIView.as_view()),
-    re_path(r"^authors\/(.+?)\/inbox\/?$", inbox_endpoint),
-    re_path(r"^authors\/(.+?)\/liked\/?$", single_author_likes),
+    re_path(r"^authors\/(?P<author_id>.+?)\/inbox\/?$", InboxAPIView.as_view()),
+    re_path(r"^authors\/(?P<author_id>.+?)\/liked\/?$", SingleAuthorLikesAPIView.as_view()),
     re_path(r"^authors\/(.+?)\/followers\/(.+?)\/request\/?$", get_request_object),
     re_path(r"^authors\/(?P<author_id>.+?)\/posts\/(?P<post_id>.+?)\/image\/?$", SingleAuthorPostImageAPIView.as_view()),
 
     re_path(r"^authors\/(.+?)\/posts\/(.+?)\/comments\/(.+?)\/likes\/(.+?)\/?$", single_comment_like),
-    re_path(r"^authors\/(.+?)\/posts\/(.+?)\/comments\/(.+?)\/likes\/?$", single_comment_likes),
+    re_path(r"^authors\/(?P<author_id>.+?)\/posts\/(?P<post_id>.+?)\/comments\/(?P<comment_id>.+?)\/likes\/?$", SingleAuthorPostCommentLikesAPIView.as_view()),
     re_path(r"^authors\/(.+?)\/posts\/(.+?)\/comments\/(.+?)\/?$", single_post_comment),
-    re_path(r"^authors\/(.+?)\/posts\/(.+?)\/comments\/?$", single_post_comments),
+    re_path(r"^authors\/(?P<author_id>.+?)\/posts\/(?P<post_id>.+?)\/comments\/?$", SingleAuthorPostCommentsAPIView.as_view()),
     re_path(r"^authors\/(.+?)\/posts\/(.+?)\/likes\/(.+?)\/?$", single_post_like),
-    re_path(r"^authors\/(.+?)\/posts\/(.+?)\/likes\/?$", single_post_likes),
+    re_path(r"^authors\/(?P<author_id>.+?)\/posts\/(?P<post_id>.+?)\/likes\/?$", SingleAuthorPostLikesAPIView.as_view()),
     re_path(r"^authors\/(?P<author_id>.+?)\/posts\/(?P<post_id>.+?)\/?$", SingleAuthorPostAPIView.as_view()),
     re_path(r"^authors\/(?P<author_id>.+?)\/posts\/?$", SingleAuthorPostsAPIView.as_view()),
     re_path(r"^authors\/(?P<author_id>.+?)\/followers\/(?P<foreign_author_id>.+?)\/?$", SingleAuthorFollowerAPIView.as_view()),

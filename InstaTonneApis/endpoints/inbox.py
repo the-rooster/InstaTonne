@@ -1,5 +1,5 @@
 from django.http import HttpRequest, HttpResponse
-from ..models import Author, Follow, Inbox, Comment, Like, Post, LikeSerializer
+from ..models import Author, Follow, Inbox, Comment, Like, Post, LikeSerializer, InboxSerializer, InboxResponseSerializer
 import json
 import requests
 from InstaTonne.settings import HOSTNAME
@@ -11,11 +11,78 @@ from InstaTonne.settings import HOSTNAME
 from urllib.parse import quote
 import re
 
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import status, permissions, serializers
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+class InboxAPIView(APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    @swagger_auto_schema(
+        operation_description="get inbox for author_id",
+        responses={200: InboxResponseSerializer(),},
+        manual_parameters=[
+            openapi.Parameter(
+                'author_id',
+                in_=openapi.IN_PATH,
+                description='author id',
+                type=openapi.TYPE_STRING,
+                default='2',
+            ),
+        ],
+    )
+    def get(self, request: HttpRequest, author_id: str):
+        return inbox_endpoint(request, author_id)
+
+    @swagger_auto_schema(
+        operation_description="post to inbox for author_id",
+        responses={204: 'success',},             
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "type": openapi.Schema(type=openapi.TYPE_STRING, example="like"),
+                "author": openapi.Schema(type=openapi.TYPE_STRING, example="http://127.0.0.1:8000/authors/1"),
+                "post": openapi.Schema(type=openapi.TYPE_STRING, example="http://127.0.0.1:8000/authors/1/posts/1"),
+                "comment": openapi.Schema(type=openapi.TYPE_STRING, example="http://127.0.0.1:8000/authors/1/posts/1/comments/1"),
+                "item": openapi.Schema(type=openapi.TYPE_STRING),
+            },
+        ),
+        manual_parameters=[
+            openapi.Parameter(
+                'author_id',
+                in_=openapi.IN_PATH,
+                description='author id',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+        ],
+    )
+    def post(self, request: HttpRequest, author_id: str):
+        return inbox_endpoint(request, author_id)
+
+    @swagger_auto_schema(
+        operation_description="delete inbox for author_id",
+        responses={204: 'success',},
+        manual_parameters=[
+            openapi.Parameter(
+                'author_id',
+                in_=openapi.IN_PATH,
+                description='author id',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+        ],
+    )
+    def delete(self, request: HttpRequest, author_id: str):
+        return inbox_endpoint(request, author_id)
+
 
 # handle requests to the inbox
 def inbox_endpoint(request: HttpRequest, author_id: str):
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
+    # if not check_auth_header(request):
+    #     return HttpResponse(status=401)
     
     if request.method == "GET":
         return get_inbox(request, author_id)

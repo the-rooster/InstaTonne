@@ -1,17 +1,87 @@
 from django.http import HttpRequest, HttpResponse
 import json
-from ..models import Post, PostSerializer, Comment, Author, CommentSerializer
+from ..models import Post, PostSerializer, Comment, Author, CommentSerializer, CommentsResponseSerializer
 from django.core.paginator import Paginator
 from .utils import make_comment_url, make_comments_url, get_one_url, make_author_url, send_to_single_inbox, check_authenticated, check_auth_header, isaURL, get_auth_headers
 import requests
 import re
 from InstaTonne.settings import HOSTNAME
 
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import status, permissions, serializers
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+
+class SingleAuthorPostCommentsAPIView(APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    @swagger_auto_schema(
+        operation_description="get the list of comments of the post whose id is POST_ID (paginated)",
+        operation_id="single_post_comments",
+        responses={200: CommentsResponseSerializer()},
+        manual_parameters=[
+            openapi.Parameter(
+                'author_id',
+                in_=openapi.IN_PATH,
+                description='- ID of an author stored on this server\n\nOR\n\n- URL to an author [FOR LOCAL USE]',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+            openapi.Parameter(
+                
+                'post_id',
+                in_=openapi.IN_PATH,
+                description='- ID of a post stored on this server\n\nOR\n\n- URL to a post [FOR LOCAL USE]',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+        ],
+    )
+    def get(self, request: HttpRequest, author_id: str, post_id: str):
+        if isaURL(post_id):
+            return single_post_comments_get_remote(request, author_id, post_id)
+        else:
+            return single_post_comments_get(request, author_id, post_id)
+        
+    @swagger_auto_schema(
+        operation_description="add a comment to the post whose id is POST_ID",
+        operation_id="single_post_comments",
+        responses={204: 'success',},
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "comment": openapi.Schema(type=openapi.TYPE_STRING),
+                "contentType": openapi.Schema(type=openapi.TYPE_STRING),
+            },
+        ),
+        manual_parameters=[
+            openapi.Parameter(
+                'author_id',
+                in_=openapi.IN_PATH,
+                description='- ID of an author stored on this server\n\nOR\n\n- URL to an author [FOR LOCAL USE]',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+            openapi.Parameter(
+                
+                'post_id',
+                in_=openapi.IN_PATH,
+                description='- ID of a post stored on this server\n\nOR\n\n- URL to a post [FOR LOCAL USE]',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+        ],
+    )
+    def post(self, request: HttpRequest, author_id: str, post_id: str):
+        return single_post_comments_post(request, author_id, post_id)
+
 
 # handle requests for the comments of a post
 def single_post_comments(request: HttpRequest, author_id: str, post_id: str):
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
+    # if not check_auth_header(request):
+    #     return HttpResponse(status=401)
 
     if isaURL(post_id) and request.method == "GET":
         return single_post_comments_get_remote(request, author_id, post_id)
@@ -33,8 +103,8 @@ def single_post_comments(request: HttpRequest, author_id: str, post_id: str):
 
 # handle requests for a single comment of a post
 def single_post_comment(request: HttpRequest, author_id: str, post_id: str, comment_id: str):
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
+    # if not check_auth_header(request):
+    #     return HttpResponse(status=401)
 
     if request.method == "GET":
         return get_single_comment_local(request, author_id, post_id, comment_id)
@@ -93,10 +163,11 @@ def single_post_comments_post_remote(request: HttpRequest, author_id : str, post
     author: Author | None = Author.objects.all().filter(userID=request.user.pk).first()
     
     if not author:
+        print("HERE?")
         return HttpResponse(status=401)
     
     try:
-        body: dict = json.loads(request.body)
+        body: dict = json.loads(request.data)
         comment: dict = {
             "type" : "comment",
             "contentType" : body["contentType"],
@@ -118,6 +189,7 @@ def single_post_comments_post(request: HttpRequest, author_id: str, post_id: str
     author: Author | None = Author.objects.all().filter(userID=request.user.pk).first()
 
     if not author:
+        print("HERE",request.user.pk)
         return HttpResponse(status=401)
     
     post: Post | None = Post.objects.all().filter(pk=post_id).first()
@@ -126,7 +198,7 @@ def single_post_comments_post(request: HttpRequest, author_id: str, post_id: str
         return HttpResponse(status=404)
     
     try:
-        body: dict = json.loads(request.body)
+        body: dict = json.loads(request.data)
         comment: dict = {
             "type" : "comment",
             "contentType" : body["contentType"],
