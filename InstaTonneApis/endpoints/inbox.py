@@ -1,61 +1,64 @@
 from django.http import HttpRequest, HttpResponse
-from ..models import Author, Follow, Inbox, Comment, Like, Post
+from ..models import Author, Follow, Inbox, Comment, Like, Post, LikeSerializer
 import json
 import requests
 from InstaTonne.settings import HOSTNAME
 from django.views.decorators.csrf import csrf_exempt
-from .utils import check_authenticated, get_author, get_all_urls, check_auth_header
+from .utils import check_authenticated, get_author, get_all_urls, check_auth_header, get_auth_headers, valid_requesting_user
 import time
 from threading import Thread, Lock
 from InstaTonne.settings import HOSTNAME
 from urllib.parse import quote
 import re
 
-@csrf_exempt
-def inbox_endpoint(request : HttpRequest):
 
-    matched = re.search(r"^\/authors\/(.*?)\/inbox\/?$", request.path)
-    if matched:
-        author_id: str = matched.group(1)
-    else:
-        return HttpResponse(status=405)
+# handle requests to the inbox
+def inbox_endpoint(request: HttpRequest, author_id: str):
+    if not check_auth_header(request):
+        return HttpResponse(status=401)
     
     if request.method == "GET":
-        return get_inbox(request,author_id)
-    elif request.method == "POST":
-        return post_inbox(request,author_id)
-    elif request.method == "DELETE":
-        return delete_inbox(request,author_id)
+        return get_inbox(request, author_id)
+    
+    if request.method == "POST":
+        return post_inbox(request, author_id)
+    
+    if request.method == "DELETE":
+        return delete_inbox(request, author_id)
     
     return HttpResponse(status=405)
 
-def get_inbox(request : HttpRequest, id : str):
 
-    result = {
+# get the items in an authors inbox
+def get_inbox(request: HttpRequest, author_id: str):
+    author: Author | None = Author.objects.all().filter(pk=author_id).first()
+
+    if author is None:
+        return HttpResponse(status=404)
+
+    inboxes = Inbox.objects.all().filter(author=author.id).order_by('published')
+
+    serialized_data = []
+    for inbox in inboxes:
+        try:
+            response: requests.Response = requests.get(inbox.url, headers=get_auth_headers(inbox.url))
+            if response.status_code == 204:
+                serialized_data.append({"found url": inbox.url})
+            else:
+                serialized_data.append(response.json())
+        except Exception as e:
+            serialized_data.append({"error url": inbox.url})
+
+    res = json.dumps({
         "type" : "inbox",
-        "author" : "http://" + request.get_host() + "/authors/" + str(id) + "/",
-        "items" : []
-    }
-    
-    # user = check_authenticated(request,id)
-    user = get_author(id)
-    if not user:
-        return HttpResponse(status=401)
-    
-
-    inbox = Inbox.objects.filter(author=user)
-    
-    urls = [item.url for item in inbox]
-
-    print(urls)
-
-    result['items'] = get_all_urls(urls)
+        "author" : author.id_url,
+        "items" : serialized_data
+    })
         
-    print(result)
-    return HttpResponse(content=json.dumps(result),status=200,content_type="application/json")
+    return HttpResponse(content=res, status=200, content_type="application/json")
 
-def parse_inbox_post(data : dict, user : Author):
 
+def parse_inbox(data : dict, user : Author):
     if "type" not in data:
         print("NO TYPE ON INBOX POST!")
         return None
@@ -63,187 +66,149 @@ def parse_inbox_post(data : dict, user : Author):
     data_type = str(data["type"].lower())
 
     if data_type == "follow":
-        return parse_inbox_follow_request(data,user)
+        return parse_inbox_follow_request(data, user)
     elif data_type == "post":
-        return parse_inbox_post_post(data,user)
+        return parse_inbox_post(data)
     elif data_type == "comment":
-        return parse_inbox_comment(data,user)
+        return parse_inbox_comment(data)
     elif data_type == "like":
-        return parse_inbox_like(data,user)
+        return parse_inbox_like(data)
 
 
-
-def parse_inbox_comment(data,user):
-    # comment: dict = {
-    #     "type" : "comment",
-    #     "contentType" : body["contentType"],
-    #     "content" : body["comment"],
-    #     "author" : make_author_url(request.get_host(), author.id),
-    #     "post" : post_id
-    # }
-
-    #get post from post_id (get last non empty field after splitting on /)
-    
-    print("POST LINK",data["post"])
-    post_local_id = [x for x in data["post"].split("/") if x][-1]
-
-    #now get the post
-
-    post = Post.objects.filter(id=post_local_id).first()
-
-    if not post:
-        print("POST WITH ID ",post_local_id, " DOES NOT EXIST")
+def parse_inbox_comment(data):
+    if "post" not in data:
+        print('ERROR: no post field in body')
         return None
     
-    obj = Comment.objects.create(type="comment",id_url="",contentType=data["contentType"],comment=data["content"],author=data["author"],post=post)
-    
-    url = HOSTNAME + "/authors/" + user.id + "/posts/" + post_local_id + '/comments/' + obj.id
-    obj.id_url = url
-    
-    obj.save()
-
-    return url
-
-def parse_inbox_like(data,user):
-    print("Data: ", data)
-    local_id = [x for x in data["object"].split("/") if x][-1]
-
-    is_comment = "comments" in data["object"]
-    print(local_id)
-
-    #now get the post
-
-    obj = None
-    like = None
-
-    #decide if local_id is post or comment
-    post = True
-    obj = Post.objects.filter(id=local_id).first()
-
-    if obj and not is_comment:
-
-        #determine if the author has already liked this post
-        if not Like.objects.filter(post=obj,author=data["author"]):
-            like = Like.objects.create(type="like",summary=data["summary"],author=data["author"],post=obj)
-        else:
-            print('yeehaw')
-            return None
-
-    elif not obj or is_comment:  
-        #no post, try comments
-
-        obj = Comment.objects.filter(id=local_id).first()
-        post = False
-        if obj:
-            if not Like.objects.filter(comment=obj,author=data["author"]):
-                like = Like.objects.create(type="like",summary=data["summary"],author=data["author"],comment=obj)
-            else:
-                print('yeesnaw')
-                return None
-    
-    if not obj:
-        print('yeespaw')
+    try:
+        post_url = data["post"].rstrip('/')
+    except:
+        print('ERROR: bad post field')
         return None
     
-    like.save()
+    post: Post | None = Post.objects.all().filter(id_url=post_url).first()
 
-    url = ""
-
-    if post:
-        url = HOSTNAME + "/authors/" + user.id + "/posts/" + local_id + "/likes/" + like.id
+    if post is not None:
+        comment = Comment.objects.create(type="comment", post=post)
     else:
-        url = HOSTNAME + "/authors/" + user.id + "/posts/" + obj.post.id + "/comments/" + obj.id + "/likes/" + like.id
-    like.id_url = url
-    
-    like.save()
-
-    return url
-
-def parse_inbox_post_post(data,user):
-
-    print("INBOX POST SENT: ",data)
-    if "id" not in data:
-        print('yahoo')
+        print('ERROR: object does not exist')
         return None
     
+    if "contentType" in data:
+        comment.contentType = data["contentType"]
+    if "comment" in data:
+        comment.comment = data["comment"]
+    if "author" in data:
+        comment.author = data["author"]
+    comment.id_url = post_url + '/comments/' + comment.id
 
+    comment.save()
+
+    return comment.id_url
+
+
+def parse_inbox_like(data):
+    if "object" not in data:
+        print('ERROR: no object field in body')
+        return None
+    
+    try:
+        object_url = data["object"].rstrip('/')
+    except:
+        print('ERROR: bad object field')
+        return None
+
+    comment: Comment | None = Comment.objects.all().filter(id_url=object_url).first()
+    post: Post | None = Post.objects.all().filter(id_url=object_url).first()
+
+    if comment is not None:
+        like = Like.objects.create(type="like", comment=comment, post=None)
+    elif post is not None:
+        like = Like.objects.create(type="like", post=post, comment=None)
+    else:
+        print('ERROR: object does not exist')
+        return None
+    
+    if "summary" in data:
+        like.summary = data["summary"]
+    if "author" in data:
+        like.author = data["author"]
+
+    like.save()
+
+    like_url = object_url + '/likes/' + like.id
+    return like_url
+
+
+def parse_inbox_post(data):
+    if "id" not in data:
+        print('ERROR: no id field in body')
+        return None
+    
     return data["id"]
 
+
 def parse_inbox_follow_request(data : dict, user: Author):
-        
-        try:
-            #parse expected fields in follow request here
-            actor_id = data["actor"]["id"]
-            summary = data["summary"]
-        except Exception as e:
-            print("INBOX FOLLOW REQUEST BROKEN!")
-            print(e)
-            return None
+    try:
+        #parse expected fields in follow request here
+        actor_id = data["actor"]["id"]
+        summary = data["summary"]
+    except Exception as e:
+        print("INBOX FOLLOW REQUEST BROKEN!")
+        print(e)
+        return None
 
-        obj = Follow.objects.create(object=user,follower_url=actor_id,accepted=False,summary=summary)
+    obj = Follow.objects.create(object=user,follower_url=actor_id,accepted=False,summary=summary)
 
-        obj.save()
+    obj.save()
 
-        return HOSTNAME + "/authors/" + user.id + "/followers/" + quote(actor_id) + "/request"
-"""
-Post an item to a users inbox!
-"""
-def post_inbox(request : HttpRequest, id : str):
+    return HOSTNAME + "/authors/" + user.id + "/followers/" + quote(actor_id, safe='').replace('.', '%2E') + "/request"
 
-    #check that request is authenticated. remote or local
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
-    
+
+# add a post to an inbox
+@csrf_exempt
+def post_inbox(request: HttpRequest, author_id: str):
     #parse request body
     data = request.body
     try:
         data = json.loads(data)
-        print("INBOX POST DATA: ",data)
     except Exception as e:
         return HttpResponse(content="expected json!",status=400)
     
-
-    
     #receiver author object
-    author = Author.objects.filter(pk=id)
+    author: Author | None = Author.objects.all().filter(pk=author_id).first()
 
-    if not author:
+    if author is None:
         #author doesn't exist. cannot post to them.
         return HttpResponse(status=404)
-    #should only be 1 author so just 0 index
-    author = author[0]
 
     #parse inbox request
-    url = parse_inbox_post(data,author)
+    url = parse_inbox(data, author)
 
     if not url:
-        print('here')
         return HttpResponse(status=400)
+    
+    print("TEST: ",author,url)
     
     obj = Inbox.objects.create(author=author,url=url)
 
     obj.save()
 
-    return HttpResponse(status=200)
+    return HttpResponse(status=204)
 
-def delete_inbox(request : HttpRequest, id : str):
 
-    # user = check_authenticated(request,id)
-    user = get_author(id)
+# clear the inbox of author_id
+def delete_inbox(request: HttpRequest, author_id: str):
 
-    if not user:
-        print("test")
+    if not valid_requesting_user(request, author_id):
         return HttpResponse(status=401)
 
+    author: Author | None = Author.objects.all().filter(pk=author_id).first()
 
-    
-    #user is now authenticated
-    #get all posts from followers
+    if author is None:
+        return HttpResponse(status=404)
 
-    
-    #now clear the inbox
-    print(id)
-    res = Inbox.objects.filter(author=user).delete()
-    print(res)
-    return HttpResponse(status=200)
+    Inbox.objects.filter(author=author).delete()
+
+    return HttpResponse(status=204)
 

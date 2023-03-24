@@ -38,13 +38,15 @@ authorInfo: {
 
 <style scoped>
 .authorBox {
-    width: 10em;
-    height: 10em;
+    width: 20vw;
+    height: 20vh;
     background-color: rgb(214, 227, 222);
+    justify-content: center;
 }
 .profile-picture {
-  width: 10vw;
-  height: 10vw;
+  width: 60%;
+  height: 60%;
+
   border-radius: 100%;
 }
 </style>

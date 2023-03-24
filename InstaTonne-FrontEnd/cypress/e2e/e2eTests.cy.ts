@@ -1,5 +1,6 @@
 // import Cookies from "js-cookie";
-import { USER_AUTHOR_ID_COOKIE } from "../../src/axiosCalls";
+// import { USER_AUTHOR_ID_COOKIE } from "../../src/axiosCalls";
+const USER_AUTHOR_ID_COOKIE = "InstatonneAuthorId";
 
 describe('e2e tests', () => {
   it('can login', () => {

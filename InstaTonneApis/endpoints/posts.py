@@ -1,75 +1,76 @@
 from django.http import HttpRequest, HttpResponse
 import json
-from ..models import Post, PostSerializer, Comment, Author
+from InstaTonneApis.models import Post, PostSerializer, Comment, Author, Follow
 from django.core.paginator import Paginator
-from .utils import make_comments_url, make_post_url, valid_requesting_user, get_all_urls, get_one_url, send_to_inboxes, check_auth_header
-import re
+from InstaTonneApis.endpoints.utils import make_comments_url, make_post_url, valid_requesting_user, send_to_inboxes, check_auth_header, isaURL, get_auth_headers, send_to_single_inbox, get_author, check_if_friends_local, check_if_friends_remote
+import requests
 import base64
+from InstaTonne.settings import HOSTNAME
 
 PNG_CONTENT_TYPE = "image/png;base64"
 JPEG_CONTENT_TYPE = "image/jpeg;base64"
 
 
-def single_author_post(request: HttpRequest):
-    matched = re.search(r"^\/authors\/(.*?)\/posts\/(.*?)\/?$", request.path)
-    if matched:
-        author_id: str = matched.group(1)
-        post_id: str = matched.group(2)
-    else:
+# handle requests for a single post of an author
+def single_author_post(request: HttpRequest, author_id: str, post_id: str):
+    if not check_auth_header(request):
+        return HttpResponse(status=401)
+
+    if isaURL(post_id) and request.method == "GET":
+        return single_author_post_get_remote(request, author_id, post_id)
+
+    if isaURL(post_id):
         return HttpResponse(status=405)
 
-    # get a remote authors post
-    if "/" in post_id and request.method == "GET":
-        return single_author_post_get_remote(request, author_id, post_id)
-    #can only get for remote posts
-    elif "/" in post_id:
-        return HttpResponse(status=405)
-    #get local post
-    elif request.method == "GET":
+    if request.method == "GET":
         return single_author_post_get(request, author_id, post_id)
-    #create local post
-    elif request.method == "POST":
+
+    if request.method == "POST":
         return single_author_post_post(request, author_id, post_id)
-    #delete local post
-    elif request.method == "DELETE":
+
+    if request.method == "DELETE":
         return single_author_post_delete(request, author_id, post_id)
-    #put local post
-    elif request.method == "PUT":
+
+    if request.method == "PUT":
         return single_author_post_put(request, author_id, post_id)
+    
     return HttpResponse(status=405)
 
 
-def single_author_posts(request: HttpRequest):
-    matched = re.search(r"^\/authors\/(.*?)\/posts\/?$", request.path)
-    if matched:
-        author_id: str = matched.group(1)
-    else:
+# handle requests for the posts of an author
+def single_author_posts(request: HttpRequest, author_id: str):
+    if not check_auth_header(request):
+        return HttpResponse(status=401)
+    
+    if isaURL(author_id) and request.method == "GET":
+        return single_author_posts_get_remote(request, author_id)
+    
+    if isaURL(author_id):
         return HttpResponse(status=405)
     
-    if "/" in author_id and request.method == "GET":
-        return single_author_posts_get_remote(request, author_id)
-    elif "/" in author_id:
-        return HttpResponse(status=405)
-    elif request.method == "GET":
+    if request.method == "GET":
         return single_author_posts_get(request, author_id)
-    elif request.method == "POST":
+    
+    if request.method == "POST":
         return single_author_posts_post(request, author_id)
+    
     return HttpResponse(status=405)
 
 
+# handle requests for an image post
 def single_author_post_image(request: HttpRequest, author_id: str, post_id: str):
-    print("HEREEEEE")
+    if not check_auth_header(request):
+        return HttpResponse(status=401)
 
     if request.method == "GET":
         return single_author_post_image_get(request, author_id, post_id)
+    
     return HttpResponse(status=405)
 
 
 # get a the encoded image from a single post
 def single_author_post_image_get(request: HttpRequest, author_id: str, post_id: str):
-
-
-    post: Post | None = Post.objects.all().filter(author=author_id, pk=post_id).first()
+    post: Post | None = Post.objects.all().filter(pk=post_id).first()
 
     if post is None:
         return HttpResponse(status=404)
@@ -82,26 +83,27 @@ def single_author_post_image_get(request: HttpRequest, author_id: str, post_id: 
     res : str = serialized_post["content"]
     res = res.split(",")[-1]
 
-    res = base64.decodebytes(res.encode("UTF-8"))
+    res_bytes = base64.decodebytes(res.encode("UTF-8"))
 
-    return HttpResponse(content=res, content_type=serialized_post["contentType"], status=200)
-
+    return HttpResponse(content=res_bytes, content_type=serialized_post["contentType"], status=200)
 
 
 # get a single post
 def single_author_post_get(request: HttpRequest, author_id: str, post_id: str):
-
-    #check that request is authenticated. remote or local
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
-    
     post: Post | None = Post.objects.all().filter(author=author_id, pk=post_id).first()
 
     if post is None:
         return HttpResponse(status=404)
+    
+    requesting_author : Author | None = Author.objects.all().filter(userID=request.user.pk).first()
+
+    if requesting_author and post.visibility == "FRIENDS" and not check_if_friends_local(post.author,requesting_author) or \
+        not check_auth_header(request):
+        print('DO NOT SHOW')
+        return HttpResponse(status=401)
 
     serialized_post = PostSerializer(post).data
-    comments_url = make_comments_url(request.get_host(), author_id, post_id)
+    comments_url = make_comments_url(HOSTNAME, author_id, post_id)
     comment_count = Comment.objects.all().filter(post=post_id).count()
     serialized_post["count"] = comment_count
     serialized_post["comments"] = comments_url
@@ -112,23 +114,39 @@ def single_author_post_get(request: HttpRequest, author_id: str, post_id: str):
 
 # get a single post of a remote author
 def single_author_post_get_remote(request: HttpRequest, author_id: str, post_id: str):
-    status_code, text = get_one_url(post_id)
-    return HttpResponse(status=status_code, content_type="application/json", content=text)
+    url = post_id
+    response: requests.Response = requests.get(url, headers=get_auth_headers(url))
+
+    requesting_author : Author | None = Author.objects.all().filter(userID=request.user.pk).first()
+    post = json.loads(response.content)
+
+    if "visibility" not in post:
+        return HttpResponse(status=401)
+
+    if requesting_author and post["visibility"] == "FRIENDS" and not check_if_friends_remote(requesting_author,post["author"]["id"]) or \
+        not check_auth_header(request):
+        print('DO NOT SHOW')
+        return HttpResponse(status=401)
+    
+    
+    return HttpResponse(
+        status=response.status_code,
+        content_type=response.headers['Content-Type'],
+        content=response.content.decode('utf-8')
+    )
 
 
 # get all the posts of an author
 def single_author_posts_get(request: HttpRequest, author_id: str):
-
-    #check that request is authenticated. remote or local
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
-    
     author: Author | None = Author.objects.all().filter(pk=author_id).first()
-
     if author is None:
         return HttpResponse(status=404)
+    
+    requesting_author : Author | None = Author.objects.all().filter(userID=request.user.pk).first()
 
-    posts = Post.objects.all().filter(author=author_id).order_by("published")
+    #check if this is a local author requesting. filter posts accordingly
+    posts = Post.objects.all().filter(author=author_id, unlisted=False).order_by("published")
+
     page_num = request.GET.get("page")
     page_size = request.GET.get("size")
 
@@ -138,14 +156,17 @@ def single_author_posts_get(request: HttpRequest, author_id: str):
 
     serialized_data = []
     for post in posts:
-        post_id = post.id #type: ignore
+
+        #check if this is a local author requesting. filter posts accordingly
+        if requesting_author and post.visibility == "FRIENDS" and not check_if_friends_local(author,requesting_author):
+            print('DO NOT SHOW')
+            continue
 
         serialized_post = PostSerializer(post).data
-        comments_url = make_comments_url(request.get_host(), author_id, post_id)
-        comment_count = Comment.objects.all().filter(post=post_id).count()
+        comments_url = make_comments_url(HOSTNAME, author_id, post.id)
+        comment_count = Comment.objects.all().filter(post=post.id).count()
         serialized_post["count"] = comment_count
         serialized_post["comments"] = comments_url
-
         serialized_data.append(serialized_post)
 
     res = json.dumps({
@@ -158,12 +179,33 @@ def single_author_posts_get(request: HttpRequest, author_id: str):
 
 # get all the posts of a remote author
 def single_author_posts_get_remote(request: HttpRequest, author_id: str):
+    requesting_author = Author.objects.filter(userID=request.user.pk).first()
     query = request.META.get('QUERY_STRING', '')
-    if query:
-        query = '?' + query
-    remote_url = author_id + '/posts' + query
-    status_code, text = get_one_url(remote_url)
-    return HttpResponse(status=status_code, content_type="application/json", content=text)
+    if query: query = '?' + query
+    url = author_id + '/posts' + query
+    response: requests.Response = requests.get(url, headers=get_auth_headers(url))
+    response_decoded = json.loads(response.content)
+
+    print(requesting_author)
+    def filter(post):
+        if "visibility" not in post:
+            return False
+        return not requesting_author or (requesting_author and post["visibility"] == "FRIENDS" and check_if_friends_remote(requesting_author,author_id)) \
+                or (requesting_author and post["visibility"] == "PUBLIC")
+
+    if "items" not in response_decoded:
+        print("NO ITEMS FIELD IN AUTHORS")
+        return HttpResponse(status=404)
+    
+    response_decoded["items"] = [post for post in response_decoded["items"] if filter(post)]
+
+    print(str([(x["title"],x["visibility"]) for x in response_decoded["items"]]))
+
+    return HttpResponse(
+        status=response.status_code,
+        content_type=response.headers['Content-Type'],
+        content=json.dumps(response_decoded))
+    
 
 
 # update an existing post
@@ -176,6 +218,8 @@ def single_author_post_post(request: HttpRequest, author_id: str, post_id: str):
 
         if post is None:
             return HttpResponse(status=404)
+        
+
     
         body: dict = json.loads(request.body)
 
@@ -193,15 +237,12 @@ def single_author_post_post(request: HttpRequest, author_id: str, post_id: str):
             post.categories = body["categories"]
         if "unlisted" in body:
             post.unlisted = body["unlisted"]
-        if request.get_host() not in post.source:
-            post.source = make_post_url(request.get_host(), author_id, post_id)
         post.save()
 
         return HttpResponse(status=204)
     except Exception as e:
         print(e)
         return HttpResponse(status=400)
-
 
 
 # create a new post without a specified post id
@@ -222,12 +263,12 @@ def single_author_posts_post(request: HttpRequest, author_id: str):
             uri = make_image_post(request,author,author_id)
             body["content"] = f"<img src=\"{uri}\">"
             body["contentType"] = "text/markdown"
-        
+
+
 
         post: Post = Post.objects.create(
             type = "post",
             title = body["title"],
-            source = body["source"] if "source" in body else "",
             description = body["description"],
             contentType = body["contentType"],
             content = body["content"],
@@ -236,26 +277,17 @@ def single_author_posts_post(request: HttpRequest, author_id: str):
             unlisted = body["unlisted"],
             author = author
         )
-
-        print("author_id: ", author_id)
-        print("post_id: ", post.id)
-        print("post.author: ", str(post.author.id))
-
-        post_id = post.id #type: ignore
-        post.id_url = make_post_url(request.get_host(), post.author.id, post_id)
-        if not post.source:
-            post.source = post.id_url
-        else:
-            post.source = make_post_url(request.get_host(), author_id, post_id)
+        post.id_url = make_post_url(HOSTNAME, author.id, post.id)
         post.origin = post.id_url if not body["origin"] else body["origin"]
+        post.source = post.id_url if not body["source"] else body["source"]
         post.save()
 
         data : dict = {
             "type" : "post",
             "id" : post.id_url
         }
-
-        send_to_inboxes(author_id, author.id_url, data ,body["visibility"])
+        send_to_inboxes(author_id, author.id_url, data, body["visibility"])
+        send_to_single_inbox(HOSTNAME + "/authors/" + author_id,data)
 
         return HttpResponse(status=204)
     except Exception as e:
@@ -263,13 +295,13 @@ def single_author_posts_post(request: HttpRequest, author_id: str):
         print("HERE!")
         return HttpResponse(status=400)
 
+
 #make image post to link to markdown post
 def make_image_post(request : HttpRequest,author: Author,author_id : str):
     body: dict = json.loads(request.body)
     post: Post = Post.objects.create(
         type = "post",
         title = "image",
-        source = body["source"] if "source" in body else "",
         description = "image",
         contentType = body["contentType"],
         content = body["content"],
@@ -278,23 +310,13 @@ def make_image_post(request : HttpRequest,author: Author,author_id : str):
         unlisted = True,
         author = author
     )
-
-    print("author_id: ", author_id)
-    print("post_id: ", post.id)
-    print("post.author: ", str(post.author.id))
-
-    post_id = post.id #type: ignore
-    post.id_url = make_post_url(request.get_host(), post.author.id, post_id)
-    if not post.source:
-        post.source = post.id_url
-    else:
-        post.source = make_post_url(request.get_host(), author_id, post_id)
+    post.id_url = make_post_url(HOSTNAME, author.id, post.id)
     post.origin = post.id_url if not body["origin"] else body["origin"]
+    post.source = post.id_url if not body["source"] else body["source"]
     post.save()
 
-
-
     return post.id_url + "/image"
+
 
 # delete a post
 def single_author_post_delete(request: HttpRequest, author_id: str, post_id: str):
@@ -322,14 +344,17 @@ def single_author_post_put(request: HttpRequest, author_id: str, post_id: str):
         if author is None:
             return HttpResponse(status=404)
         
+        existing_post: Post | None = Post.objects.all().filter(pk=post_id).first()
+
+        if existing_post is not None:
+            return single_author_post_post(request, author_id, post_id)
+        
         body: dict = json.loads(request.body)
         post: Post = Post.objects.create(
             id = post_id,
-            id_url = make_post_url(request.get_host(), author_id, post_id),
+            id_url = make_post_url(HOSTNAME, author_id, post_id),
             type = "post",
             title = body["title"],
-            source = body["source"],
-            origin = body["origin"],
             description = body["description"],
             contentType = body["contentType"],
             content = body["content"],
@@ -338,11 +363,14 @@ def single_author_post_put(request: HttpRequest, author_id: str, post_id: str):
             unlisted = body["unlisted"],
             author = author
         )
+        post.origin = post.id_url if not body["origin"] else body["origin"]
+        post.source = post.id_url if not body["source"] else body["source"]
+        post.save()
 
         data : dict = {
+            "type" : "post",
             "id" : post.id_url
         }
-
         send_to_inboxes(author_id, author.id_url, data, body["visibility"])
 
         return HttpResponse(status=204)

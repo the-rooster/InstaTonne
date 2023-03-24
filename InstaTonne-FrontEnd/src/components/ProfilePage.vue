@@ -8,7 +8,7 @@
     <br />
     <v-btn
       v-if="profileId === Cookies.get(USER_AUTHOR_ID_COOKIE)"
-      v-bind:href="`/authors/${profileId}/edit`"
+      v-bind:href="`/app/authors/${profileId}/edit`"
       >Edit Profile</v-btn
     >
     <a v-bind:href="profileData.github"
@@ -30,7 +30,7 @@
     <div class="flex-container">
       <div v-for="post in posts" :key="post.id" class="post-tiny">
         <a
-          v-bind:href="`/authors/${encodeURIComponent(
+          v-bind:href="`/app/authors/${encodeURIComponent(
             profileData.id
           )}/posts/${encodeURIComponent(post.id)}/`"
         >
@@ -109,7 +109,7 @@ onMounted(() => {
       canFollow.value = true;
     });
 
-  createHTTP(`authors/${profileId}/followers/`)
+  createHTTP(`authors/${profileId}/followers`)
     .get()
     .then((response) => {
       console.log(response, 123123123);
@@ -120,7 +120,7 @@ onMounted(() => {
       console.log(response.data, 567);
     });
 
-  createHTTP(`authors/${profileId}/posts/`)
+  createHTTP(`authors/${profileId}/posts`)
     .get()
     .then((response) => {
       let data = response.data;
@@ -135,10 +135,11 @@ const statusMessage = ref("");
 const showStatus = computed(() => statusMessage.value.length > 0);
 
 function follow() {
+  // encodeURIComponent(profileId)
   createHTTP(
-    `authors/${encodeURIComponent(profileId)}/followers/${Cookies.get(
+    `authors/${Cookies.get(
       USER_AUTHOR_ID_COOKIE
-    )}`
+    )}/followers/${encodeURIComponent(profileId)}`
   )
     .post("")
     .then((response) => {

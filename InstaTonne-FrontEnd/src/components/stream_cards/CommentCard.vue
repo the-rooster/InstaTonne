@@ -17,8 +17,11 @@
 </template>
 
 <script setup lang="ts">
+import { onBeforeMount } from "vue";
 import { createHTTP } from "../../axiosCalls";
 import { defineProps, ref, toRaw } from "vue";
+
+let author = ref({});
 
 const props = defineProps({
   commentData: {
@@ -31,11 +34,10 @@ const props = defineProps({
   },
 });
 
-console.log(toRaw(props.commentData).id, 555);
 
 async function likeComment() {
   await createHTTP(
-    `/authors/${encodeURI(props.postData.author.id)}/posts/${encodeURI(
+    `/authors/${encodeURIComponent(props.postData.author.id)}/posts/${encodeURI(
       props.postData.id
     )}/comments/${props.commentData.id}/likes/`
   )
@@ -45,12 +47,16 @@ async function likeComment() {
     });
 }
 
-let author = ref({});
-createHTTP(toRaw(props.commentData).author)
+onBeforeMount(() => {
+  createHTTP(`/authors/${encodeURIComponent(props.postData.author.id)}/`)
   .get()
   .then((response) => {
     author.value = response.data;
   });
+})
+
+
+
 // defineProps<{ msg: string }>();
 </script>
 

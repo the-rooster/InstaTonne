@@ -1,5 +1,5 @@
 <template>
-  <div class="viewBox">
+  <div>
     <v-progress-circular
       v-if="loading"
       indeterminate

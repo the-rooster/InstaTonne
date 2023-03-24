@@ -1,7 +1,22 @@
 import axios from "axios";
 
+let backend_url = "";
+
+try{
+  if(import.meta.env.DEV){
+    backend_url = import.meta.env.VITE_BACKEND_URL;
+  }
+  else if(import.meta.env.PROD){
+    backend_url = import.meta.env.VITE_BACKEND_URL_PROD;
+  }
+
+}
+catch (e) {
+  backend_url = 'http://127.0.0.1:8000/';
+}
+
 const HTTP = axios.create({
-  baseURL: "http://127.0.0.1:8000/",
+  baseURL: backend_url,
   withCredentials: true,
   xsrfCookieName: "csrftoken",
   xsrfHeaderName: "X-CSRFToken",
@@ -41,6 +56,9 @@ function createHTTP(url: string) {
     //   }
   };
 }
+
+// create http request to retrieve csrf token
+createHTTP("csrf/").get();
 
 function createFormBody(credentials: any[]) {
   const formBody: string[] = [];

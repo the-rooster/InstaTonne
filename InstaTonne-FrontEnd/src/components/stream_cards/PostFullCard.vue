@@ -11,9 +11,9 @@
           ></v-avatar>
         </template> -->
 
-        <v-list-item-title>{{
+        <v-list-item-title><a :href="`/app/ProfilePage/${encodeURIComponent(props.postData.author?.url)}/`">{{
           props.postData.author?.displayName
-        }}</v-list-item-title>
+        }}</a></v-list-item-title>
 
         <v-list-item-subtitle>{{
           props.postData.author?.host
@@ -21,6 +21,16 @@
 
         <template v-slot:append>
           <div class="justify-self-end">
+            <router-link
+              v-bind:to="`/editPost/${encodeURIComponent(getPostId())}/`"
+            >
+              <v-btn v-if="isAuthorsPost"
+                ><v-icon class="me-1" icon="mdi-pencil"></v-icon
+              ></v-btn>
+            </router-link>
+            <v-btn v-if="isAuthorsPost" @click="deletePost"
+              ><v-icon class="me-1" icon="mdi-delete"></v-icon
+            ></v-btn>
             <v-btn @click="likePost"
               ><v-icon class="me-1" icon="mdi-heart"></v-icon
             ></v-btn>
@@ -87,7 +97,7 @@
         <v-card-text>
           <div v-for="item in comments" v-bind:key="item.id_url">
             <CommentCard
-              v-if="(item.type = 'comment')"
+              v-if="item.type == 'comment'"
               v-bind:commentData="item"
               v-bind:postData="postData"
             />
@@ -100,6 +110,7 @@
 
 <script setup lang="ts">
 import { ref, toRaw, onBeforeMount, computed } from "vue";
+import {router} from "../../main";
 import CommentCard from "./CommentCard.vue";
 import Cookies from "js-cookie";
 import { marked } from "marked";
@@ -109,6 +120,13 @@ import DOMPurify from "dompurify";
 
 import { USER_AUTHOR_ID_COOKIE, createHTTP } from "../../axiosCalls";
 import { vModelCheckbox } from "vue";
+import { onMounted } from "vue";
+
+let comments = ref({});
+const isImage = ref(false);
+const show = ref(false);
+const authorId = Cookies.get(USER_AUTHOR_ID_COOKIE);
+const loading = ref(true);
 
 const props = defineProps({
   postData: {
@@ -123,6 +141,15 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+});
+
+const isAuthorsPost = computed(() => {
+  if (!props.postData.author) {
+    return false;
+  }
+  let author_id = props.postData.author.id;
+  console.log(author_id.endsWith(authorId), 8988);
+  return author_id.endsWith(authorId);
 });
 
 let content = computed(() => {
@@ -141,14 +168,14 @@ let content = computed(() => {
   return props.postData.content;
 });
 
-console.log(toRaw(props.postData).id, 1000);
-console.log(toRaw(props.postData));
-
 async function likePost() {
+  if (!props.postData.author) {
+    return;
+  }
   await createHTTP(
-    `/authors/${encodeURI(props.postData.author.id)}/posts/${encodeURI(
-      props.postData.id
-    )}/likes/`
+    `/authors/${encodeURIComponent(
+      props.postData.author.id
+    )}/posts/${encodeURIComponent(props.postData.id)}/likes/`
   )
     .post("")
     .then((response: { data: object }) => {
@@ -156,10 +183,10 @@ async function likePost() {
     });
 }
 
-const authorId = Cookies.get(USER_AUTHOR_ID_COOKIE);
-const loading = ref(true);
-
 async function sharePost() {
+  if (!authorId) {
+    return;
+  }
   loading.value = true;
   var updatedPost = toRaw(props.postData);
   console.log(updatedPost, 1002);
@@ -172,13 +199,32 @@ async function sharePost() {
     });
 }
 
+async function deletePost() {
+  if (!props.postData.author) {
+    return;
+  }
+  loading.value = true;
+  let postId = props.postData.id;
+  postId = postId.substring(postId.lastIndexOf("/") + 1);
+  await createHTTP(`/authors/${authorId}/posts/${postId}`)
+    .delete()
+    .then((response: { data: object }) => {
+      loading.value = false;
+      router.go(0);
+      router.back();
+    });
+}
+
 const newComment = ref("");
 async function saveComment() {
+  if (!props.postData.author) {
+    return;
+  }
   console.log("newComment", newComment.value);
   await createHTTP(
-    `/authors/${encodeURI(props.postData.author.id)}/posts/${encodeURI(
-      props.postData.id
-    )}/comments/`
+    `/authors/${encodeURIComponent(
+      props.postData.author.id
+    )}/posts/${encodeURIComponent(props.postData.id)}/comments/`
   )
     .post(
       JSON.stringify({
@@ -189,30 +235,37 @@ async function saveComment() {
     )
     .then((response: { data: object }) => {
       loading.value = false;
-      // gotta do what you gotta do
-      window.history.go();
+      getComments();
     });
-
-
 }
 
-let comments = ref({});
-createHTTP(
-  `/authors/${encodeURI(props.postData.author.id)}/posts/${encodeURI(
-    props.postData.id
-  )}/comments/`
-)
-  .get()
-  .then((response) => {
-    console.log(response.data, 4567);
-    comments.value = response.data.comments;
-  });
+onMounted(() => {
+  console.log("POSTDATA", props.postData);
+  getComments();
+
+  isImage.value =
+    props.postData.author.contentType === "image/png;base64" ||
+    props.postData.author.contentType === "image/jpeg;base64";
+});
+
+function getComments() {
+  createHTTP(
+    `authors/${encodeURI(props.postData.author.id)}/posts/${encodeURI(
+      props.postData.id
+    )}/comments/`
+  )
+    .get()
+    .then((response) => {
+      console.log(response.data, 4567);
+      comments.value = response.data.comments;
+    });
+}
+
+function getPostId() {
+  return props.postData.id.substring(props.postData.id.lastIndexOf("/") + 1);
+}
 
 // defineProps<{ msg: string }>()
-const isImage =
-  props.postData.author.contentType === "image/png;base64" ||
-  props.postData.author.contentType === "image/jpeg;base64";
-const show = ref(false);
 </script>
 
 <style scoped>

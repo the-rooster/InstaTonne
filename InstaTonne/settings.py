@@ -12,24 +12,27 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 import os
+import sys
+import django_on_heroku
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 #Configure this before deployment
-HOSTNAME = "http://127.0.0.1:8000"
-FRONTEND = "http://127.0.0.1:5173"
+HOSTNAME = os.environ["HOSTNAME"] if "HOSTNAME" in os.environ else "http://127.0.0.1:8000"
+FRONTEND = os.environ["FRONTEND"] if "FRONTEND" in os.environ else "http://127.0.0.1:5173"
 
+print(HOSTNAME,FRONTEND)
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-&*@f6gvr9uj@kzi*dyrenhrxjraelqzm9bf6zb3r7#ge#c!u5+'
+SECRET_KEY = os.environ["SECRET_KEY"] if "SECRET_KEY" in os.environ else 'django-insecure-&*@f6gvr9uj@kzi*dyrenhrxjraelqzm9bf6zb3r7#ge#c!u5+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['cmput404-group6-instatonne.herokuapp.com','127.0.0.1']
 
 
 # Application definition
@@ -43,7 +46,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'InstaTonneApis.apps.InstatonneapisConfig'
+    'InstaTonneApis.apps.InstatonneapisConfig',
+    'drf_yasg'
 ]
 
 MIDDLEWARE = [
@@ -61,13 +65,17 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173", # allow frontend
     "http://localhost:3000", # allow tests
-    "http://127.0.0.1:5173"
+    "http://127.0.0.1:5173",
+    HOSTNAME,
+    FRONTEND
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173", # allow frontend
     "http://localhost:3000", # allow tests
-    "http://127.0.0.1:5173"
+    "http://127.0.0.1:5173",
+    HOSTNAME,
+    FRONTEND
 ]
 
 CORS_ALLOW_HEADERS = [
@@ -98,6 +106,8 @@ TEMPLATES = [
         },
     },
 ]
+
+
 
 WSGI_APPLICATION = 'InstaTonne.wsgi.application'
 
@@ -147,7 +157,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = 'static/'
+print("BASE DIR",BASE_DIR)
+STATIC_URL = 'assets/'
+STATIC_ROOT = BASE_DIR / 'assets_go_here'
+print("STATIC ROOT",STATIC_ROOT)
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'templates/assets',
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -161,3 +178,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ]
 }
+
+
+django_on_heroku.settings(locals(),staticfiles=False)

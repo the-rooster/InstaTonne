@@ -1,6 +1,6 @@
 from collections import OrderedDict
 from django.test import TestCase
-from .models import Author, Follow, Post, Request, Comment, Like, Inbox, AuthorSerializer, FollowSerializer, PostSerializer, RequestSerializer, CommentSerializer, LikeSerializer
+from ..models import Author, Follow, Post, Request, Comment, Like, Inbox, AuthorSerializer, FollowSerializer, PostSerializer, RequestSerializer, CommentSerializer, LikeSerializer
 
 def get_author_object(index: int):
     if index == 1:

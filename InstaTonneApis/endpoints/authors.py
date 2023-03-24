@@ -1,69 +1,102 @@
 from django.http import HttpRequest, HttpResponse
 import json
-from ..models import Author, AuthorSerializer
+from InstaTonneApis.models import Author, AuthorSerializer, AuthorsResponseSerializer
+from InstaTonneApis.endpoints.utils import valid_requesting_user, check_auth_header, isaURL, get_auth_headers
 from django.core.paginator import Paginator
-from .utils import valid_requesting_user, get_one_url, check_auth_header
-import re
+import requests
+from InstaTonneApis.endpoints.permissions import CustomPermission
+from InstaTonne.settings import HOSTNAME
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import status, permissions, serializers
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 
-def get_author_id(request : HttpRequest):
-    if request.method != "POST":
-        return HttpResponse(status=405)
-    
-    author = Author.objects.filter(userID=request.user.id) #type: ignore
+class RemoteAuthorsAPIView(APIView):
+    #permission_classes = (permissions.AllowAny,CustomPermission,)
+    permission_classes = (permissions.AllowAny,)
 
-    if not author:
-        return HttpResponse(status=404)
-    
-    author = author[0]
+    @swagger_auto_schema(
+        operation_description="get all the authors stored on a remote server [FOR LOCAL USE]",
+        responses={200: AuthorsResponseSerializer(),},
+        manual_parameters=[
+            openapi.Parameter(
+                'remote',
+                in_=openapi.IN_PATH,
+                description='URL to an author',
+                type=openapi.TYPE_STRING,
+                default=HOSTNAME + '/authors',
+            ),
+        ],
+    )
+    def get(self, request: HttpRequest, remote: str):
+        return authors_get_remote(request, remote)
 
-    res = {"id" : author.id}
 
-    return HttpResponse(content=json.dumps(res),status=200)
+class AuthorsAPIView(APIView):
+    #permission_classes = (permissions.AllowAny,CustomPermission,)
+    permission_classes = (permissions.AllowAny,)
 
-# get remote authors from url
-def remote_authors(request: HttpRequest,remote_authors : str):
-    
-    if request.method == "GET":
-        status, resp = get_one_url(remote_authors)
-        return HttpResponse(status=status,content=resp)
-    
-    return HttpResponse(status=405)
-
-def authors(request: HttpRequest):
-    if request.method == "GET":
+    @swagger_auto_schema(
+        operation_description="get all the authors stored on this server",
+        responses={200: AuthorsResponseSerializer(),},
+    )
+    def get(self, request: HttpRequest):
         return authors_get(request)
-    return HttpResponse(status=405)
 
 
-def single_author(request: HttpRequest):
-    matched = re.search(r"^\/authors\/(.*?)\/?$", request.path)
-    if matched:
-        author_id: str = matched.group(1)
-    else:
-        return HttpResponse(status=400)
+class SingleAuthorApiView(APIView):
+    #permission_classes = (permissions.AllowAny,CustomPermission,)
+    permission_classes = (permissions.AllowAny,)
 
-    if "/" in author_id and request.method == "GET":
-        return single_author_get_remote(request, author_id)
-    elif "/" in author_id:
-        return HttpResponse(status=405)
-    if request.method == "GET":
-        return single_author_get(request, author_id)
-    if request.method == "POST":
-        print("Getting into single_author_post")
-        print(request)
-        print(author_id)
+    @swagger_auto_schema(
+        operation_description="get author_id",
+        responses={200: AuthorSerializer(),},
+        manual_parameters=[
+            openapi.Parameter(
+                'author_id',
+                in_=openapi.IN_PATH,
+                description='- ID of an author stored on this server\n\nOR\n\n- URL to an author [FOR LOCAL USE]',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+        ],
+    )
+    def get(self, request: HttpRequest, author_id: str):
+        if isaURL(author_id):
+            return single_author_get_remote(request, author_id)
+        else:
+            return single_author_get(request, author_id)
+        
+    @swagger_auto_schema(
+        operation_description="update an author stored on this server",
+        responses={200: AuthorSerializer(),},
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'displayName': openapi.Schema(type=openapi.TYPE_STRING),
+                'github': openapi.Schema(type=openapi.TYPE_STRING),
+                'profileImage': openapi.Schema(type=openapi.TYPE_STRING),
+            },
+        ),
+        manual_parameters=[
+            openapi.Parameter(
+                'author_id',
+                in_=openapi.IN_PATH,
+                description='ID of the author stored on this server',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+        ],
+    )
+    def post(self, request: HttpRequest, author_id: str):
         return single_author_post(request, author_id)
-    return HttpResponse(status=405)
 
 
 # get all authors
-def authors_get(request : HttpRequest):
-
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
-    
-    authors = Author.objects.all().order_by("id")
+def authors_get(request: HttpRequest):
+    authors = Author.objects.all().filter(active=True).order_by("id")
     page_num = request.GET.get("page")
     page_size = request.GET.get("size")
 
@@ -84,29 +117,45 @@ def authors_get(request : HttpRequest):
     return HttpResponse(content=res, content_type="application/json", status=200)
 
 
+# get all remote authors
+def authors_get_remote(request: HttpRequest, remote_authors: str):
+    url = remote_authors
+    response: requests.Response = requests.get(url, headers=get_auth_headers(url))
+
+    print(response.content)
+    return HttpResponse(
+        status=response.status_code,
+        content_type=response.headers['Content-Type'],
+        content=response.content.decode('utf-8')
+    )
+
+
 # get a single author
 def single_author_get(request: HttpRequest, author_id: str):
+    author: Author | None = Author.objects.all().filter(pk=author_id).first()
 
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
-    
-    author = Author.objects.get(pk=author_id)
+    if author is None:
+        return HttpResponse(status=404)
+
     serialized_author = AuthorSerializer(author).data
-    # serialized_author["id"] = serialized_author["id_url"]
-    # del serialized_author["id_url"]
+    
     res = json.dumps(serialized_author)
     return HttpResponse(content=res, content_type="application/json", status=200)
 
 
 # get a single remote author
 def single_author_get_remote(request: HttpRequest, author_id: str):
-    status_code, text = get_one_url(author_id)
-    return HttpResponse(content=text, content_type="application/json", status=status_code)
+    url = author_id
+    response: requests.Response = requests.get(url, headers=get_auth_headers(url))
+    return HttpResponse(
+        status=response.status_code,
+        content_type=response.headers['Content-Type'],
+        content=response.content.decode('utf-8')
+    )
 
 
 # update a single author
 def single_author_post(request: HttpRequest, author_id: str):
-    
     if not valid_requesting_user(request, author_id):
         return HttpResponse(status=401)
 
@@ -130,3 +179,19 @@ def single_author_post(request: HttpRequest, author_id: str):
     except Exception as e:
         print(e)
         return HttpResponse(status=400)
+
+
+def get_author_id(request : HttpRequest):
+    if request.method != "POST":
+        return HttpResponse(status=405)
+    
+    author = Author.objects.filter(userID=request.user.id) #type: ignore
+
+    if not author:
+        return HttpResponse(status=404)
+    
+    author = author[0]
+
+    res = {"id" : author.id}
+
+    return HttpResponse(content=json.dumps(res),status=200)

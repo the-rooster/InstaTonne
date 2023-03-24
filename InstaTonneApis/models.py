@@ -32,6 +32,11 @@ class AuthorSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return Author.objects.create(**validated_data)
+    
+
+class AuthorsResponseSerializer(serializers.Serializer):
+    type = serializers.CharField(default='authors')
+    items = AuthorSerializer(many=True)
 
 
 class Follow(models.Model):
@@ -44,10 +49,16 @@ class Follow(models.Model):
 
 class FollowSerializer(serializers.ModelSerializer):
     object = AuthorSerializer()
+    actor = serializers.CharField(source='follower_url')
 
     class Meta:
         model = Follow
-        fields = ['object','summary','accepted']
+        fields = ['object','summary','accepted','actor']
+
+
+class FollowersResponseSerializer(serializers.Serializer):
+    type = serializers.CharField(default='followers')
+    items = AuthorSerializer(many=True)
 
 
 class Post(models.Model):
@@ -140,18 +151,23 @@ class Like(models.Model):
 class LikeSerializer(serializers.ModelSerializer):
     comment = CommentSerializer()
     post = PostSerializer()
+    
     class Meta:
         model = Like
         fields = ['type', 'summary', 'author', 'comment', 'post']
 
 
 class Inbox(models.Model):
+    id = models.TextField(primary_key=True, default=default_id_generator, editable=False)
     author = models.ForeignKey(Author,on_delete=models.CASCADE)
     url = models.TextField()
+
+    published = models.DateTimeField(auto_now_add=True)
 
 
 class ConnectedServer(models.Model):
     host = models.TextField()
+    api = models.TextField()
     accepted_creds = models.TextField()
     our_creds = models.TextField()
 
@@ -159,4 +175,4 @@ class ConnectedServerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model=ConnectedServer
-        fields = ['host']
+        fields = ['host','api']
