@@ -43,6 +43,28 @@ class SingleAuthorPostLikesAPIView(APIView):
         else:
             return single_post_likes_get(request, author_id, post_id)
         
+
+    @swagger_auto_schema(
+        operation_description="post a like to the post whose id is POST_ID",
+        operation_id="single_post_likes",
+        responses={204: "success"},
+        manual_parameters=[
+            openapi.Parameter(
+                'author_id',
+                in_=openapi.IN_PATH,
+                description='- ID of an author stored on this server\n\nOR\n\n- URL to an author [FOR LOCAL USE]',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+            openapi.Parameter(
+                'post_id',
+                in_=openapi.IN_PATH,
+                description='- ID of a post stored on this server\n\nOR\n\n- URL to a post [FOR LOCAL USE]',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+        ],
+    )
     def post(self, request: HttpRequest, author_id : str, post_id: str):
 
         if isaURL(post_id):
@@ -87,11 +109,37 @@ class SingleAuthorPostCommentLikesAPIView(APIView):
         else:
             return single_comment_likes_get(request, author_id, post_id, comment_id)
         
+    @swagger_auto_schema(
+        operation_description="post a like to the comment whose id is COMMENT_ID",
+        operation_id="single_comment_likes",
+        responses={204: "success"},
+        manual_parameters=[
+            openapi.Parameter(
+                'author_id',
+                in_=openapi.IN_PATH,
+                description='- ID of an author stored on this server\n\nOR\n\n- URL to an author [FOR LOCAL USE]',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+            openapi.Parameter(
+                'post_id',
+                in_=openapi.IN_PATH,
+                description='- ID of a post stored on this server\n\nOR\n\n- URL to a post [FOR LOCAL USE]',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+            openapi.Parameter(
+                'comment_id',
+                in_=openapi.IN_PATH,
+                description='- ID of a comment stored on this server\n\nOR\n\n- URL to a comment [FOR LOCAL USE]',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+        ],
+    )
     def post(self,request: HttpRequest,author_id : str,post_id : str, comment_id: str):
-
         if isaURL(comment_id):
             return single_comment_likes_post_remote(request,author_id,post_id,comment_id)
-        
         return single_comment_likes_post(request,author_id,post_id,comment_id)
         
 
