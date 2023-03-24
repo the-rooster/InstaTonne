@@ -103,9 +103,8 @@ import Cookies from "js-cookie";
 import {
   createHTTP,
   createFormBody,
-  USER_AUTHOR_ID_COOKIE,
 } from "../axiosCalls";
-import { router } from "../main";
+import { USER_AUTHOR_ID_COOKIE } from "../constants";
 
 
 const emits = defineEmits(["LoggedIn"]);

@@ -37,9 +37,8 @@ import PostFullCard from "./stream_cards/PostFullCard.vue";
 import InboxCommentCard from "./stream_cards/InboxCommentCard.vue";
 import LikeCommentCard from "./stream_cards/InboxLikeCard.vue";
 import Cookies from "js-cookie";
-// defineProps<{ msg: string }>()
-
-import { USER_AUTHOR_ID_COOKIE, createHTTP } from "../axiosCalls";
+import { createHTTP } from "../axiosCalls";
+import { USER_AUTHOR_ID_COOKIE } from "../constants";
 
 let posts = ref({});
 

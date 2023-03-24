@@ -1,16 +1,15 @@
 // import Cookies from "js-cookie";
-// import { USER_AUTHOR_ID_COOKIE } from "../../src/axiosCalls";
-const USER_AUTHOR_ID_COOKIE = "InstatonneAuthorId";
+import { USER_AUTHOR_ID_COOKIE } from "../../src/constants";
 
 describe('e2e tests', () => {
   it('can login', () => {
-    cy.intercept('POST', '/login/', { fixture: '../../src/exampleLoginResponse.json' }).as('getLogin')
+    // cy.intercept('POST', '/login/', { fixture: '../../src/exampleLoginResponse.json' }).as('getLogin')
 
-    cy.intercept('GET', '/authors/1', { fixture: '../../src/exampleAuthorData.json' }).as('getAuthor')
+    // cy.intercept('GET', '/authors/1', { fixture: '../../src/exampleAuthorData.json' }).as('getAuthor')
 
-    cy.intercept('GET', '/authors/1/inbox/', { fixture: '../../src/exampleInbox.json' }).as('getInbox')
+    // cy.intercept('GET', '/authors/1/inbox/', { fixture: '../../src/exampleInbox.json' }).as('getInbox')
   
-    cy.intercept('GET', '/csrf/', []).as('getCSRF')
+    // cy.intercept('GET', '/csrf/', []).as('getCSRF')
 
     cy.clearCookie(USER_AUTHOR_ID_COOKIE);
 
@@ -21,6 +20,9 @@ describe('e2e tests', () => {
     cy.get("input#input-2").type("password1")
 
     cy.contains("Login").click()
+
+    // wait for backend
+    cy.wait(5000)
     
     cy.get("h1").should("contain", "Your Stream")
 

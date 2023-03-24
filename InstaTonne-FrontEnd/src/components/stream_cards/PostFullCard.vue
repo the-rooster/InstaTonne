@@ -118,7 +118,8 @@ import DOMPurify from "dompurify";
 
 // defineProps<{ msg: string }>()
 
-import { USER_AUTHOR_ID_COOKIE, createHTTP } from "../../axiosCalls";
+import { createHTTP } from "../../axiosCalls";
+import { USER_AUTHOR_ID_COOKIE } from "../../constants";
 import { vModelCheckbox } from "vue";
 import { onMounted } from "vue";
 

@@ -35,7 +35,7 @@ import UserSearch from "./components/UserSearch.vue";
 import UserPost from "./components/UserPost.vue";
 import FriendsPage from "./components/FriendsPage.vue";
 import EditProfilePage from "./components/EditProfilePage.vue";
-import { USER_AUTHOR_ID_COOKIE } from "./axiosCalls";
+import { USER_AUTHOR_ID_COOKIE } from "./constants";
 // 2. Define some routes
 // Each route should map to a component.
 // We'll talk about nested routes later.

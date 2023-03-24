@@ -41,7 +41,8 @@
 import { ref, onBeforeMount, computed } from 'vue'
 import FriendCard from './stream_cards/FriendCard.vue'
 import FollowRequestCard from './stream_cards/FollowRequestCard.vue'
-import { createHTTP, USER_AUTHOR_ID_COOKIE } from '../axiosCalls'
+import { createHTTP } from "../axiosCalls";
+import { USER_AUTHOR_ID_COOKIE } from "../constants";
 import Cookies from "js-cookie";
 
 const loading = ref(true)

@@ -64,7 +64,8 @@
 import { ref, onBeforeMount, computed, watch } from 'vue'
 import { RouterView, useRoute } from 'vue-router';
 import { nav_bar_routes as routes, router } from "./main"
-import { createHTTP, USER_AUTHOR_ID_COOKIE } from './axiosCalls'
+import { createHTTP } from './axiosCalls'
+import { USER_AUTHOR_ID_COOKIE } from './constants'
 import LoginPage from './components/LoginPage.vue'
 import Cookies from 'js-cookie';
 
