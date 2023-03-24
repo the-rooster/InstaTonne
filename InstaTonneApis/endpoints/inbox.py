@@ -236,9 +236,8 @@ def parse_inbox_follow_request(data : dict, user: Author):
 @csrf_exempt
 def post_inbox(request: HttpRequest, author_id: str):
     #parse request body
-    data = request.body
     try:
-        data = json.loads(data)
+        data = request.data
     except Exception as e:
         return HttpResponse(content="expected json!",status=400)
     

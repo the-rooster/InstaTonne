@@ -83,7 +83,8 @@ def send_to_single_inbox(author_url : str, data : dict):
     try:
         response: requests.Response = requests.post(inbox_url,
                                                     json.dumps(data),headers={"Origin" : HOSTNAME, 
-                                                                            "Authentication" : get_auth_header_for_server(author_url)})
+                                                                            "Authentication" : get_auth_header_for_server(author_url),
+                                                                            "Content-Type":"application/json"})
     except Exception as e:
         print(e)
         print("SERVER DOWN! Returning 404")
@@ -125,8 +126,10 @@ def author_follows_follower(author_url: str, follower_url: str) -> bool:
 def post_to_follower_inbox(follower_url: str, data: dict) -> bool:
     follower_url = follower_url.strip("/")
     inbox_url: str = follower_url + '/inbox/'
+    headers = get_auth_headers(follower_url)
+    headers['Content-Type'] = "application/json"
     try:
-        response: requests.Response = requests.post(inbox_url, json.dumps(data), headers=get_auth_headers(follower_url))
+        response: requests.Response = requests.post(inbox_url, json.dumps(data), headers=headers)
     except Exception as e:
         print("SERVER DOWN!")
         return True
