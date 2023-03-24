@@ -121,6 +121,11 @@ class RequestSerializer(serializers.ModelSerializer):
         fields = ['type','summary','published','actor','object']
 
 
+class RequestResponseSerializer(serializers.Serializer):
+    type = serializers.CharField(default='request')
+    items = RequestSerializer(many=True)
+
+
 class Comment(models.Model):
     id = models.TextField(primary_key=True, default=default_id_generator, editable=False)
     type = models.TextField()
@@ -139,6 +144,11 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ['type', 'id', 'contentType', 'comment', 'published', 'author']
+
+
+class CommentsResponseSerializer(serializers.Serializer):
+    type = serializers.CharField(default='comments')
+    items = CommentSerializer(many=True)
 
 
 class Like(models.Model):
@@ -162,6 +172,11 @@ class LikeSerializer(serializers.ModelSerializer):
         fields = ['type', 'summary', 'author', 'comment', 'post']
 
 
+class LikesResponseSerializer(serializers.Serializer):
+    type = serializers.CharField(default='likes')
+    items = LikeSerializer(many=True)
+
+
 class Inbox(models.Model):
     id = models.TextField(primary_key=True, default=default_id_generator, editable=False)
     author = models.ForeignKey(Author,on_delete=models.CASCADE)
@@ -170,11 +185,24 @@ class Inbox(models.Model):
     published = models.DateTimeField(auto_now_add=True)
 
 
+class InboxSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='id_url')
+    class Meta:
+        model = Inbox
+        fields = ['id', 'author', 'url', 'published']   
+
+
+class InboxResponseSerializer(serializers.Serializer):
+    type = serializers.CharField(default='inbox')
+    items = InboxSerializer(many=True)
+
+
 class ConnectedServer(models.Model):
     host = models.TextField()
     api = models.TextField()
     accepted_creds = models.TextField()
     our_creds = models.TextField()
+
 
 class ConnectedServerSerializer(serializers.ModelSerializer):
 
