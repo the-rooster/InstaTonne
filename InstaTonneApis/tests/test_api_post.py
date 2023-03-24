@@ -205,12 +205,12 @@ class PostApiTestCase(AbstractApiTestCase):
         mocked_post.return_value = self.generic_mock_response()
 
         post = Post.objects.all().filter(
-            id_url=HOST + '/authors/1/posts/3'
+            id_url=HOST + '/authors/1/posts/4'
         ).first()
         assert post is None
     
         response : HttpResponse = self.client.put(
-            HOST + '/authors/1/posts/3',
+            HOST + '/authors/1/posts/4',
             {
                 "title" : "title3",
                 "source" : "source3",
@@ -229,7 +229,7 @@ class PostApiTestCase(AbstractApiTestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         post = Post.objects.all().filter(
-            id_url=HOST + '/authors/1/posts/3',
+            id_url=HOST + '/authors/1/posts/4',
             title="title3",
             source="source3",
             origin="origin3",

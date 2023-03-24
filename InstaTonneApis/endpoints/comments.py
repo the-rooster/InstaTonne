@@ -1,11 +1,81 @@
 from django.http import HttpRequest, HttpResponse
 import json
-from ..models import Post, PostSerializer, Comment, Author, CommentSerializer
+from ..models import Post, PostSerializer, Comment, Author, CommentSerializer, CommentsResponseSerializer
 from django.core.paginator import Paginator
 from .utils import make_comment_url, make_comments_url, get_one_url, make_author_url, send_to_single_inbox, check_authenticated, check_auth_header, isaURL, get_auth_headers
 import requests
 import re
 from InstaTonne.settings import HOSTNAME
+
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import status, permissions, serializers
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+
+class SingleAuthorPostCommentsAPIView(APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    @swagger_auto_schema(
+        operation_description="get the list of comments of the post whose id is POST_ID (paginated)",
+        operation_id="single_post_comments",
+        responses={200: CommentsResponseSerializer()},
+        manual_parameters=[
+            openapi.Parameter(
+                'author_id',
+                in_=openapi.IN_PATH,
+                description='- ID of an author stored on this server\n\nOR\n\n- URL to an author [FOR LOCAL USE]',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+            openapi.Parameter(
+                
+                'post_id',
+                in_=openapi.IN_PATH,
+                description='- ID of a post stored on this server\n\nOR\n\n- URL to a post [FOR LOCAL USE]',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+        ],
+    )
+    def get(self, request: HttpRequest, author_id: str, post_id: str):
+        if isaURL(post_id):
+            return single_post_comments_get_remote(request, author_id, post_id)
+        else:
+            return single_post_comments_get(request, author_id, post_id)
+        
+    @swagger_auto_schema(
+        operation_description="add a comment to the post whose id is POST_ID",
+        operation_id="single_post_comments",
+        responses={204: 'success',},
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "comment": openapi.Schema(type=openapi.TYPE_STRING),
+                "contentType": openapi.Schema(type=openapi.TYPE_STRING),
+            },
+        ),
+        manual_parameters=[
+            openapi.Parameter(
+                'author_id',
+                in_=openapi.IN_PATH,
+                description='- ID of an author stored on this server\n\nOR\n\n- URL to an author [FOR LOCAL USE]',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+            openapi.Parameter(
+                
+                'post_id',
+                in_=openapi.IN_PATH,
+                description='- ID of a post stored on this server\n\nOR\n\n- URL to a post [FOR LOCAL USE]',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+        ],
+    )
+    def post(self, request: HttpRequest, author_id: str, post_id: str):
+        return single_post_comments_post(request, author_id, post_id)
 
 
 # handle requests for the comments of a post

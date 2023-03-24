@@ -2,7 +2,7 @@
   <div class="viewBox">
     <div style="justify-content:center;align-items:center;position:relative;top:0%;left:43%;z-index:100">
     <v-card height="5vh" width="10vw">
-      <h3>Your Stream</h3>
+      <h3 id="homeHeader">Your Stream</h3>
       <br>
     </v-card>
     </div>
