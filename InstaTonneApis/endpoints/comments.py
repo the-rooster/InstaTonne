@@ -80,8 +80,8 @@ class SingleAuthorPostCommentsAPIView(APIView):
 
 # handle requests for the comments of a post
 def single_post_comments(request: HttpRequest, author_id: str, post_id: str):
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
+    # if not check_auth_header(request):
+    #     return HttpResponse(status=401)
 
     if isaURL(post_id) and request.method == "GET":
         return single_post_comments_get_remote(request, author_id, post_id)
@@ -103,8 +103,8 @@ def single_post_comments(request: HttpRequest, author_id: str, post_id: str):
 
 # handle requests for a single comment of a post
 def single_post_comment(request: HttpRequest, author_id: str, post_id: str, comment_id: str):
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
+    # if not check_auth_header(request):
+    #     return HttpResponse(status=401)
 
     if request.method == "GET":
         return get_single_comment_local(request, author_id, post_id, comment_id)
@@ -163,10 +163,11 @@ def single_post_comments_post_remote(request: HttpRequest, author_id : str, post
     author: Author | None = Author.objects.all().filter(userID=request.user.pk).first()
     
     if not author:
+        print("HERE?")
         return HttpResponse(status=401)
     
     try:
-        body: dict = json.loads(request.body)
+        body: dict = json.loads(request.data)
         comment: dict = {
             "type" : "comment",
             "contentType" : body["contentType"],
@@ -188,6 +189,7 @@ def single_post_comments_post(request: HttpRequest, author_id: str, post_id: str
     author: Author | None = Author.objects.all().filter(userID=request.user.pk).first()
 
     if not author:
+        print("HERE",request.user.pk)
         return HttpResponse(status=401)
     
     post: Post | None = Post.objects.all().filter(pk=post_id).first()
@@ -196,7 +198,7 @@ def single_post_comments_post(request: HttpRequest, author_id: str, post_id: str
         return HttpResponse(status=404)
     
     try:
-        body: dict = json.loads(request.body)
+        body: dict = json.loads(request.data)
         comment: dict = {
             "type" : "comment",
             "contentType" : body["contentType"],
