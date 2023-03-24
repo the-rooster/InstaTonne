@@ -5,13 +5,15 @@ from django.shortcuts import render, redirect
 from InstaTonneApis.models import Author
 from InstaTonne.forms import RegisterForm
 from InstaTonne.settings import HOSTNAME
+import json
 
 def register_author(request : HttpRequest):
 
     if request.method != "POST":
         return HttpResponse(status=405)
 
-    form = RegisterForm(request.data)
+    data = json.loads(request.body)
+    form = RegisterForm(data)
 
     if not form.is_valid():
         form.add_error("username","Form is invalid.")
