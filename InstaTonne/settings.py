@@ -30,7 +30,7 @@ print(HOSTNAME,FRONTEND)
 SECRET_KEY = os.environ["SECRET_KEY"] if "SECRET_KEY" in os.environ else 'django-insecure-&*@f6gvr9uj@kzi*dyrenhrxjraelqzm9bf6zb3r7#ge#c!u5+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['cmput404-group6-instatonne.herokuapp.com','127.0.0.1']
 
