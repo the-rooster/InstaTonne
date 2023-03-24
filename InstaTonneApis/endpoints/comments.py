@@ -80,8 +80,8 @@ class SingleAuthorPostCommentsAPIView(APIView):
 
 # handle requests for the comments of a post
 def single_post_comments(request: HttpRequest, author_id: str, post_id: str):
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
+    # if not check_auth_header(request):
+    #     return HttpResponse(status=401)
 
     if isaURL(post_id) and request.method == "GET":
         return single_post_comments_get_remote(request, author_id, post_id)

@@ -262,6 +262,7 @@ def single_author_post_get(request: HttpRequest, author_id: str, post_id: str):
     requesting_author : Author | None = Author.objects.all().filter(userID=request.user.pk).first()
 
     if requesting_author and post.visibility == "FRIENDS" and not check_if_friends_local(post.author,requesting_author):
+        print("HERE")
         print('DO NOT SHOW')
         return HttpResponse(status=401)
 
@@ -286,8 +287,7 @@ def single_author_post_get_remote(request: HttpRequest, author_id: str, post_id:
     if "visibility" not in post:
         return HttpResponse(status=401)
 
-    if requesting_author and post["visibility"] == "FRIENDS" and not check_if_friends_remote(requesting_author,post["author"]["id"]) or \
-        not check_auth_header(request):
+    if requesting_author and post["visibility"] == "FRIENDS" and not check_if_friends_remote(requesting_author,post["author"]["id"]):
         print('DO NOT SHOW')
         return HttpResponse(status=401)
     

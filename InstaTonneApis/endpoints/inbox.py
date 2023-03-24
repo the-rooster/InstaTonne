@@ -81,8 +81,8 @@ class InboxAPIView(APIView):
 
 # handle requests to the inbox
 def inbox_endpoint(request: HttpRequest, author_id: str):
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
+    # if not check_auth_header(request):
+    #     return HttpResponse(status=401)
     
     if request.method == "GET":
         return get_inbox(request, author_id)

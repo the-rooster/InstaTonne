@@ -271,8 +271,8 @@ def check_author_follower_remote(request : HttpRequest, author_id : str, foreign
 
 #get the actual request object. this is for our local front end ONLY (for the inbox to retrieve follow requests)
 def get_request_object(request: HttpRequest, author_id: str, foreign_author_id: str):
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
+    # if not check_auth_header(request):
+    #     return HttpResponse(status=401)
 
     print("GETTING REQUEST OBJECT")
     if request.method != "GET":

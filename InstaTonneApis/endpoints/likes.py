@@ -109,8 +109,8 @@ class SingleAuthorLikesAPIView(APIView):
 
 # handle requests for the likes of a post
 def single_post_likes(request: HttpRequest, author_id: str, post_id: str):
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
+    # if not check_auth_header(request):
+    #     return HttpResponse(status=401)
 
     if isaURL(post_id) and request.method == "GET":
         return single_post_likes_get_remote(request, author_id, post_id)
@@ -132,8 +132,8 @@ def single_post_likes(request: HttpRequest, author_id: str, post_id: str):
 
 # handle requests for a single like of a comment
 def single_comment_like(request: HttpRequest, author_id: str, post_id: str, comment_id: str, like_id: str):
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
+    # if not check_auth_header(request):
+    #     return HttpResponse(status=401)
 
     if request.method == "GET":
         return get_single_like_comment_local(request, author_id, post_id, comment_id, like_id)
@@ -143,8 +143,8 @@ def single_comment_like(request: HttpRequest, author_id: str, post_id: str, comm
 
 # handle requests for a single like of a post
 def single_post_like(request: HttpRequest, author_id: str, post_id: str, like_id: str):
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
+    # if not check_auth_header(request):
+    #     return HttpResponse(status=401)
 
     if request.method == "GET":
         return get_single_like_post_local(request, author_id, post_id, like_id)
@@ -154,8 +154,8 @@ def single_post_like(request: HttpRequest, author_id: str, post_id: str, like_id
 
 # handle requests for the likes of a comment
 def single_comment_likes(request: HttpRequest, author_id: str, post_id: str, comment_id: str):
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
+    # if not check_auth_header(request):
+    #     return HttpResponse(status=401)
 
     if isaURL(comment_id) and request.method == "GET":
         return single_comment_likes_get_remote(request, author_id, post_id, comment_id)
@@ -177,8 +177,8 @@ def single_comment_likes(request: HttpRequest, author_id: str, post_id: str, com
 
 # handle requests for the likes of an author
 def single_author_likes(request: HttpRequest, author_id: str):
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
+    # if not check_auth_header(request):
+    #     return HttpResponse(status=401)
 
     if isaURL(author_id) and request.method == "GET":
         return single_author_likes_get_remote(request, author_id)
