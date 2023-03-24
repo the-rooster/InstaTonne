@@ -384,7 +384,7 @@ def single_author_post_post(request: HttpRequest, author_id: str, post_id: str):
         
 
     
-        body: dict = json.loads(request.body)
+        body: dict = json.loads(request.data)
 
         if "title" in body:
             post.title = body["title"]
@@ -419,7 +419,7 @@ def single_author_posts_post(request: HttpRequest, author_id: str):
         if author is None:
             return HttpResponse(status=404)
         
-        body: dict = json.loads(request.body)
+        body: dict = json.loads(request.data)
         #if were creating an image, create a seperate unlisted post with the image to link to
         if body["contentType"] == PNG_CONTENT_TYPE or body["contentType"] == JPEG_CONTENT_TYPE:
             print("CREATING UNLISTED IMAGE POST")
@@ -461,7 +461,7 @@ def single_author_posts_post(request: HttpRequest, author_id: str):
 
 #make image post to link to markdown post
 def make_image_post(request : HttpRequest,author: Author,author_id : str):
-    body: dict = json.loads(request.body)
+    body: dict = json.loads(request.data)
     post: Post = Post.objects.create(
         type = "post",
         title = "image",
@@ -512,7 +512,7 @@ def single_author_post_put(request: HttpRequest, author_id: str, post_id: str):
         if existing_post is not None:
             return single_author_post_post(request, author_id, post_id)
         
-        body: dict = json.loads(request.body)
+        body: dict = json.loads(request.data)
         post: Post = Post.objects.create(
             id = post_id,
             id_url = make_post_url(HOSTNAME, author_id, post_id),
