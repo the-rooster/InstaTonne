@@ -164,7 +164,11 @@ def post_author_follower(request: HttpRequest, author_id : str, foreign_author_i
         "summary": author.displayName + " wants to follow " + author_response.json()["displayName"]
     }
 
-    inbox_response: requests.Response = requests.post(foreign_author_id + '/inbox/', json.dumps(serialized_follow), headers=get_auth_headers(foreign_author_id))
+    headers = get_auth_headers(foreign_author_id)
+
+    headers["Content-Type"] = "application/json"
+
+    inbox_response: requests.Response = requests.post(foreign_author_id + '/inbox/', json.dumps(serialized_follow), headers=headers)
 
     return HttpResponse(
         status=inbox_response.status_code,

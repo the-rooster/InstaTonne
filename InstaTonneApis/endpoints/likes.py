@@ -42,6 +42,12 @@ class SingleAuthorPostLikesAPIView(APIView):
             return single_post_likes_get_remote(request, author_id, post_id)
         else:
             return single_post_likes_get(request, author_id, post_id)
+        
+    def post(self, request: HttpRequest, author_id : str, post_id: str):
+
+        if isaURL(post_id):
+            return single_post_likes_post_remote(request,author_id,post_id)
+        return single_post_likes_post(request,author_id,post_id)
 
 
 class SingleAuthorPostCommentLikesAPIView(APIView):
@@ -81,6 +87,13 @@ class SingleAuthorPostCommentLikesAPIView(APIView):
         else:
             return single_comment_likes_get(request, author_id, post_id, comment_id)
         
+    def post(self,request: HttpRequest,author_id : str,post_id : str, comment_id: str):
+
+        if isaURL(comment_id):
+            return single_comment_likes_post_remote(request,author_id,post_id,comment_id)
+        
+        return single_comment_likes_post(request,author_id,post_id,comment_id)
+        
 
 class SingleAuthorLikesAPIView(APIView):
     permission_classes = (permissions.AllowAny,)
@@ -104,6 +117,8 @@ class SingleAuthorLikesAPIView(APIView):
             return single_author_likes_get_remote(request, author_id)
         else:
             return single_author_likes_get(request, author_id)
+        
+
         
 
 

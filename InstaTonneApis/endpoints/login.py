@@ -11,10 +11,17 @@ import json
 def login(request : HttpRequest):
 
     
+    print("HERRHHEEHRHR")
     if request.method != "POST":
         return HttpResponse(status=405)
 
-    form = LoginForm(request.POST)
+    try:
+        data = json.loads(request.body)
+    except Exception as e:
+        print("EXCEPTION IN LOGIN: ",e)
+        return HttpResponse(status=400)
+    print(request.body,request.POST,data)
+    form = LoginForm(data)
 
 
     if not form.is_valid():
@@ -47,5 +54,7 @@ def login(request : HttpRequest):
     res = json.dumps({
         "authorId": author.id
     })
+
+    print(res)
 
     return HttpResponse(status=200, content=res)

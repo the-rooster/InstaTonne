@@ -75,6 +75,10 @@ class SingleAuthorPostCommentsAPIView(APIView):
         ],
     )
     def post(self, request: HttpRequest, author_id: str, post_id: str):
+
+        if isaURL(post_id):
+            return single_post_comments_post_remote(request,author_id,post_id)
+        
         return single_post_comments_post(request, author_id, post_id)
 
 
@@ -117,6 +121,7 @@ def single_post_comments_get(request: HttpRequest, author_id: str, post_id: str)
     post: Post | None = Post.objects.all().filter(pk=post_id).first()
 
     if post is None:
+        print("HERE3")
         return HttpResponse(status=404)
     
     comments = Comment.objects.all().filter(post=post_id).order_by("published")
@@ -167,7 +172,9 @@ def single_post_comments_post_remote(request: HttpRequest, author_id : str, post
         return HttpResponse(status=401)
     
     try:
-        body: dict = json.loads(request.data)
+        print(request.data)
+        body: dict = request.data
+        print(body)
         comment: dict = {
             "type" : "comment",
             "contentType" : body["contentType"],
@@ -195,10 +202,12 @@ def single_post_comments_post(request: HttpRequest, author_id: str, post_id: str
     post: Post | None = Post.objects.all().filter(pk=post_id).first()
 
     if post is None:
+        print("HERE2",post_id)
         return HttpResponse(status=404)
     
     try:
-        body: dict = json.loads(request.data)
+        print(request.data)
+        body: dict = request.data
         comment: dict = {
             "type" : "comment",
             "contentType" : body["contentType"],
