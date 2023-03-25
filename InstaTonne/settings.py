@@ -85,7 +85,8 @@ CSRF_TRUSTED_ORIGINS = [
 CORS_ALLOW_HEADERS = [
     "X-CSRFToken",
     "Cookie",
-    "Authorization"
+    "Authorization",
+    "Content-Type"
 ]
 
 CSRF_COOKIE_HTTPONLY = False
