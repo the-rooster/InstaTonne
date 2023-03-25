@@ -66,6 +66,10 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173", # allow frontend
     "http://localhost:3000", # allow tests
     "http://127.0.0.1:5173",
+    "https://t20-social-distribution.herokuapp.com",
+    "https://social-distribution-media.herokuapp.com",
+    "https://group-13-epic-app.herokuapp.com",
+    "https://epic-app.vercel.app",
     HOSTNAME,
     FRONTEND
 ]
@@ -81,6 +85,7 @@ CSRF_TRUSTED_ORIGINS = [
 CORS_ALLOW_HEADERS = [
     "X-CSRFToken",
     "Cookie",
+    "Authorization"
 ]
 
 CSRF_COOKIE_HTTPONLY = False
