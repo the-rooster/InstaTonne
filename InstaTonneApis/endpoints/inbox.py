@@ -81,8 +81,7 @@ class InboxAPIView(APIView):
 
 # handle requests to the inbox
 def inbox_endpoint(request: HttpRequest, author_id: str):
-    # if not check_auth_header(request):
-    #     return HttpResponse(status=401)
+
     
     if request.method == "GET":
         return get_inbox(request, author_id)
@@ -208,6 +207,7 @@ def parse_inbox_like(data):
 
 
 def parse_inbox_post(data):
+
     if "id" not in data:
         print('ERROR: no id field in body')
         return None
@@ -216,6 +216,15 @@ def parse_inbox_post(data):
 
 
 def parse_inbox_follow_request(data : dict, user: Author):
+
+    #ensure that the follow request is valid
+    if "actor" not in data:
+        print("INBOX FOLLOW REQUEST BROKEN!")
+        return None
+    if "summary" not in data:
+        print("INBOX FOLLOW REQUEST BROKEN!")
+        return None
+    
     try:
         #parse expected fields in follow request here
         actor_id = data["actor"]["id"]
@@ -241,6 +250,7 @@ def post_inbox(request: HttpRequest, author_id: str):
     except Exception as e:
         return HttpResponse(content="expected json!",status=400)
     
+
     #receiver author object
     author: Author | None = Author.objects.all().filter(pk=author_id).first()
 

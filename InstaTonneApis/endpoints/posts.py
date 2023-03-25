@@ -287,6 +287,7 @@ def single_author_post_get_remote(request: HttpRequest, author_id: str, post_id:
     print("HERE:",response.content)
     post = json.loads(response.content)
 
+    print("YAHOOO")
     post = adapter_get_remote_single_post(post,url)
 
     if "visibility" not in post:
