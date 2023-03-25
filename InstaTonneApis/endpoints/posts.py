@@ -13,7 +13,7 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, permissions, serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from ..adapters.adapters import adapter_get_remote_posts
+from ..adapters.adapters import adapter_get_remote_posts, adapter_get_remote_single_post
 
 
 PNG_CONTENT_TYPE = "image/png;base64"
@@ -286,6 +286,8 @@ def single_author_post_get_remote(request: HttpRequest, author_id: str, post_id:
 
     print("HERE:",response.content)
     post = json.loads(response.content)
+
+    post = adapter_get_remote_single_post(post)
 
     if "visibility" not in post:
         return HttpResponse(status=401)
