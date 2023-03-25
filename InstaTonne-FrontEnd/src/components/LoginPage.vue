@@ -139,7 +139,7 @@ async function login() {
   };
 
   await createHTTP("login/")
-    .post(createFormBody(credentials))
+    .post(credentials)
     .then((response: { authorId: string }) => {
       // login worked. Set cookies to show we are logged in
       // We assume that the session got set, if it didn't then the user needs to log in again

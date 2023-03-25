@@ -11,9 +11,14 @@
           ></v-avatar>
         </template> -->
 
-        <v-list-item-title>{{
-          props.postData.author?.displayName
-        }}</v-list-item-title>
+        <v-list-item-title
+          ><a
+            :href="`/app/ProfilePage/${encodeURIComponent(
+              props.postData.author?.url
+            )}/`"
+            >{{ props.postData.author?.displayName }}</a
+          ></v-list-item-title
+        >
 
         <v-list-item-subtitle>{{
           props.postData.author?.host
@@ -100,6 +105,7 @@
 
 <script setup lang="ts">
 import { ref, toRaw, onBeforeMount, computed } from "vue";
+import { router } from "../../main";
 import CommentCard from "./CommentCard.vue";
 import Cookies from "js-cookie";
 import { marked } from "marked";
@@ -180,6 +186,22 @@ async function sharePost() {
     .post(JSON.stringify(updatedPost))
     .then((response: { data: object }) => {
       loading.value = false;
+    });
+}
+
+async function deletePost() {
+  if (!props.postData.author) {
+    return;
+  }
+  loading.value = true;
+  let postId = props.postData.id;
+  postId = postId.substring(postId.lastIndexOf("/") + 1);
+  await createHTTP(`/authors/${authorId}/posts/${postId}`)
+    .delete()
+    .then((response: { data: object }) => {
+      loading.value = false;
+      router.go(0);
+      router.back();
     });
 }
 

@@ -1,16 +1,131 @@
 from django.http import HttpRequest, HttpResponse
 import json
-from ..models import Post, Comment, Author, Like, LikeSerializer
+from ..models import Post, Comment, Author, Like, LikeSerializer, LikesResponseSerializer
 from .utils import get_one_url, make_author_url, send_to_single_inbox, check_auth_header, get_auth_headers, isaURL
 import requests
 import re
 from InstaTonne.settings import HOSTNAME
 
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import status, permissions, serializers
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+
+class SingleAuthorPostLikesAPIView(APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    @swagger_auto_schema(
+        operation_description="get the list of likes of the post whose id is POST_ID (paginated)",
+        operation_id="single_post_likes",
+        responses={200: LikesResponseSerializer()},
+        manual_parameters=[
+            openapi.Parameter(
+                'author_id',
+                in_=openapi.IN_PATH,
+                description='- ID of an author stored on this server\n\nOR\n\n- URL to an author [FOR LOCAL USE]',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+            openapi.Parameter(
+                'post_id',
+                in_=openapi.IN_PATH,
+                description='- ID of a post stored on this server\n\nOR\n\n- URL to a post [FOR LOCAL USE]',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+        ],
+    )
+    def get(self, request: HttpRequest, author_id: str, post_id: str):
+        if isaURL(post_id):
+            return single_post_likes_get_remote(request, author_id, post_id)
+        else:
+            return single_post_likes_get(request, author_id, post_id)
+        
+    def post(self, request: HttpRequest, author_id : str, post_id: str):
+
+        if isaURL(post_id):
+            return single_post_likes_post_remote(request,author_id,post_id)
+        return single_post_likes_post(request,author_id,post_id)
+
+
+class SingleAuthorPostCommentLikesAPIView(APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    @swagger_auto_schema(
+        operation_description="get the list of likes of the comment whose id is COMMENT_ID (paginated)",
+        operation_id="single_comment_likes",
+        responses={200: LikesResponseSerializer()},
+        manual_parameters=[
+            openapi.Parameter(
+                'author_id',
+                in_=openapi.IN_PATH,
+                description='- ID of an author stored on this server\n\nOR\n\n- URL to an author [FOR LOCAL USE]',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+            openapi.Parameter(
+                'post_id',
+                in_=openapi.IN_PATH,
+                description='- ID of a post stored on this server\n\nOR\n\n- URL to a post [FOR LOCAL USE]',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+            openapi.Parameter(
+                'comment_id',
+                in_=openapi.IN_PATH,
+                description='- ID of a comment stored on this server\n\nOR\n\n- URL to a comment [FOR LOCAL USE]',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+        ],
+    )
+    def get(self, request: HttpRequest, author_id: str, post_id: str, comment_id: str):
+        if isaURL(comment_id):
+            return single_comment_likes_get_remote(request, author_id, post_id, comment_id)
+        else:
+            return single_comment_likes_get(request, author_id, post_id, comment_id)
+        
+    def post(self,request: HttpRequest,author_id : str,post_id : str, comment_id: str):
+
+        if isaURL(comment_id):
+            return single_comment_likes_post_remote(request,author_id,post_id,comment_id)
+        
+        return single_comment_likes_post(request,author_id,post_id,comment_id)
+        
+
+class SingleAuthorLikesAPIView(APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    @swagger_auto_schema(
+        operation_description="get the list of likes of the author whose id is AUTHOR_ID (paginated)",
+        operation_id="single_author_likes",
+        responses={200: LikesResponseSerializer()},
+        manual_parameters=[
+            openapi.Parameter(
+                'author_id',
+                in_=openapi.IN_PATH,
+                description='- ID of an author stored on this server\n\nOR\n\n- URL to an author [FOR LOCAL USE]',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+        ],
+    )
+    def get(self, request: HttpRequest, author_id: str):
+        if isaURL(author_id):
+            return single_author_likes_get_remote(request, author_id)
+        else:
+            return single_author_likes_get(request, author_id)
+        
+
+        
+
 
 # handle requests for the likes of a post
 def single_post_likes(request: HttpRequest, author_id: str, post_id: str):
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
+    # if not check_auth_header(request):
+    #     return HttpResponse(status=401)
 
     if isaURL(post_id) and request.method == "GET":
         return single_post_likes_get_remote(request, author_id, post_id)
@@ -32,8 +147,8 @@ def single_post_likes(request: HttpRequest, author_id: str, post_id: str):
 
 # handle requests for a single like of a comment
 def single_comment_like(request: HttpRequest, author_id: str, post_id: str, comment_id: str, like_id: str):
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
+    # if not check_auth_header(request):
+    #     return HttpResponse(status=401)
 
     if request.method == "GET":
         return get_single_like_comment_local(request, author_id, post_id, comment_id, like_id)
@@ -43,8 +158,8 @@ def single_comment_like(request: HttpRequest, author_id: str, post_id: str, comm
 
 # handle requests for a single like of a post
 def single_post_like(request: HttpRequest, author_id: str, post_id: str, like_id: str):
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
+    # if not check_auth_header(request):
+    #     return HttpResponse(status=401)
 
     if request.method == "GET":
         return get_single_like_post_local(request, author_id, post_id, like_id)
@@ -54,8 +169,8 @@ def single_post_like(request: HttpRequest, author_id: str, post_id: str, like_id
 
 # handle requests for the likes of a comment
 def single_comment_likes(request: HttpRequest, author_id: str, post_id: str, comment_id: str):
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
+    # if not check_auth_header(request):
+    #     return HttpResponse(status=401)
 
     if isaURL(comment_id) and request.method == "GET":
         return single_comment_likes_get_remote(request, author_id, post_id, comment_id)
@@ -75,19 +190,20 @@ def single_comment_likes(request: HttpRequest, author_id: str, post_id: str, com
     return HttpResponse(status=405)
 
 
-def single_author_likes(request: HttpRequest):
-    matched = re.search(r"^\/authors\/(.*?)\/liked\/?$", request.path)
-    if matched:
-        author_id: str = matched.group(1)
-    else:
-        return HttpResponse(status=405)
+# handle requests for the likes of an author
+def single_author_likes(request: HttpRequest, author_id: str):
+    # if not check_auth_header(request):
+    #     return HttpResponse(status=401)
 
-    if "/" in author_id and request.method == "GET":
-        return single_author_likes_get_remote(request, author_id,)
-    elif "/" in author_id:
+    if isaURL(author_id) and request.method == "GET":
+        return single_author_likes_get_remote(request, author_id)
+    
+    if isaURL(author_id):
         return HttpResponse(status=405)
+    
     if request.method == "GET":
         return single_author_likes_get(request, author_id)
+    
     return HttpResponse(status=405)
 
 
@@ -243,7 +359,7 @@ def single_comment_likes_get(request: HttpRequest, author_id: str, post_id: str,
     if comment is None:
         return HttpResponse(status=404)
 
-    likes = Like.objects.all().filter(post=post_id).order_by("published")
+    likes = Like.objects.all().filter(comment=comment_id).order_by("published")
 
     serialized_data = []
     for like in likes:
@@ -274,24 +390,23 @@ def single_comment_likes_get_remote(request: HttpRequest, author_id: str, post_i
     )
 
 
-# get the likes from an author
+# get the likes of an author on this server
 def single_author_likes_get(request: HttpRequest, author_id: str):
-    
-    #check that request is authenticated. remote or local
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
-    
-    likes = Like.objects.all().filter(author=make_author_url(request.get_host(), author_id)).order_by("published")
+    author: Author | None = Author.objects.all().filter(pk=author_id).first()
+
+    if author is None:
+        return HttpResponse(status=404)
+
+    likes = Like.objects.all().filter(author=author.id_url).order_by("published")
 
     serialized_data = []
     for like in likes:
         serialized_like = LikeSerializer(like).data
 
-        if serialized_like["post"]:
-            serialized_like["object"] = Post.objects.all().filter(pk=serialized_like["post"]).first().id_url #type: ignore
-        elif serialized_like["comment"]:
-            serialized_like["object"] = Comment.objects.all().filter(pk=serialized_like["comment"]).first().id_url #type: ignore
-
+        if like.post is not None:
+            serialized_like["object"] = like.post.id_url
+        if like.comment is not None:
+            serialized_like["object"] = like.comment.id_url
         del serialized_like["post"]
         del serialized_like["comment"]
 
@@ -305,10 +420,15 @@ def single_author_likes_get(request: HttpRequest, author_id: str):
     return HttpResponse(content=res, content_type="application/json", status=200)
 
 
+# get the likes of an author on a remote server
 def single_author_likes_get_remote(request: HttpRequest, author_id: str):
-    remote_url = author_id + '/liked'
-    status_code, text, _ = get_one_url(remote_url)
-    return HttpResponse(status=status_code, content_type="application/json", content=text)
+    url = author_id + '/liked'
+    response: requests.Response = requests.get(url, headers=get_auth_headers(url))
+    return HttpResponse(
+        status=response.status_code,
+        content_type=response.headers['Content-Type'],
+        content=response.content.decode('utf-8')
+    )
 
 
 def get_single_like_post_local(request: HttpRequest,author_id : str,post_id : str, like_id : str):

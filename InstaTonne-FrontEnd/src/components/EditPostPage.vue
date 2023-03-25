@@ -50,6 +50,7 @@ onBeforeMount(async () => {
 
 async function savePost(updatedPost) {
   loading.value = true;
+  console.log("POST: ",updatedPost);
   await createHTTP(`authors/${authorId}/posts/${route.params.postid}/`)
     .post(JSON.stringify(updatedPost))
     .then((response: { data: object }) => {

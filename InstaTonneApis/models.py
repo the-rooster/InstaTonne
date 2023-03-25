@@ -32,6 +32,11 @@ class AuthorSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return Author.objects.create(**validated_data)
+    
+
+class AuthorsResponseSerializer(serializers.Serializer):
+    type = serializers.CharField(default='authors')
+    items = AuthorSerializer(many=True)
 
 
 class Follow(models.Model):
@@ -49,6 +54,11 @@ class FollowSerializer(serializers.ModelSerializer):
     class Meta:
         model = Follow
         fields = ['object','summary','accepted','actor']
+
+
+class FollowersResponseSerializer(serializers.Serializer):
+    type = serializers.CharField(default='followers')
+    items = AuthorSerializer(many=True)
 
 
 class Post(models.Model):
@@ -88,6 +98,11 @@ class PostSerializer(serializers.ModelSerializer):
         return Post.objects.create(**validated_data)
 
 
+class PostsResponseSerializer(serializers.Serializer):
+    type = serializers.CharField(default='posts')
+    items = PostSerializer(many=True)
+
+
 class Request(models.Model):
     type = models.TextField()
     summary = models.TextField()
@@ -104,6 +119,11 @@ class RequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Request
         fields = ['type','summary','published','actor','object']
+
+
+class RequestResponseSerializer(serializers.Serializer):
+    type = serializers.CharField(default='request')
+    items = RequestSerializer(many=True)
 
 
 class Comment(models.Model):
@@ -124,6 +144,11 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ['type', 'id', 'contentType', 'comment', 'published', 'author']
+
+
+class CommentsResponseSerializer(serializers.Serializer):
+    type = serializers.CharField(default='comments')
+    items = CommentSerializer(many=True)
 
 
 class Like(models.Model):
@@ -147,11 +172,29 @@ class LikeSerializer(serializers.ModelSerializer):
         fields = ['type', 'summary', 'author', 'comment', 'post']
 
 
+class LikesResponseSerializer(serializers.Serializer):
+    type = serializers.CharField(default='likes')
+    items = LikeSerializer(many=True)
+
+
 class Inbox(models.Model):
+    id = models.TextField(primary_key=True, default=default_id_generator, editable=False)
     author = models.ForeignKey(Author,on_delete=models.CASCADE)
     url = models.TextField()
 
     published = models.DateTimeField(auto_now_add=True)
+
+
+class InboxSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='id_url')
+    class Meta:
+        model = Inbox
+        fields = ['id', 'author', 'url', 'published']   
+
+
+class InboxResponseSerializer(serializers.Serializer):
+    type = serializers.CharField(default='inbox')
+    items = InboxSerializer(many=True)
 
 
 class ConnectedServer(models.Model):
@@ -159,6 +202,7 @@ class ConnectedServer(models.Model):
     api = models.TextField()
     accepted_creds = models.TextField()
     our_creds = models.TextField()
+
 
 class ConnectedServerSerializer(serializers.ModelSerializer):
 

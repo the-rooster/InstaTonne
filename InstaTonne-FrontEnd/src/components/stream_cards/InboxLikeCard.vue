@@ -1,9 +1,12 @@
 <template>
-  <v-card class="mx-auto" color="#eee" theme="light" max-width="80%">
+  <v-card class="mx-auto" color="#fff" theme="light" max-width="90%">
     <v-card-actions>
       <v-list-item class="w-100">
         <v-list-item-title
-          >{{ author.displayName }} liked your post</v-list-item-title
+          ><a :href="`/app/ProfilePage/${encodeURIComponent(author.url)}/`">{{
+            author.displayName
+          }}</a>
+          liked your post</v-list-item-title
         >
         <template v-slot:append>
           <div class="justify-self-end"></div>
@@ -15,6 +18,7 @@
             justify-content: space-between;
           "
         >
+          <img :src="author.profileImage" class="profile-picture" />
           <v-list-item>{{ props.likeData.summary }}</v-list-item>
           <a v-bind:href="postUrl">
             <div class="post-tiny">
@@ -73,6 +77,9 @@ onBeforeMount(() => {
   if (groups) {
     authorId = groups.authorId;
   }
+  postUrl.value = `authors/${encodeURIComponent(
+    authorId
+  )}/posts/${encodeURIComponent(postId)}/`;
 
   console.log("POSTID", postId);
   console.log("AUTHORID", authorId);
@@ -83,15 +90,12 @@ onBeforeMount(() => {
       postData.value = result.data;
     });
 
-  createHTTP(`authors/${props.likeData.author}/`)
+  createHTTP(`authors/${encodeURIComponent(props.likeData.author)}/`)
     .get()
     .then((response) => {
       console.log(response.data, 51515);
       author.value = response.data;
       console.log(response.data, 567);
-      postUrl.value = `authors/${encodeURIComponent(
-        author.value.id
-      )}/posts/${encodeURIComponent(postId)}/`;
     });
 });
 

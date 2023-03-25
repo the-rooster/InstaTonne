@@ -11,7 +11,7 @@ from urllib.parse import quote
 import copy
 
 PUBLIC = "PUBLIC"
-PRIVATE = "PRIVATE"
+PRIVATE = "FRIENDS"
 
 
 def get_all_urls(urls: list[str]):
@@ -83,7 +83,8 @@ def send_to_single_inbox(author_url : str, data : dict):
     try:
         response: requests.Response = requests.post(inbox_url,
                                                     json.dumps(data),headers={"Origin" : HOSTNAME, 
-                                                                            "Authentication" : get_auth_header_for_server(author_url)})
+                                                                            "Authentication" : get_auth_header_for_server(author_url),
+                                                                            "Content-Type":"application/json"})
     except Exception as e:
         print(e)
         print("SERVER DOWN! Returning 404")
@@ -99,19 +100,22 @@ def send_to_inboxes(author_id: str, author_url: str, data: dict, item_visibility
                 print("ERROR: bad inbox response, public")
 
     elif item_visibility == PRIVATE:
+        print("yoi")
         for follow in follows:
             if not author_follows_follower(author_url, follow.follower_url):
+                print('wo')
                 continue
             if not post_to_follower_inbox(follow.follower_url, data):
+                print("frungle")
                 print("ERROR: bad inbox response, private")
-
+            print('yoi yoi')
     else:
         print("ERROR: invalid visibility")
 
 
 def author_follows_follower(author_url: str, follower_url: str) -> bool:
-    encoded_follower_url = quote(follower_url, safe='').replace('.', '%2E')
-    check_url: str = author_url + '/followers/' + encoded_follower_url
+    encoded_author_url = quote(author_url, safe='').replace('.', '%2E')
+    check_url: str = follower_url + '/followers/' + encoded_author_url
     try:
         check_response: requests.Response = requests.get(check_url, headers=get_auth_headers(follower_url))
         return check_response.status_code >= 200 and check_response.status_code < 300
@@ -122,8 +126,10 @@ def author_follows_follower(author_url: str, follower_url: str) -> bool:
 def post_to_follower_inbox(follower_url: str, data: dict) -> bool:
     follower_url = follower_url.strip("/")
     inbox_url: str = follower_url + '/inbox/'
+    headers = get_auth_headers(follower_url)
+    headers['Content-Type'] = "application/json"
     try:
-        response: requests.Response = requests.post(inbox_url, json.dumps(data), headers=get_auth_headers(follower_url))
+        response: requests.Response = requests.post(inbox_url, json.dumps(data), headers=headers)
     except Exception as e:
         print("SERVER DOWN!")
         return True
@@ -134,10 +140,38 @@ def post_to_follower_inbox(follower_url: str, data: dict) -> bool:
 def get_author(id : str):
     user = Author.objects.filter(pk=id)
     if not user:
-        print("db corrupted probably. user exists but author does not.")
+        print("no requesting user")
         return None
     return user[0]
 
+def check_if_friends_local(author1 : Author,author2: Author):
+
+    followers_author1 = Follow.objects.filter(object=author1,follower_url=author2.url)
+    followers_author2 = Follow.objects.filter(object=author2,follower_url=author1.url)
+
+    if followers_author1 and followers_author2:
+        print('they was local friends')
+        return True
+    
+    if author1.pk == author2.pk:
+        return True
+    
+    print("THEY WAS NOT FRIENDS")
+    return False
+
+def check_if_friends_remote(local_author : Author,remote_author_url : str):
+    followers_local = Follow.objects.filter(object=local_author,follower_url=remote_author_url)
+
+    local_is_following_remote = author_follows_follower(local_author.url,remote_author_url)
+
+    if followers_local and local_is_following_remote:
+        print('they was friends')
+        return True
+    
+    if local_author.url == remote_author_url:
+        return True
+    print("THEY WAS NOT FRIENDS")
+    return False
 
 # check if a user is authenticated
 def check_authenticated(request : HttpRequest, id : str):
@@ -181,20 +215,18 @@ def valid_requesting_user(request: HttpRequest, required_author_id: str) -> bool
 def make_author_url(request_host: str, author_id: str) -> str:
     return request_host + "/authors/" + author_id
 
-
 def make_post_url(request_host: str, author_id: str, post_id: str) -> str:
     return make_author_url(request_host, author_id) + "/posts/" + post_id
 
-
 def make_comments_url(request_host: str, author_id: str, post_id: str) -> str:
     return make_post_url(request_host, author_id, post_id) + "/comments"
-
 
 def make_comment_url(request_host: str, author_id: str, post_id: str, comment_id: str) -> str:
     return make_post_url(request_host, author_id, post_id) + "/comments/" + comment_id
 
 def make_inbox_url(request_host: str, author_id: str) -> str:
     return make_author_url(request_host,author_id) + "/inbox"
+
 
 # checks that the request is authenticated either with our connected servers table in the DB,
 # or the request is coming from our frontend/backend
@@ -204,12 +236,12 @@ def check_auth_header(request : HttpRequest):
     
     origin = request.META.get('HTTP_ORIGIN')
 
-    print("ORIGIN:",origin)
-    print("SHOULD BE",HOSTNAME,FRONTEND)
+    #print("ORIGIN:",origin)
+    #print("SHOULD BE",HOSTNAME,FRONTEND)
 
     #check if the request is from us
     if origin == FRONTEND or origin == HOSTNAME:
-        print("SUCCESS")
+        #print("SUCCESS")
         return True
 
     if 'HTTP_AUTHORIZATION'  in request.META:
@@ -225,16 +257,8 @@ def check_auth_header(request : HttpRequest):
 
         if connected:
             return True
-    else:
-        #check csrf token
 
-        reason = CsrfViewMiddleware(lambda x : print(x)).process_view(request, None, (), {})
-        if reason:
-            # CSRF failed
-            print("CSRF FAILED IN CHECK AUTH HEADER")
-            return False
         
-        return True
 
 
     
@@ -251,6 +275,7 @@ def can_send_request(url : str):
     #print("HOSTNAME PARSED",parsed_hostname)
     #print("HERE2","HOST:" + parsed_hostname + " URL: " + parsed_url)
     #print("WHAT " + parsed_url)
+    print("HOST ",parsed_hostname," URL HOST ",parsed_url," test ",url)
     if parsed_url == parsed_hostname:
         #print("REQUEST TO SELF")
         return True
@@ -270,13 +295,14 @@ def get_auth_header_for_server(url : str):
     connected = ConnectedServer.objects.filter(host=parsed_url.hostname)
 
     if connected:
-
+        print("GOT THE CREDS!")
+        print(connected[0].our_creds)
         return connected[0].our_creds
     
     return ""
 
 def get_auth_headers(url: str):
-    return {"Origin": HOSTNAME, "Authentication": get_auth_header_for_server(url)}
+    return {"Origin": HOSTNAME, "Authorization": get_auth_header_for_server(url)}
 
 def isaURL(s: str):
     return "/" in s

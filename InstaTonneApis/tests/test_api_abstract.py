@@ -33,3 +33,4 @@ class AbstractApiTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.get('Content-Type'), 'application/json')
         self.assertEqual(response.json(), {'mock_key': 'mock_value'})
+

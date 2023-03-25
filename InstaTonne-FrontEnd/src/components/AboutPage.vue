@@ -1,6 +1,17 @@
 <template>
     <div class="viewBox">
         ABOUT PAGE
+
+
+        <br>
+        WELCOME TO INSTATONNE! 
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        CMPUT 404 GROUP 6
     </div>
 </template>
   

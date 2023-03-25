@@ -135,10 +135,11 @@ const statusMessage = ref("");
 const showStatus = computed(() => statusMessage.value.length > 0);
 
 function follow() {
+  // encodeURIComponent(profileId)
   createHTTP(
-    `authors/${encodeURIComponent(profileId)}/followers/${Cookies.get(
+    `authors/${Cookies.get(
       USER_AUTHOR_ID_COOKIE
-    )}`
+    )}/followers/${encodeURIComponent(profileId)}`
   )
     .post("")
     .then((response) => {
