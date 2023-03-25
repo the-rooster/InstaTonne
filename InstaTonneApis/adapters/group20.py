@@ -5,6 +5,6 @@ def get_remote_posts_adapter_group20(content : dict):
 
 
     for post in content["items"]:
-        post["id"] = post["origin"] + post["id"]
+        post["id"] = post["origin"]
 
     return content
