@@ -148,6 +148,10 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class CommentsResponseSerializer(serializers.Serializer):
     type = serializers.CharField(default='comments')
+    page = serializers.CharField(default='1')
+    size = serializers.CharField(default='1')
+    post = serializers.CharField(default='<url to the post>')
+    id = serializers.CharField(default='<url to the comments>')
     items = CommentSerializer(many=True)
 
 
@@ -172,9 +176,16 @@ class LikeSerializer(serializers.ModelSerializer):
         fields = ['type', 'summary', 'author', 'comment', 'post']
 
 
+class LikeResponseSerializer(serializers.Serializer):
+    type = serializers.CharField(default='like')
+    summary = serializers.CharField(default='string')
+    author = serializers.CharField(default='<url to the author>')
+    object = serializers.CharField(default='<url to the post or comment>')
+
+
 class LikesResponseSerializer(serializers.Serializer):
     type = serializers.CharField(default='likes')
-    items = LikeSerializer(many=True)
+    items = LikeResponseSerializer(many=True)
 
 
 class Inbox(models.Model):

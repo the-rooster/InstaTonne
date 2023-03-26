@@ -1,6 +1,6 @@
 from django.http import HttpRequest, HttpResponse
 import json
-from ..models import Post, Comment, Author, Like, LikeSerializer, LikesResponseSerializer
+from ..models import Post, Comment, Author, Like, LikeSerializer, LikesResponseSerializer, LikeResponseSerializer
 from .utils import get_one_url, make_author_url, send_to_single_inbox, check_auth_header, get_auth_headers, isaURL
 import requests
 import re
@@ -17,14 +17,14 @@ class SingleAuthorPostLikesAPIView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     @swagger_auto_schema(
-        operation_description="get the list of likes of the post whose id is POST_ID (paginated)",
-        operation_id="single_post_likes",
+        operation_description="get the list of likes of the post whose id is post_id",
+        operation_id="single_post_likes_get",
         responses={200: LikesResponseSerializer()},
         manual_parameters=[
             openapi.Parameter(
                 'author_id',
                 in_=openapi.IN_PATH,
-                description='- ID of an author stored on this server\n\nOR\n\n- URL to an author [FOR LOCAL USE]',
+                description='ID of an author stored on this server',
                 type=openapi.TYPE_STRING,
                 default='1',
             ),
@@ -43,8 +43,28 @@ class SingleAuthorPostLikesAPIView(APIView):
         else:
             return single_post_likes_get(request, author_id, post_id)
         
+    @swagger_auto_schema(
+        operation_description="add a like to the post whose id is post_id",
+        operation_id="single_post_likes_post",
+        responses={204: 'success'},
+        manual_parameters=[
+            openapi.Parameter(
+                'author_id',
+                in_=openapi.IN_PATH,
+                description='ID of an author stored on this server',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+            openapi.Parameter(
+                'post_id',
+                in_=openapi.IN_PATH,
+                description='- ID of a post stored on this server\n\nOR\n\n- URL to a post [FOR LOCAL USE]',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+        ],
+    )
     def post(self, request: HttpRequest, author_id : str, post_id: str):
-
         if isaURL(post_id):
             return single_post_likes_post_remote(request,author_id,post_id)
         return single_post_likes_post(request,author_id,post_id)
@@ -54,21 +74,21 @@ class SingleAuthorPostCommentLikesAPIView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     @swagger_auto_schema(
-        operation_description="get the list of likes of the comment whose id is COMMENT_ID (paginated)",
-        operation_id="single_comment_likes",
+        operation_description="get the list of likes of the comment whose id is comment_id",
+        operation_id="single_comment_likes_get",
         responses={200: LikesResponseSerializer()},
         manual_parameters=[
             openapi.Parameter(
                 'author_id',
                 in_=openapi.IN_PATH,
-                description='- ID of an author stored on this server\n\nOR\n\n- URL to an author [FOR LOCAL USE]',
+                description='ID of an author stored on this server',
                 type=openapi.TYPE_STRING,
                 default='1',
             ),
             openapi.Parameter(
                 'post_id',
                 in_=openapi.IN_PATH,
-                description='- ID of a post stored on this server\n\nOR\n\n- URL to a post [FOR LOCAL USE]',
+                description='ID of a post stored on this server',
                 type=openapi.TYPE_STRING,
                 default='1',
             ),
@@ -87,8 +107,35 @@ class SingleAuthorPostCommentLikesAPIView(APIView):
         else:
             return single_comment_likes_get(request, author_id, post_id, comment_id)
         
+    @swagger_auto_schema(
+        operation_description="add a like to the comment whose id is comment_id",
+        operation_id="single_comment_likes_post",
+        responses={204: 'success'},
+        manual_parameters=[
+            openapi.Parameter(
+                'author_id',
+                in_=openapi.IN_PATH,
+                description='ID of an author stored on this server',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+            openapi.Parameter(
+                'post_id',
+                in_=openapi.IN_PATH,
+                description='ID of a post stored on this server',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+            openapi.Parameter(
+                'comment_id',
+                in_=openapi.IN_PATH,
+                description='- ID of a comment stored on this server\n\nOR\n\n- URL to a comment [FOR LOCAL USE]',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+        ],
+    )
     def post(self,request: HttpRequest,author_id : str,post_id : str, comment_id: str):
-
         if isaURL(comment_id):
             return single_comment_likes_post_remote(request,author_id,post_id,comment_id)
         
@@ -99,7 +146,7 @@ class SingleAuthorLikesAPIView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     @swagger_auto_schema(
-        operation_description="get the list of likes of the author whose id is AUTHOR_ID (paginated)",
+        operation_description="get the list of likes of the author whose id is author_id",
         operation_id="single_author_likes",
         responses={200: LikesResponseSerializer()},
         manual_parameters=[
@@ -119,92 +166,82 @@ class SingleAuthorLikesAPIView(APIView):
             return single_author_likes_get(request, author_id)
         
 
-        
+class SingleAuthorPostLikeAPIView(APIView):
+    permission_classes = (permissions.AllowAny,)
 
-
-# handle requests for the likes of a post
-def single_post_likes(request: HttpRequest, author_id: str, post_id: str):
-    # if not check_auth_header(request):
-    #     return HttpResponse(status=401)
-
-    if isaURL(post_id) and request.method == "GET":
-        return single_post_likes_get_remote(request, author_id, post_id)
-    
-    if isaURL(post_id) and request.method == "POST":
-        return single_post_likes_post_remote(request,author_id,post_id)
-    
-    if isaURL(post_id) or "/" in author_id:
-        return HttpResponse(status=405)
-    
-    if request.method == "GET":
-        return single_post_likes_get(request, author_id, post_id)
-    
-    if request.method == "POST":
-        return single_post_likes_post(request,author_id,post_id)
-    
-    return HttpResponse(status=405)
-
-
-# handle requests for a single like of a comment
-def single_comment_like(request: HttpRequest, author_id: str, post_id: str, comment_id: str, like_id: str):
-    # if not check_auth_header(request):
-    #     return HttpResponse(status=401)
-
-    if request.method == "GET":
-        return get_single_like_comment_local(request, author_id, post_id, comment_id, like_id)
-    
-    return HttpResponse(status=405)
-
-
-# handle requests for a single like of a post
-def single_post_like(request: HttpRequest, author_id: str, post_id: str, like_id: str):
-    # if not check_auth_header(request):
-    #     return HttpResponse(status=401)
-
-    if request.method == "GET":
+    @swagger_auto_schema(
+        operation_description="get the like whose id is like_id of the post whose id is post_id",
+        operation_id="single_post_like_get",
+        responses={200: LikeResponseSerializer()},
+        manual_parameters=[
+            openapi.Parameter(
+                'author_id',
+                in_=openapi.IN_PATH,
+                description='ID of an author stored on this server',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+            openapi.Parameter(
+                'post_id',
+                in_=openapi.IN_PATH,
+                description='ID of a post stored on this server',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+            openapi.Parameter(
+                'like_id',
+                in_=openapi.IN_PATH,
+                description='ID of a like stored on this server',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+        ],
+    )
+    def get(self, request: HttpRequest, author_id: str, post_id: str, like_id: str):
         return get_single_like_post_local(request, author_id, post_id, like_id)
     
-    return HttpResponse(status=405)
 
+class SingleAuthorPostCommentLikeAPIView(APIView):
+    permission_classes = (permissions.AllowAny,)
 
-# handle requests for the likes of a comment
-def single_comment_likes(request: HttpRequest, author_id: str, post_id: str, comment_id: str):
-    # if not check_auth_header(request):
-    #     return HttpResponse(status=401)
-
-    if isaURL(comment_id) and request.method == "GET":
-        return single_comment_likes_get_remote(request, author_id, post_id, comment_id)
-    
-    if isaURL(comment_id) and request.method == "POST":
-        return single_comment_likes_post_remote(request, author_id, post_id, comment_id)
-    
-    if isaURL(comment_id):
-        return HttpResponse(status=405)
-    
-    if request.method == "GET":
-        return single_comment_likes_get(request, author_id, post_id, comment_id)
-    
-    if request.method == "POST":
-        return single_comment_likes_post(request, author_id, post_id, comment_id)
-    
-    return HttpResponse(status=405)
-
-
-# handle requests for the likes of an author
-def single_author_likes(request: HttpRequest, author_id: str):
-    # if not check_auth_header(request):
-    #     return HttpResponse(status=401)
-
-    if isaURL(author_id) and request.method == "GET":
-        return single_author_likes_get_remote(request, author_id)
-    
-    if isaURL(author_id):
-        return HttpResponse(status=405)
-    
-    if request.method == "GET":
-        return single_author_likes_get(request, author_id)
-    
-    return HttpResponse(status=405)
+    @swagger_auto_schema(
+        operation_description="get the like whose id is like_id of the comment whose id is comment_id",
+        operation_id="single_comment_like_get",
+        responses={200: LikeResponseSerializer()},
+        manual_parameters=[
+            openapi.Parameter(
+                'author_id',
+                in_=openapi.IN_PATH,
+                description='ID of an author stored on this server',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+            openapi.Parameter(
+                'post_id',
+                in_=openapi.IN_PATH,
+                description='ID of a post stored on this server',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+            openapi.Parameter(
+                'comment_id',
+                in_=openapi.IN_PATH,
+                description='ID of a comment stored on this server',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+            openapi.Parameter(
+                'like_id',
+                in_=openapi.IN_PATH,
+                description='ID of a like stored on this server',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+        ],
+    )
+    def get(self, request: HttpRequest, author_id: str, post_id: str, comment_id: str, like_id: str):
+        return get_single_like_comment_local(request, author_id, post_id, comment_id, like_id)
+        
 
 
 # add a like to a remote post
