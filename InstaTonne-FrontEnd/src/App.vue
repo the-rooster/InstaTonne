@@ -71,6 +71,7 @@ const loggedIn = computed(() => activeUserId.value != undefined);
 const logout = () => {
   Cookies.remove(USER_AUTHOR_ID_COOKIE);
   router.push({ path: "/" });
+  window.location.reload();
 };
 
 const route = useRoute();

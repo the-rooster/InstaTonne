@@ -25,12 +25,24 @@
         }}</v-list-item-subtitle>
 
         <template v-slot:append>
+          <p>{{ numberOfLikes }}</p>
           <div class="justify-self-end">
-            <v-btn @click="likePost"
-              ><v-icon class="me-1" icon="mdi-heart"></v-icon
+            <v-btn v-if="isLiked"
+              ><v-icon class="me-1" icon="mdi-heart" color="blue"></v-icon
             ></v-btn>
-            <v-btn @click="sharePost"
-              ><v-icon class="me-1" icon="mdi-share-variant"></v-icon
+            <v-btn v-else @click="likePost"
+              ><v-icon class="me-1" icon="mdi-heart-outline"></v-icon
+            ></v-btn>
+
+            <v-btn v-if="isShared"
+              ><v-icon
+                class="me-1"
+                icon="mdi-share-variant"
+                color="blue"
+              ></v-icon
+            ></v-btn>
+            <v-btn v-else @click="sharePost"
+              ><v-icon class="me-1" icon="mdi-share-variant-outline"></v-icon
             ></v-btn>
           </div>
         </template>
@@ -159,14 +171,53 @@ async function likePost() {
   if (!props.postData.author) {
     return;
   }
-  await createHTTP(
-    `/authors/${encodeURI(props.postData.author.id)}/posts/${encodeURI(
-      props.postData.id
-    )}/likes/`
-  )
+  console.log(props.postData.origin, "originn");
+  const remove_host = props.postData.origin.split("/")[3];
+  console.log(remove_host, "remove host");
+  await createHTTP(`${encodeURI(props.postData.origin)}/likes/`)
     .post("")
     .then((response: { data: object }) => {
       console.log(response.data);
+      router.go(0);
+    });
+}
+
+const isLiked = ref(false);
+
+// Check if I liked the post
+async function checkIfLiked() {
+  if (!props.postData.author) {
+    return;
+  }
+  await createHTTP(`/authors/${encodeURI(props.postData.origin)}/likes/`)
+    .get()
+    .then((response: { data: object }) => {
+      console.log(response.data, "check if liked");
+      response.data.items.forEach((item: any) => {
+        console.log("author id", authorId);
+        const item_author_id = item.author.substring(
+          item.author.lastIndexOf("/") + 1
+        );
+        console.log("item_author_id", item_author_id);
+        if (item_author_id == authorId) {
+          isLiked.value = true;
+        }
+      });
+    });
+}
+
+const numberOfLikes = ref(0);
+
+async function getPostLikeCount() {
+  if (!props.postData.author) {
+    return;
+  }
+  await createHTTP(`/authors/${encodeURI(props.postData.origin)}/likes/`)
+    .get()
+    .then((response: { data: object }) => {
+      console.log(response.data, "get post like count");
+      numberOfLikes.value = response.data.items.length;
+      console.log(numberOfLikes.value, "number of likes");
     });
 }
 
@@ -186,6 +237,32 @@ async function sharePost() {
     .post(JSON.stringify(updatedPost))
     .then((response: { data: object }) => {
       loading.value = false;
+      router.go(0);
+    });
+}
+
+const isShared = ref(false);
+
+// Check if I have a post with the same ID
+async function checkIfShared() {
+  if (!authorId) {
+    return;
+  }
+  await createHTTP(`authors/${authorId}/posts/`)
+    .get()
+    .then((response: { data: object }) => {
+      console.log(response.data, "check if shared");
+      for (let i = 0; i < response.data.items.length; i++) {
+        if (response.data.items[i].id == props.postData.id) {
+          console.log(
+            "sharedd",
+            response.data.items[i].id,
+            props.postData.content
+          );
+          isShared.value = true;
+          break;
+        }
+      }
     });
 }
 
@@ -232,6 +309,11 @@ async function saveComment() {
 onMounted(() => {
   console.log("POSTDATA", props.postData);
   getComments();
+  getPostLikeCount();
+  checkIfLiked();
+  checkIfShared();
+
+  console.log("isShared", isShared.value);
 
   isImage.value =
     props.postData.author.contentType === "image/png;base64" ||
