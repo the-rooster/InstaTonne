@@ -9,7 +9,7 @@
           fixed
           permanent
           rail-width="60"
-          width="500"
+          width="200"
         >
           <v-list>
             <v-list-item
