@@ -27,6 +27,7 @@
           display: flex;
           flex-direction: column;
         "
+        @keyup.enter="registerMode ? register() : login()"
       >
         <v-text-field v-model="username" label="Username" />
         <v-text-field

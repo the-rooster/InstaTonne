@@ -1,7 +1,7 @@
 <template>
   <v-card
     class="mx-auto my-5 rounded-xl"
-    color="#eee"
+    color="#E3F2FD"
     theme="light"
     max-width="80%"
     style="margin: 5%"

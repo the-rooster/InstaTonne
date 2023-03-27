@@ -56,16 +56,37 @@ const routes = [
 ];
 
 export const nav_bar_routes = [
-  { path: "/", name: "Home", component: HomePage },
-  { path: "/about", name: "About", component: AboutPage },
-  { path: "/CreatePost", name: "Create New Post", component: CreatePostPage },
+  { path: "/", name: "Home", component: HomePage, icon: "mdi-home" },
+  {
+    path: "/about",
+    name: "About",
+    component: AboutPage,
+    icon: "mdi-book-information-variant",
+  },
+  {
+    path: "/CreatePost",
+    name: "Create New Post",
+    component: CreatePostPage,
+    icon: "mdi-plus",
+  },
   {
     path: `/ProfilePage/${Cookies.get(USER_AUTHOR_ID_COOKIE)}`,
     name: "ProfilePage",
     component: ProfilePage,
+    icon: "mdi-account",
   },
-  { path: "/UserSearch", name: "UserSearch", component: UserSearch },
-  { path: "/FriendsPage", name: "FriendsPage", component: FriendsPage },
+  {
+    path: "/UserSearch",
+    name: "UserSearch",
+    component: UserSearch,
+    icon: "mdi-account-search",
+  },
+  {
+    path: "/FriendsPage",
+    name: "FriendsPage",
+    component: FriendsPage,
+    icon: "mdi-account-group",
+  },
 ];
 
 // 3. Create the router instance and pass the `routes` option

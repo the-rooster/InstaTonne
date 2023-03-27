@@ -1,5 +1,10 @@
 <template>
-  <v-card class="my-5 rounded-xl" color="#eee" theme="light" max-width="100%">
+  <v-card
+    class="my-5 rounded-xl"
+    color="#E3F2FD"
+    theme="light"
+    max-width="100%"
+  >
     <v-card-actions>
       <v-list-item class="w-100">
         <v-list-item-title>{{ author.displayName }}</v-list-item-title>

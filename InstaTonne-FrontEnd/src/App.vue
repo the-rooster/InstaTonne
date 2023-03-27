@@ -32,14 +32,19 @@
             <v-list-item
               v-for="route in routes"
               :key="route.path"
-              color="red"
+              color="blue"
               :title="route.name"
               :to="route.path"
               :prepend-icon="route.icon"
             />
           </v-list>
           <v-list>
-            <v-list-item v-if="loggedIn" title="Logout" @click="logout" />
+            <v-list-item
+              v-if="loggedIn"
+              title="Logout"
+              @click="logout"
+              prepend-icon="mdi-logout"
+            />
           </v-list>
         </v-navigation-drawer>
         <v-main>
