@@ -164,7 +164,11 @@ def post_author_follower(request: HttpRequest, author_id : str, foreign_author_i
         "summary": author.displayName + " wants to follow " + author_response.json()["displayName"]
     }
 
-    inbox_response: requests.Response = requests.post(foreign_author_id + '/inbox/', json.dumps(serialized_follow), headers=get_auth_headers(foreign_author_id))
+    headers = get_auth_headers(foreign_author_id)
+
+    headers["Content-Type"] = "application/json"
+
+    inbox_response: requests.Response = requests.post(foreign_author_id + '/inbox/', json.dumps(serialized_follow), headers=headers)
 
     return HttpResponse(
         status=inbox_response.status_code,
@@ -271,8 +275,8 @@ def check_author_follower_remote(request : HttpRequest, author_id : str, foreign
 
 #get the actual request object. this is for our local front end ONLY (for the inbox to retrieve follow requests)
 def get_request_object(request: HttpRequest, author_id: str, foreign_author_id: str):
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
+    # if not check_auth_header(request):
+    #     return HttpResponse(status=401)
 
     print("GETTING REQUEST OBJECT")
     if request.method != "GET":

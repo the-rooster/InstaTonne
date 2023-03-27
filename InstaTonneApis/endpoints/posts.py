@@ -13,6 +13,7 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, permissions, serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from ..adapters.adapters import adapter_get_remote_posts, adapter_get_remote_single_post
 
 
 PNG_CONTENT_TYPE = "image/png;base64"
@@ -87,7 +88,7 @@ class SingleAuthorPostAPIView(APIView):
         return single_author_post_post(request, author_id, post_id)
 
     @swagger_auto_schema(
-        operation_description="remote a post of author_id",
+        operation_description="remove a post of author_id",
         operation_id="single_author_post_delete",
         responses={204: 'success',},
         manual_parameters=[
@@ -164,6 +165,20 @@ class SingleAuthorPostsAPIView(APIView):
                 type=openapi.TYPE_STRING,
                 default='1',
             ),
+            openapi.Parameter(
+                'page',
+                in_=openapi.IN_QUERY,
+                description='page number',
+                type=openapi.TYPE_INTEGER,
+                default=1,
+            ),
+            openapi.Parameter(
+                'size',
+                in_=openapi.IN_QUERY,
+                description='number of items per page',
+                type=openapi.TYPE_INTEGER,
+                default=1,
+            ),
         ],
     )
     def get(self, request: HttpRequest, author_id: str):
@@ -210,7 +225,7 @@ class SingleAuthorPostImageAPIView(APIView):
     @swagger_auto_schema(
         operation_description="get the image in a post of author_id",
         operation_id="single_author_post_image_get",
-        responses={200: PostSerializer(),},
+        responses={200: 'the image itself',},
         manual_parameters=[
             openapi.Parameter(
                 'author_id',
@@ -262,6 +277,7 @@ def single_author_post_get(request: HttpRequest, author_id: str, post_id: str):
     requesting_author : Author | None = Author.objects.all().filter(userID=request.user.pk).first()
 
     if requesting_author and post.visibility == "FRIENDS" and not check_if_friends_local(post.author,requesting_author):
+        print("HERE")
         print('DO NOT SHOW')
         return HttpResponse(status=401)
 
@@ -281,13 +297,16 @@ def single_author_post_get_remote(request: HttpRequest, author_id: str, post_id:
     response: requests.Response = requests.get(url, headers=get_auth_headers(url))
 
     requesting_author : Author | None = Author.objects.all().filter(userID=request.user.pk).first()
+
+    print("HERE:",response.content)
     post = json.loads(response.content)
+
+    post = adapter_get_remote_single_post(post,url)
 
     if "visibility" not in post:
         return HttpResponse(status=401)
 
-    if requesting_author and post["visibility"] == "FRIENDS" and not check_if_friends_remote(requesting_author,post["author"]["id"]) or \
-        not check_auth_header(request):
+    if requesting_author and post["visibility"] == "FRIENDS" and not check_if_friends_remote(requesting_author,post["author"]["id"]):
         print('DO NOT SHOW')
         return HttpResponse(status=401)
     
@@ -349,6 +368,8 @@ def single_author_posts_get_remote(request: HttpRequest, author_id: str):
     response: requests.Response = requests.get(url, headers=get_auth_headers(url))
     response_decoded = json.loads(response.content)
 
+    response_decoded = adapter_get_remote_posts(response_decoded,url)
+
     print(requesting_author)
     def filter(post):
         if "visibility" not in post:
@@ -384,7 +405,7 @@ def single_author_post_post(request: HttpRequest, author_id: str, post_id: str):
         
 
     
-        body: dict = json.loads(request.body)
+        body: dict = request.data
 
         if "title" in body:
             post.title = body["title"]
@@ -419,7 +440,7 @@ def single_author_posts_post(request: HttpRequest, author_id: str):
         if author is None:
             return HttpResponse(status=404)
         
-        body: dict = json.loads(request.body)
+        body: dict = request.data
         #if were creating an image, create a seperate unlisted post with the image to link to
         if body["contentType"] == PNG_CONTENT_TYPE or body["contentType"] == JPEG_CONTENT_TYPE:
             print("CREATING UNLISTED IMAGE POST")
@@ -461,7 +482,7 @@ def single_author_posts_post(request: HttpRequest, author_id: str):
 
 #make image post to link to markdown post
 def make_image_post(request : HttpRequest,author: Author,author_id : str):
-    body: dict = json.loads(request.body)
+    body: dict = request.data
     post: Post = Post.objects.create(
         type = "post",
         title = "image",
@@ -512,7 +533,7 @@ def single_author_post_put(request: HttpRequest, author_id: str, post_id: str):
         if existing_post is not None:
             return single_author_post_post(request, author_id, post_id)
         
-        body: dict = json.loads(request.body)
+        body: dict = request.data
         post: Post = Post.objects.create(
             id = post_id,
             id_url = make_post_url(HOSTNAME, author_id, post_id),

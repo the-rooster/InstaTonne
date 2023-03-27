@@ -18,24 +18,37 @@ class SingleAuthorPostCommentsAPIView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     @swagger_auto_schema(
-        operation_description="get the list of comments of the post whose id is POST_ID (paginated)",
-        operation_id="single_post_comments",
+        operation_description="get the list of comments of the post whose id is post_id",
+        operation_id="single_post_comments_get",
         responses={200: CommentsResponseSerializer()},
         manual_parameters=[
             openapi.Parameter(
                 'author_id',
                 in_=openapi.IN_PATH,
-                description='- ID of an author stored on this server\n\nOR\n\n- URL to an author [FOR LOCAL USE]',
+                description='ID of an author stored on this server',
                 type=openapi.TYPE_STRING,
                 default='1',
             ),
             openapi.Parameter(
-                
                 'post_id',
                 in_=openapi.IN_PATH,
                 description='- ID of a post stored on this server\n\nOR\n\n- URL to a post [FOR LOCAL USE]',
                 type=openapi.TYPE_STRING,
                 default='1',
+            ),
+            openapi.Parameter(
+                'page',
+                in_=openapi.IN_QUERY,
+                description='page number',
+                type=openapi.TYPE_INTEGER,
+                default=1,
+            ),
+            openapi.Parameter(
+                'size',
+                in_=openapi.IN_QUERY,
+                description='number of items per page',
+                type=openapi.TYPE_INTEGER,
+                default=1,
             ),
         ],
     )
@@ -46,8 +59,8 @@ class SingleAuthorPostCommentsAPIView(APIView):
             return single_post_comments_get(request, author_id, post_id)
         
     @swagger_auto_schema(
-        operation_description="add a comment to the post whose id is POST_ID",
-        operation_id="single_post_comments",
+        operation_description="add a comment to the post whose id is post_id",
+        operation_id="single_post_comments_post",
         responses={204: 'success',},
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
@@ -60,7 +73,7 @@ class SingleAuthorPostCommentsAPIView(APIView):
             openapi.Parameter(
                 'author_id',
                 in_=openapi.IN_PATH,
-                description='- ID of an author stored on this server\n\nOR\n\n- URL to an author [FOR LOCAL USE]',
+                description='ID of an author stored on this server',
                 type=openapi.TYPE_STRING,
                 default='1',
             ),
@@ -75,41 +88,45 @@ class SingleAuthorPostCommentsAPIView(APIView):
         ],
     )
     def post(self, request: HttpRequest, author_id: str, post_id: str):
+        if isaURL(post_id):
+            return single_post_comments_post_remote(request,author_id,post_id)
+        
         return single_post_comments_post(request, author_id, post_id)
 
 
-# handle requests for the comments of a post
-def single_post_comments(request: HttpRequest, author_id: str, post_id: str):
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
+class SingleAuthorPostCommentAPIView(APIView):
+    permission_classes = (permissions.AllowAny,)
 
-    if isaURL(post_id) and request.method == "GET":
-        return single_post_comments_get_remote(request, author_id, post_id)
-    
-    if isaURL(post_id) and request.method == "POST":
-        return single_post_comments_post_remote(request,author_id,post_id)
-    
-    if isaURL(post_id):
-        return HttpResponse(status=405)
-    
-    if request.method == "GET":
-        return single_post_comments_get(request, author_id, post_id)
-    
-    if request.method == "POST":
-        return single_post_comments_post(request, author_id, post_id)
-    
-    return HttpResponse(status=405)
-
-
-# handle requests for a single comment of a post
-def single_post_comment(request: HttpRequest, author_id: str, post_id: str, comment_id: str):
-    if not check_auth_header(request):
-        return HttpResponse(status=401)
-
-    if request.method == "GET":
+    @swagger_auto_schema(
+        operation_description="get the comment whose id is comment_id",
+        operation_id="single_post_comment_get",
+        responses={200: CommentSerializer()},
+        manual_parameters=[
+            openapi.Parameter(
+                'author_id',
+                in_=openapi.IN_PATH,
+                description='ID of an author stored on this server',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+            openapi.Parameter(
+                'post_id',
+                in_=openapi.IN_PATH,
+                description='ID of a post stored on this server',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+            openapi.Parameter(
+                'comment_id',
+                in_=openapi.IN_PATH,
+                description='- ID of a comment stored on this server\n\nOR\n\n- URL to a comment [FOR LOCAL USE]',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+        ],
+    )
+    def get(self, request: HttpRequest, author_id: str, post_id: str, comment_id: str):
         return get_single_comment_local(request, author_id, post_id, comment_id)
-    
-    return HttpResponse(status=405)
 
 
 # get the comments from a post
@@ -117,6 +134,7 @@ def single_post_comments_get(request: HttpRequest, author_id: str, post_id: str)
     post: Post | None = Post.objects.all().filter(pk=post_id).first()
 
     if post is None:
+        print("HERE3")
         return HttpResponse(status=404)
     
     comments = Comment.objects.all().filter(post=post_id).order_by("published")
@@ -163,10 +181,13 @@ def single_post_comments_post_remote(request: HttpRequest, author_id : str, post
     author: Author | None = Author.objects.all().filter(userID=request.user.pk).first()
     
     if not author:
+        print("HERE?")
         return HttpResponse(status=401)
     
     try:
-        body: dict = json.loads(request.body)
+        print(request.data)
+        body: dict = request.data
+        print(body)
         comment: dict = {
             "type" : "comment",
             "contentType" : body["contentType"],
@@ -188,15 +209,18 @@ def single_post_comments_post(request: HttpRequest, author_id: str, post_id: str
     author: Author | None = Author.objects.all().filter(userID=request.user.pk).first()
 
     if not author:
+        print("HERE",request.user.pk)
         return HttpResponse(status=401)
     
     post: Post | None = Post.objects.all().filter(pk=post_id).first()
 
     if post is None:
+        print("HERE2",post_id)
         return HttpResponse(status=404)
     
     try:
-        body: dict = json.loads(request.body)
+        print(request.data)
+        body: dict = request.data
         comment: dict = {
             "type" : "comment",
             "contentType" : body["contentType"],

@@ -21,6 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 #Configure this before deployment
 HOSTNAME = os.environ["HOSTNAME"] if "HOSTNAME" in os.environ else "http://127.0.0.1:8000"
 FRONTEND = os.environ["FRONTEND"] if "FRONTEND" in os.environ else "http://127.0.0.1:5173"
+GITHUB_TOKEN = "<TOKEN>"
 
 print(HOSTNAME,FRONTEND)
 # Quick-start development settings - unsuitable for production
@@ -66,6 +67,10 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173", # allow frontend
     "http://localhost:3000", # allow tests
     "http://127.0.0.1:5173",
+    "https://t20-social-distribution.herokuapp.com",
+    "https://social-distribution-media.herokuapp.com",
+    "https://group-13-epic-app.herokuapp.com",
+    "https://epic-app.vercel.app",
     HOSTNAME,
     FRONTEND
 ]
@@ -81,6 +86,8 @@ CSRF_TRUSTED_ORIGINS = [
 CORS_ALLOW_HEADERS = [
     "X-CSRFToken",
     "Cookie",
+    "Authorization",
+    "Content-Type"
 ]
 
 CSRF_COOKIE_HTTPONLY = False
@@ -172,6 +179,12 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
+
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
+        'rest_framework.parsers.JSONParser'
+     ),
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
