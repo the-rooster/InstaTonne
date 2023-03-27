@@ -17,10 +17,7 @@
           padding-top: 10em;
         "
       >
-        <img
-          src="../assets/EpicLogo.svg"
-          style="width: 9em; padding: 2em"
-        >
+        <img src="../assets/EpicLogo.svg" style="width: 9em; padding: 2em" />
         <h1>InstaTonne</h1>
       </div>
       <div
@@ -31,10 +28,7 @@
           flex-direction: column;
         "
       >
-        <v-text-field
-          v-model="username"
-          label="Username"
-        />
+        <v-text-field v-model="username" label="Username" />
         <v-text-field
           v-model="password"
           label="Password"
@@ -51,9 +45,7 @@
             :append-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
             @click:append="showConfirmPassword = !showConfirmPassword"
           />
-          <div v-if="!passwordsMatch">
-            Passwords must match
-          </div>
+          <div v-if="!passwordsMatch">Passwords must match</div>
         </div>
         <div>
           <v-btn
@@ -65,10 +57,7 @@
           </v-btn>
         </div>
         <div>
-          <v-btn
-            class="button"
-            @click="registerMode = !registerMode"
-          >
+          <v-btn class="button" @click="registerMode = !registerMode">
             {{ registerMode ? "Return To Login" : "Register" }}
           </v-btn>
         </div>
@@ -76,11 +65,7 @@
           {{ errorMessage }}
 
           <template #actions>
-            <v-btn
-              color="blue"
-              variant="text"
-              @click="errorMessage = ''"
-            >
+            <v-btn color="blue" variant="text" @click="errorMessage = ''">
               Close
             </v-btn>
           </template>
@@ -105,7 +90,6 @@ import {
   USER_AUTHOR_ID_COOKIE,
 } from "../axiosCalls";
 import { router } from "../main";
-
 
 const emits = defineEmits(["LoggedIn"]);
 

@@ -1,5 +1,10 @@
 <template>
-  <v-card class="mx-auto" color="#eee" theme="light" max-width="80%">
+  <v-card
+    class="mx-auto my-5 rounded-xl"
+    color="#eee"
+    theme="light"
+    max-width="80%"
+  >
     <v-card-actions>
       <v-list-item v-if="loading" class="w-100">
         <v-progress-circular

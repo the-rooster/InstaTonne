@@ -1,17 +1,23 @@
 <template>
-  <v-card class="mx-auto" color="#eee" theme="light" max-width="80%">
+  <v-card
+    class="mx-auto my-5 rounded-xl"
+    color="#eee"
+    theme="light"
+    max-width="80%"
+  >
     <v-card-actions>
       <v-list-item class="w-100">
-        <!-- <template v-slot:prepend>
+        <template v-slot:prepend>
           <v-avatar
+            size="70"
             color="grey-darken-3"
             image="{{
-            props.postData.author.profileImage
-            }}"
+              props.postData.author.profileImage
+              }}"
           ></v-avatar>
-        </template> -->
+        </template>
 
-        <v-list-item-title
+        <v-list-item-title class="text-h6"
           ><a
             :href="`/app/ProfilePage/${encodeURIComponent(
               props.postData.author?.url
@@ -20,12 +26,12 @@
           ></v-list-item-title
         >
 
-        <v-list-item-subtitle>{{
+        <v-list-item-subtitle class="text-h7">{{
           props.postData.author?.host
         }}</v-list-item-subtitle>
 
         <template v-slot:append>
-          <p>{{ numberOfLikes }}</p>
+          <p>{{ numberOfLikes }} Likes</p>
           <div class="justify-self-end">
             <v-btn v-if="isLiked"
               ><v-icon class="me-1" icon="mdi-heart" color="blue"></v-icon
@@ -49,7 +55,7 @@
       </v-list-item>
     </v-card-actions>
 
-    <v-card class="mx-4" min-height="30vh">
+    <v-card class="mx-4 rounded-xl" min-height="30vh">
       <v-list-item-title
         ><h3>{{ props.postData.title }}</h3></v-list-item-title
       >
@@ -76,13 +82,14 @@
       </v-card-text>
     </v-card>
     <v-text-field
+      class="mx-4 my-2 rounded-xl"
       v-model="newComment"
       label="Comment"
       placeholder="Comment"
       clearable
       @keyup.enter="saveComment"
     />
-    <v-card-actions>
+    <v-card-actions v-if="hasComments">
       <v-btn variant="text"> Comments </v-btn>
 
       <v-spacer />
@@ -172,8 +179,6 @@ async function likePost() {
     return;
   }
   console.log(props.postData.origin, "originn");
-  const remove_host = props.postData.origin.split("/")[3];
-  console.log(remove_host, "remove host");
   await createHTTP(`${encodeURI(props.postData.origin)}/likes/`)
     .post("")
     .then((response: { data: object }) => {
@@ -320,6 +325,8 @@ onMounted(() => {
     props.postData.author.contentType === "image/jpeg;base64";
 });
 
+const hasComments = ref(false);
+
 function getComments() {
   createHTTP(
     `/authors/${encodeURI(props.postData.author.id)}/posts/${encodeURI(
@@ -330,6 +337,9 @@ function getComments() {
     .then((response) => {
       console.log(response.data, 4567);
       comments.value = response.data.comments;
+      if (comments.value.length > 0) {
+        hasComments.value = true;
+      }
     });
 }
 

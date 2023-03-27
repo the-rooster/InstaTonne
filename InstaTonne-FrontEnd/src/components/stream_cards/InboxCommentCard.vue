@@ -1,9 +1,9 @@
 <template>
   <v-card
-    class="mx-auto"
-    color="#fff"
+    class="mx-auto my-5 rounded-xl"
+    color="#eee"
     theme="light"
-    max-width="90%"
+    max-width="80%"
     style="margin: 5%"
   >
     <v-card-actions>
