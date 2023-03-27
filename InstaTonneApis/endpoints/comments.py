@@ -1,6 +1,6 @@
 from django.http import HttpRequest, HttpResponse
 import json
-from ..models import Post, PostSerializer, Comment, Author, CommentSerializer, CommentsResponseSerializer
+from ..models import Post, PostSerializer, Comment, Author, CommentSerializer, CommentsResponseSerializer, CommentResponseSerializer
 from django.core.paginator import Paginator
 from .utils import make_comment_url, make_comments_url, get_one_url, make_author_url, send_to_single_inbox, check_authenticated, check_auth_header, isaURL, get_auth_headers
 import requests
@@ -100,7 +100,7 @@ class SingleAuthorPostCommentAPIView(APIView):
     @swagger_auto_schema(
         operation_description="get the comment whose id is comment_id",
         operation_id="single_post_comment_get",
-        responses={200: CommentSerializer()},
+        responses={200: CommentResponseSerializer()},
         manual_parameters=[
             openapi.Parameter(
                 'author_id',
@@ -148,8 +148,15 @@ def single_post_comments_get(request: HttpRequest, author_id: str, post_id: str)
     serialized_data = []
     for comment in comments:
         serialized_comment = CommentSerializer(comment).data
+        url = comment.author
 
-        serialized_data.append(serialized_comment)
+        try:
+            response: requests.Response = requests.get(url, headers=get_auth_headers(url))
+            serialized_comment["author"] = json.loads(response.content.decode('utf-8'))
+            serialized_data.append(serialized_comment)
+        except Exception as e:
+            serialized_comment["author"] = {"error url": url}
+            serialized_data.append(serialized_comment)
 
     res = json.dumps({
         "type": "comments",
@@ -247,6 +254,14 @@ def get_single_comment_local(request: HttpRequest, author_id: str, post_id: str,
         return HttpResponse(status=404)
     
     serialized_comment = CommentSerializer(comment).data
+
+    url = comment.author
+
+    try:
+        response: requests.Response = requests.get(url, headers=get_auth_headers(url))
+        serialized_comment["author"] = json.loads(response.content.decode('utf-8'))
+    except Exception as e:
+        serialized_comment["author"] = {"error url": url}
 
     res = json.dumps(serialized_comment)
 

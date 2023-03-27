@@ -146,13 +146,22 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = ['type', 'id', 'contentType', 'comment', 'published', 'author']
 
 
+class CommentResponseSerializer(serializers.Serializer):
+    type = serializers.CharField(default='string')
+    id = serializers.CharField(default='string')
+    contentType = serializers.CharField(default='string')
+    comment = serializers.CharField(default='string')
+    published = serializers.CharField(default='string')
+    author = AuthorSerializer()
+
+
 class CommentsResponseSerializer(serializers.Serializer):
     type = serializers.CharField(default='comments')
     page = serializers.CharField(default='1')
     size = serializers.CharField(default='1')
     post = serializers.CharField(default='<url to the post>')
     id = serializers.CharField(default='<url to the comments>')
-    items = CommentSerializer(many=True)
+    items = CommentResponseSerializer(many=True)
 
 
 class Like(models.Model):
