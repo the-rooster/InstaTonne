@@ -220,3 +220,19 @@ class ConnectedServerSerializer(serializers.ModelSerializer):
     class Meta:
         model=ConnectedServer
         fields = ['host','api']
+
+
+class GithubActorResponseSerializer(serializers.Serializer):
+    id = serializers.IntegerField(default=1)
+    login = serializers.CharField(default='<github user name>')
+
+class GithubRepoResponseSerializer(serializers.Serializer):
+    id = serializers.IntegerField(default=1)
+    login = serializers.CharField(default='<github repo name>')
+
+class GithubResponseSerializer(serializers.Serializer):
+    id = serializers.CharField(default='1')
+    type = serializers.CharField(default='<event type>')
+    actor = GithubActorResponseSerializer()
+    repo = GithubRepoResponseSerializer()
+    payload = serializers.CharField(default='<payload>')
