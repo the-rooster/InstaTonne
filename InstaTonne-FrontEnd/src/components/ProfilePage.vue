@@ -24,7 +24,7 @@
         <span class="followers"><br /><br />Followers: {{ follow_count }}</span>
       </a>
     </div>
-    <v-btn @click="follow()" :disabled="!canFollow"> Follow </v-btn>
+    <v-btn @click="follow()" :disabled="!canFollow" class="FollowButton"> Follow </v-btn>
     <br />
     <br />
     <div class="flex-container">

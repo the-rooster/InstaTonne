@@ -34,10 +34,12 @@
         <v-text-field
           v-model="username"
           label="Username"
+          class="UsernameField"
         />
         <v-text-field
           v-model="password"
           label="Password"
+          class="PasswordField"
           :type="showPassword ? 'text' : 'password'"
           :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
           hint="At least 8 characters"

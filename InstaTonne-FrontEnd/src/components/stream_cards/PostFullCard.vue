@@ -44,7 +44,7 @@
 
     <v-card class="mx-4" min-height="30vh">
       <v-list-item-title
-        ><h3>{{ props.postData.title }}</h3></v-list-item-title
+        ><h3 id="TitleText">{{ props.postData.title }}</h3></v-list-item-title
       >
       <v-img v-if="isImage" :src="require('${ props.postData.content }')" />
       <v-card-text class="my-10" v-else>

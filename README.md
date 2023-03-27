@@ -27,3 +27,15 @@ Note: eslint does not like debuggers. To use a debugger, be sure to disable the 
 debugger; // eslint-disable-line no-debugger
 
 Frontend tests: npm run test. Runs tests in watch mode.
+
+Cypress E2E testing:
+
+To reset to the test db:
+1. delete /fixtures/pycache, and db
+2. python3 manage.py makemigrations InstaTonneApis
+3. python3 manage.py migrate --run-syncdb
+4. python3 manage.py loaddata test_data.json
+
+5. Run backend: python3 manage.py runserver
+6. Run frontend: /InstaTonne-Frontend npm run dev
+7. Run Cypress: npx cypress open

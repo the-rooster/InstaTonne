@@ -57,26 +57,6 @@
       }
   },
   {
-    "model" : "InstaTonneApis.Follow",
-    "fields": {
-      "id" : "1",
-      "object" : "1",
-      "follower_url" : "http://127.0.0.1:8000/authors/2",
-      "summary" : "user2 wants to follow user1",
-      "accepted" : true
-    }
-  },
-  {
-    "model" : "InstaTonneApis.Follow",
-    "fields": {
-      "id" : "2",
-      "object" : "1",
-      "follower_url" : "http://127.0.0.1:8000/authors/1",
-      "summary" : "user1 wants to follow user1",
-      "accepted" : true
-    }
-  },
-  {
     "model": "InstaTonneApis.Post",
     "fields": {
       "id" : "1",
