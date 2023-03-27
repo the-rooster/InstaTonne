@@ -34,6 +34,7 @@ from InstaTonneApis.endpoints.posts import SingleAuthorPostsAPIView, SingleAutho
 from InstaTonneApis.endpoints.comments import SingleAuthorPostCommentsAPIView, SingleAuthorPostCommentAPIView
 from InstaTonneApis.endpoints.likes import SingleAuthorPostLikesAPIView, SingleAuthorPostCommentLikesAPIView, SingleAuthorLikesAPIView, SingleAuthorPostCommentLikeAPIView, SingleAuthorPostLikeAPIView
 from InstaTonneApis.endpoints.inbox import InboxAPIView
+from InstaTonneApis.endpoints.github import GithubAPIView
 
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
@@ -62,6 +63,7 @@ urlpatterns = [
     re_path(r"^authors\/(?P<author_id>.+?)\/liked\/?$", SingleAuthorLikesAPIView.as_view()),
     re_path(r"^authors\/(.+?)\/followers\/(.+?)\/request\/?$", get_request_object),
     re_path(r"^authors\/(?P<author_id>.+?)\/posts\/(?P<post_id>.+?)\/image\/?$", SingleAuthorPostImageAPIView.as_view()),
+    re_path(r"^authors\/(?P<author_id>.+?)\/github\/?$", GithubAPIView.as_view()),
 
     re_path(r"^authors\/(?P<author_id>.+?)\/posts\/(?P<post_id>.+?)\/comments\/(?P<comment_id>.+?)\/likes\/(?P<like_id>.+?)\/?$", SingleAuthorPostCommentLikeAPIView.as_view()),
     re_path(r"^authors\/(?P<author_id>.+?)\/posts\/(?P<post_id>.+?)\/comments\/(?P<comment_id>.+?)\/likes\/?$", SingleAuthorPostCommentLikesAPIView.as_view()),
