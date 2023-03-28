@@ -88,7 +88,7 @@ class SingleAuthorPostAPIView(APIView):
         return single_author_post_post(request, author_id, post_id)
 
     @swagger_auto_schema(
-        operation_description="remote a post of author_id",
+        operation_description="remove a post of author_id",
         operation_id="single_author_post_delete",
         responses={204: 'success',},
         manual_parameters=[
@@ -165,6 +165,20 @@ class SingleAuthorPostsAPIView(APIView):
                 type=openapi.TYPE_STRING,
                 default='1',
             ),
+            openapi.Parameter(
+                'page',
+                in_=openapi.IN_QUERY,
+                description='page number',
+                type=openapi.TYPE_INTEGER,
+                default=1,
+            ),
+            openapi.Parameter(
+                'size',
+                in_=openapi.IN_QUERY,
+                description='number of items per page',
+                type=openapi.TYPE_INTEGER,
+                default=1,
+            ),
         ],
     )
     def get(self, request: HttpRequest, author_id: str):
@@ -211,7 +225,7 @@ class SingleAuthorPostImageAPIView(APIView):
     @swagger_auto_schema(
         operation_description="get the image in a post of author_id",
         operation_id="single_author_post_image_get",
-        responses={200: PostSerializer(),},
+        responses={200: 'the image itself',},
         manual_parameters=[
             openapi.Parameter(
                 'author_id',

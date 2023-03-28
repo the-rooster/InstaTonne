@@ -21,7 +21,8 @@ class InboxAPIView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     @swagger_auto_schema(
-        operation_description="get inbox for author_id",
+        operation_description="get the inbox of author_id",
+        operation_id="inbox_get",
         responses={200: InboxResponseSerializer(),},
         manual_parameters=[
             openapi.Parameter(
@@ -29,24 +30,42 @@ class InboxAPIView(APIView):
                 in_=openapi.IN_PATH,
                 description='author id',
                 type=openapi.TYPE_STRING,
-                default='2',
+                default='1',
             ),
         ],
     )
     def get(self, request: HttpRequest, author_id: str):
-        return inbox_endpoint(request, author_id)
+        return get_inbox(request, author_id)
 
     @swagger_auto_schema(
-        operation_description="post to inbox for author_id",
+        operation_description='''
+        add item to inbox of author_id\n
+        When adding a post, the body should contain at least:\n
+            - type: 'post'\n
+            - id: <url to the post>\n
+        When adding a like, the body should contain at least:\n
+            - summary: <summary of the like>\n
+            - type: 'like'\n
+            - author: <url to the author making the like>\n
+            - object: <url to the comment or post being liked>\n
+        When adding a comment, the body should contain at least:\n
+            - type: 'comment'\n
+            - contentType: <contentType of the comment>\n
+            - content: <content of the comment>\n
+            - author: <url to the author making the comment>\n
+            - post: <url to the post being commented on>\n
+        When adding a follow, the body should contain at least:\n
+            - type: 'follow'\n
+            - summary: <summary of the follow>\n
+            - actor: { id: <url to the author making the follow request> }\n
+        ''',
+        operation_id="inbox_post",
         responses={204: 'success',},             
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                "type": openapi.Schema(type=openapi.TYPE_STRING, example="like"),
-                "author": openapi.Schema(type=openapi.TYPE_STRING, example="http://127.0.0.1:8000/authors/1"),
-                "post": openapi.Schema(type=openapi.TYPE_STRING, example="http://127.0.0.1:8000/authors/1/posts/1"),
-                "comment": openapi.Schema(type=openapi.TYPE_STRING, example="http://127.0.0.1:8000/authors/1/posts/1/comments/1"),
-                "item": openapi.Schema(type=openapi.TYPE_STRING),
+                "type": openapi.Schema(type=openapi.TYPE_STRING, example="post"),
+                "id": openapi.Schema(type=openapi.TYPE_STRING, example="http://127.0.0.1:8000/authors/1/posts/1"),
             },
         ),
         manual_parameters=[
@@ -60,10 +79,11 @@ class InboxAPIView(APIView):
         ],
     )
     def post(self, request: HttpRequest, author_id: str):
-        return inbox_endpoint(request, author_id)
+        return post_inbox(request, author_id)
 
     @swagger_auto_schema(
-        operation_description="delete inbox for author_id",
+        operation_description="clear the inbox of author_id",
+        operation_id="inbox_delete",
         responses={204: 'success',},
         manual_parameters=[
             openapi.Parameter(
@@ -76,24 +96,7 @@ class InboxAPIView(APIView):
         ],
     )
     def delete(self, request: HttpRequest, author_id: str):
-        return inbox_endpoint(request, author_id)
-
-
-# handle requests to the inbox
-def inbox_endpoint(request: HttpRequest, author_id: str):
-    # if not check_auth_header(request):
-    #     return HttpResponse(status=401)
-    
-    if request.method == "GET":
-        return get_inbox(request, author_id)
-    
-    if request.method == "POST":
-        return post_inbox(request, author_id)
-    
-    if request.method == "DELETE":
         return delete_inbox(request, author_id)
-    
-    return HttpResponse(status=405)
 
 
 # get the items in an authors inbox

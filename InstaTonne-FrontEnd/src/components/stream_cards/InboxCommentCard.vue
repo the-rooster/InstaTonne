@@ -1,39 +1,55 @@
 <template>
-  <v-card class="mx-auto" color="#fff" theme="light" max-width="90%" style="margin:5%">
+  <v-card
+    class="mx-auto my-5 rounded-xl"
+    color="#E3F2FD"
+    theme="light"
+    max-width="80%"
+    style="margin: 5%"
+  >
     <v-card-actions>
       <v-list-item class="w-100">
-        <v-list-item-title><a :href="`/app/ProfilePage/${encodeURIComponent(author.url)}/`">{{ author.displayName }}</a> commented on your post</v-list-item-title>
+        <v-list-item-title
+          ><a :href="`/app/ProfilePage/${encodeURIComponent(author.url)}/`">{{
+            author.displayName
+          }}</a>
+          commented on your post</v-list-item-title
+        >
         <template v-slot:append>
-          <div class="justify-self-end">
-          </div>
+          <div class="justify-self-end"></div>
         </template>
-        <div style="display:flex;flex-direction:row;justify-content:space-between">
-          <img :src="author.profileImage" class="profile-picture">
+        <div
+          style="
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+          "
+        >
+          <img :src="author.profileImage" class="profile-picture" />
           <v-list-item>{{ props.commentData.comment }}</v-list-item>
           <a v-bind:href="postUrl">
-              <div class="post-tiny" >
-                  <h1
-                  style="
-                      text-overflow: ellipsis;
-                      white-space: nowrap;
-                      max-width: 100%;
-                      overflow: hidden;
-                  "
-                  >
-                  {{ postData.title }}
-                  </h1>
-                  <span
-                  style="
-                      text-overflow: ellipsis;
-                      white-space: nowrap;
-                      max-width: 100%;
-                      overflow: hidden;
-                  "
-                  >{{ postData.description }}</span>
-              </div>
+            <div class="post-tiny">
+              <h1
+                style="
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
+                  max-width: 100%;
+                  overflow: hidden;
+                "
+              >
+                {{ postData.title }}
+              </h1>
+              <span
+                style="
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
+                  max-width: 100%;
+                  overflow: hidden;
+                "
+                >{{ postData.description }}</span
+              >
+            </div>
           </a>
-          </div>
-
+        </div>
       </v-list-item>
     </v-card-actions>
   </v-card>
@@ -56,38 +72,42 @@ const props = defineProps({
 });
 
 onBeforeMount(() => {
+  let commentId: string = props.commentData.id;
 
-  let commentId : string = props.commentData.id
+  let groups = commentId.match(
+    /(.*)\/authors\/(?<authorId>.*)\/posts\/(?<postId>.*)\/comments\//
+  )?.groups;
 
-  let groups = commentId.match(/(.*)\/authors\/(?<authorId>.*)\/posts\/(?<postId>.*)\/comments\//)?.groups;
-
-
-  
   let authorId = "";
   let postId = "";
-  if (groups){
-      authorId = groups.authorId;
-      postId = groups.postId
+  if (groups) {
+    authorId = groups.authorId;
+    postId = groups.postId;
   }
 
-  postUrl.value=`authors/${encodeURIComponent(authorId)}/posts/${encodeURIComponent(postId)}`;
+  postUrl.value = `authors/${encodeURIComponent(
+    authorId
+  )}/posts/${encodeURIComponent(postId)}`;
 
-  console.log("POSTID",postId)
-  console.log("AUTHORID",authorId)
-  createHTTP(`authors/${encodeURIComponent(authorId)}/posts/${encodeURIComponent(postId)}`).get()
-  .then((result) => {
-      console.log("POST",result.data)
+  console.log("POSTID", postId);
+  console.log("AUTHORID", authorId);
+  createHTTP(
+    `authors/${encodeURIComponent(authorId)}/posts/${encodeURIComponent(
+      postId
+    )}`
+  )
+    .get()
+    .then((result) => {
+      console.log("POST", result.data);
       postData.value = result.data;
-  })
+    });
 
   createHTTP(`authors/${encodeURIComponent(props.commentData.author)}`)
-  .get()
-  .then((response) => {
-    author.value = response.data;
-  });
-})
-
-
+    .get()
+    .then((response) => {
+      author.value = response.data;
+    });
+});
 
 // defineProps<{ msg: string }>();
 </script>

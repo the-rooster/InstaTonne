@@ -1,39 +1,54 @@
 <template>
-  <v-card class="mx-auto" color="#fff" theme="light" max-width="90%">
+  <v-card
+    class="mx-auto my-5 rounded-xl"
+    color="#E3F2FD"
+    theme="light"
+    max-width="80%"
+  >
     <v-card-actions>
       <v-list-item class="w-100">
-        <v-list-item-title><a :href="`/app/ProfilePage/${encodeURIComponent(author.url)}/`">{{ author.displayName }}</a> liked your post</v-list-item-title>
+        <v-list-item-title
+          ><a :href="`/app/ProfilePage/${encodeURIComponent(author.url)}/`">{{
+            author.displayName
+          }}</a>
+          liked your post</v-list-item-title
+        >
         <template v-slot:append>
-          <div class="justify-self-end">
-          </div>
+          <div class="justify-self-end"></div>
         </template>
-        <div style="display:flex;flex-direction:row;justify-content:space-between">
-          <img :src="author.profileImage" class="profile-picture">
+        <div
+          style="
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+          "
+        >
+          <img :src="author.profileImage" class="profile-picture" />
           <v-list-item>{{ props.likeData.summary }}</v-list-item>
           <a v-bind:href="postUrl">
-              <div class="post-tiny" >
-                  <h1
-                  style="
-                      text-overflow: ellipsis;
-                      white-space: nowrap;
-                      max-width: 100%;
-                      overflow: hidden;
-                  "
-                  >
-                  {{ postData.title }}
-                  </h1>
-                  <span
-                  style="
-                      text-overflow: ellipsis;
-                      white-space: nowrap;
-                      max-width: 100%;
-                      overflow: hidden;
-                  "
-                  >{{ postData.description }}</span>
-              </div>
+            <div class="post-tiny">
+              <h1
+                style="
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
+                  max-width: 100%;
+                  overflow: hidden;
+                "
+              >
+                {{ postData.title }}
+              </h1>
+              <span
+                style="
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
+                  max-width: 100%;
+                  overflow: hidden;
+                "
+                >{{ postData.description }}</span
+              >
+            </div>
           </a>
-          </div>
-
+        </div>
       </v-list-item>
     </v-card-actions>
   </v-card>
@@ -56,42 +71,40 @@ const props = defineProps({
 });
 
 onBeforeMount(() => {
+  let postId: string = props.likeData.object;
 
-  let postId : string = props.likeData.object;
+  let groups = postId.match(
+    /http:\/\/(.*)\/authors\/(?<authorId>.*)\/posts\//
+  )?.groups;
 
-  let groups = postId.match(/http:\/\/(.*)\/authors\/(?<authorId>.*)\/posts\//)?.groups;
-
-
-  
   let authorId = "";
 
-  if (groups){
-      authorId = groups.authorId;
+  if (groups) {
+    authorId = groups.authorId;
   }
-  postUrl.value=`authors/${encodeURIComponent(authorId)}/posts/${encodeURIComponent(postId)}/`;
-  
+  postUrl.value = `authors/${encodeURIComponent(
+    authorId
+  )}/posts/${encodeURIComponent(postId)}/`;
 
-  console.log("POSTID",postId);
-  console.log("AUTHORID",authorId);
-  createHTTP(`authors/${authorId}/posts/${postId}`).get()
-  .then((result) => {
-      console.log("POST",result.data)
+  console.log("POSTID", postId);
+  console.log("AUTHORID", authorId);
+  createHTTP(`authors/${authorId}/posts/${postId}`)
+    .get()
+    .then((result) => {
+      console.log("POST", result.data);
       postData.value = result.data;
-  })
+    });
 
   createHTTP(`authors/${encodeURIComponent(props.likeData.author)}/`)
-  .get()
-  .then((response) => {
-    console.log(response.data, 51515);
-    author.value = response.data;
-    console.log(response.data, 567);
-    
-  });
-})
+    .get()
+    .then((response) => {
+      console.log(response.data, 51515);
+      author.value = response.data;
+      console.log(response.data, 567);
+    });
+});
 
 console.log(toRaw(props.likeData).id, 555);
-
-
 
 // defineProps<{ msg: string }>();
 </script>

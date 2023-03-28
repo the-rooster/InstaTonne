@@ -42,6 +42,22 @@ class AuthorsAPIView(APIView):
     @swagger_auto_schema(
         operation_description="get all the authors stored on this server",
         responses={200: AuthorsResponseSerializer(),},
+        manual_parameters=[
+            openapi.Parameter(
+                'page',
+                in_=openapi.IN_QUERY,
+                description='page number',
+                type=openapi.TYPE_INTEGER,
+                default=1,
+            ),
+            openapi.Parameter(
+                'size',
+                in_=openapi.IN_QUERY,
+                description='number of items per page',
+                type=openapi.TYPE_INTEGER,
+                default=1,
+            ),
+        ],
     )
     def get(self, request: HttpRequest):
         return authors_get(request)

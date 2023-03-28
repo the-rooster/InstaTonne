@@ -56,7 +56,7 @@ def get_all_urls(urls: list[str]):
     return result
 
 
-def get_one_url(url: str) -> Tuple[int, str, str|None]:
+def get_one_url(url: str):
 
     # check if requested hostname in valid hosts here
     if not can_send_request(url):
