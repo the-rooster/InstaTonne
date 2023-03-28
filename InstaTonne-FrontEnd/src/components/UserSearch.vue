@@ -2,7 +2,7 @@
   <div class="viewBox">
     <h2>User Search</h2>
     <!-- server list -->
-    <h4 style="padding: 0px">Connected Servers</h4>
+    <h4 style="padding: 0">Connected Servers</h4>
     <div class="server-list">
       <div v-for="server in servers" :key="server.host" class="server-display">
         <v-btn
