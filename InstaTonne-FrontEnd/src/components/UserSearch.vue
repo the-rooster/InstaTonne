@@ -2,7 +2,7 @@
   <div class="viewBox">
     <h2>User Search</h2>
     <!-- server list -->
-    <h4 style="padding: 0px">Connected Servers</h4>
+    <h4 style="padding: 0">Connected Servers</h4>
     <div class="server-list">
       <div v-for="server in servers" :key="server.host" class="server-display">
         <v-btn
@@ -151,24 +151,24 @@ async function fetchRemoteAuthors(server: string) {
     });
 }
 
-  onBeforeMount(() => {
-    fetchAuthors();
-    getAllServers();
-  });
+onBeforeMount(() => {
+  fetchAuthors();
+  getAllServers();
+});
 
-  const myVal = computed({
-    get() {
-      return authorsList.value.filter((u) => {
-        return (
-          u.displayName.toLowerCase().indexOf(search.value.toLowerCase()) != -1
-        );
-      });
-      // return authorsList.value
-    },
-    set(val) {
-      return;
-    },
-  });
+const myVal = computed({
+  get() {
+    return authorsList.value.filter((u) => {
+      return (
+        u.displayName.toLowerCase().indexOf(search.value.toLowerCase()) != -1
+      );
+    });
+    // return authorsList.value
+  },
+  set(val) {
+    return;
+  },
+});
 
 // function filteredUsers() {
 //   // return authorsList.value.reduce((u: string) => {
