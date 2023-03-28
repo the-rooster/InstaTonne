@@ -7,7 +7,9 @@
   >
     <v-card-actions>
       <v-list-item class="w-100">
-        <v-list-item-title>{{ author.displayName }}</v-list-item-title>
+        <v-list-item-title>{{
+          props.commentData.author.displayName
+        }}</v-list-item-title>
         <template v-slot:append>
           <p>{{ likeCount }} Likes</p>
           <div class="justify-self-end">
