@@ -1,15 +1,12 @@
 <template>
   <v-card
-    class="mx-auto"
-    color="#fff"
+    class="mx-auto my-5 rounded-l"
+    color="#E3F2FD"
     theme="light"
-    max-width="400"
+    max-width="80%"
   >
     <v-card-actions>
-      <v-list-item
-        v-if="loading"
-        class="w-100"
-      >
+      <v-list-item v-if="loading" class="w-100">
         <v-progress-circular
           indeterminate
           width="20"
@@ -17,47 +14,41 @@
           class="loadingIcon"
         />
       </v-list-item>
-      <v-list-item
-        v-else
-        class="w-100"
-      >
+      <v-list-item v-else class="w-100">
         <v-list-item-title />
         <template #append>
-          {{
-            props.requestData.displayName
-          }}
+          {{ props.requestData.displayName }}
         </template>
       </v-list-item>
     </v-card-actions>
   </v-card>
 </template>
-  
-<script setup lang="ts">
-import { ref } from 'vue'
-import AuthorCard from "../AuthorCard.vue"
-import { createHTTP,  } from '../../axiosCalls'
 
-const loading = ref(false)
+<script setup lang="ts">
+import { ref } from "vue";
+import AuthorCard from "../AuthorCard.vue";
+import { createHTTP } from "../../axiosCalls";
+
+const loading = ref(false);
 
 const props = defineProps({
-    requestData: {
-        type: Object,
-        required: true,
-    },
-    authorId: {
-        type: Number,
-        required: true
-    }
+  requestData: {
+    type: Object,
+    required: true,
+  },
+  authorId: {
+    type: Number,
+    required: true,
+  },
 });
 
-const emit = defineEmits(['update'])
+const emit = defineEmits(["update"]);
 
-const error = ref("")
+const error = ref("");
 </script>
 
 <style scoped>
 .read-the-docs {
-color: #888;
+  color: #888;
 }
 </style>
-  
