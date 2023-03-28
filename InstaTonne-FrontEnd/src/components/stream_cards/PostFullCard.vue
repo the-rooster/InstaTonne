@@ -33,6 +33,16 @@
         <template v-slot:append>
           <p>{{ numberOfLikes }} Likes</p>
           <div class="justify-self-end">
+            <router-link
+              v-bind:to="`/editPost/${encodeURIComponent(getPostId())}/`"
+            >
+              <v-btn v-if="isAuthorsPost"
+                ><v-icon class="me-1" icon="mdi-pencil"></v-icon
+              ></v-btn>
+            </router-link>
+            <v-btn v-if="isAuthorsPost" @click="deletePost"
+              ><v-icon class="me-1" icon="mdi-delete"></v-icon
+            ></v-btn>
             <v-btn v-if="isLiked"
               ><v-icon class="me-1" icon="mdi-heart" color="blue"></v-icon
             ></v-btn>
