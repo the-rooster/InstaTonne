@@ -1,7 +1,6 @@
 <template>
   <div class="viewBox">
     <div>
-
       <AuthorCard :author-info="postData.author" />
 
       <v-text-field
@@ -81,6 +80,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
+import { router } from "../main";
 import AuthorCard from "./AuthorCard.vue";
 
 const props = defineProps({
@@ -113,6 +113,8 @@ const disableSaving = computed(
 
 async function savePost() {
   props.saveFunction(postData.value);
+  // Go to home page
+  router.push({ path: "/" });
 }
 </script>
 
