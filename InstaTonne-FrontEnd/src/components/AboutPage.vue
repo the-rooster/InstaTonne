@@ -4,7 +4,6 @@
   margin: 0 auto;
   margin-top: 20;
   text-align: center;
-  background-color: #f9f9f9;
   padding: 2rem;
   border-radius: 10pt;
   font-family: Arial, sans-serif;
@@ -22,7 +21,6 @@
   line-height: 1.5;
   max-width: 90%;
   margin: 0 auto;
-  margin-bottom: 1.5rem;
 }
 
 .viewBox a {
@@ -53,6 +51,7 @@
       various independent social networks without being limited to a single
       platform like Facebook, Instagram or Twitter.
     </p>
+    <br />
     <p>
       Inspired by
       <a href="https://diasporafoundation.org/" target="_blank">Diaspora</a>,
@@ -61,6 +60,7 @@
       like GitHub and other social networks. It also enables the distribution
       and sharing of posts and content across different servers.
     </p>
+    <br />
     <p>
       With InstaTonne, authors can aggregate their friends' posts from other
       servers, creating a seamless and interconnected experience. We utilize an
@@ -72,18 +72,21 @@
       protocol. However, we've made it simpler and more accessible for everyday
       users.
     </p>
+    <br />
     <p>
       Our name, InstaTonne, is a playful nod to the popular platform Instagram,
       with the idea that we're a "tonne" better in terms of user control and
       freedom. Join us in redefining the social networking experience by taking
       control of your own content and connections.
     </p>
+    <br />
     <p>
       To learn more, check out our GitHub repository:
       <a href="https://github.com/the-rooster/InstaTonne" target="_blank"
         >InstaTonne</a
       >
     </p>
+    <br />
     <p>
       <strong>InstaTonne - Brought to you by CMPUT 404 W2023 Group 6</strong>
     </p>

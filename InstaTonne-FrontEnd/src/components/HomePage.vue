@@ -76,7 +76,7 @@ function getInbox() {
     .get()
     .then((response) => {
       console.log(response.data, 3454545);
-      posts.value = response.data.items;
+      posts.value = response.data.items.reverse();
       console.log(response.data.items, 125125125);
     });
 }
