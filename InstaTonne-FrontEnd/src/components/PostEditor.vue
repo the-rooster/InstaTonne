@@ -1,7 +1,6 @@
 <template>
   <div class="viewBox">
     <div>
-      <AuthorCard :author-info="postData.author" />
 
       <v-text-field
         v-model="postData.title"

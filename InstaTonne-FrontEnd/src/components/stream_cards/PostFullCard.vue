@@ -11,9 +11,9 @@
           <v-avatar
             size="70"
             color="grey-darken-3"
-            image="{{
+            :image="
               props.postData.author.profileImage
-              }}"
+              "
           ></v-avatar>
         </template>
 
