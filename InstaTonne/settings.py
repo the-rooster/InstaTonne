@@ -75,7 +75,8 @@ CORS_ALLOWED_ORIGINS = [
     FRONTEND,
     "https://group-13-epic-app.herokuapp.com",
     "https://social-distribution-media.herokuapp.com",
-    "https://t20-social-distribution.herokuapp.com"
+    "https://t20-social-distribution.herokuapp.com",
+    "https://evil-instatonne.herokuapp.com"
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -86,7 +87,8 @@ CSRF_TRUSTED_ORIGINS = [
     FRONTEND,
     "https://group-13-epic-app.herokuapp.com",
     "https://social-distribution-media.herokuapp.com",
-    "https://t20-social-distribution.herokuapp.com"
+    "https://t20-social-distribution.herokuapp.com",
+    "https://evil-instatonne.herokuapp.com"
 ]
 
 CORS_ALLOW_HEADERS = [
