@@ -89,6 +89,8 @@ def send_to_single_inbox(author_url : str, data : dict):
         print(e)
         print("SERVER DOWN! Returning 404")
         return 404
+    
+    print("RESPONSE STATUS CODE!!!!!!!!!!!!!!!!!!!",response.status_code)
     return response.status_code
 
 def send_to_inboxes(author_id: str, author_url: str, data: dict, item_visibility: str):
