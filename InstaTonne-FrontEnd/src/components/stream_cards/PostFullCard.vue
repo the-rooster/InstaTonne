@@ -31,6 +31,22 @@
         }}</v-list-item-subtitle>
 
         <template v-slot:append>
+          <div class="justify-self-end">
+            <router-link
+              v-bind:to="`/editPost/${encodeURIComponent(getPostId())}/`"
+            >
+              <v-btn v-if="isAuthorsPost"
+                ><v-icon
+                  class="me-1"
+                  icon="mdi-pencil-outline"
+                  color="black"
+                ></v-icon
+              ></v-btn>
+            </router-link>
+            <v-btn v-if="isAuthorsPost" @click="deletePost"
+              ><v-icon class="me-1" icon="mdi-delete-outline"></v-icon
+            ></v-btn>
+          </div>
           <p>{{ numberOfLikes }} Likes</p>
           <div class="justify-self-end">
             <v-btn v-if="isLiked"
@@ -269,6 +285,19 @@ async function checkIfShared() {
         }
       }
     });
+}
+
+const isAuthorsPost = computed(() => {
+  if (!props.postData.author) {
+    return false;
+  }
+  let author_id = props.postData.author.id;
+  console.log(author_id.endsWith(authorId), 8988);
+  return author_id.endsWith(authorId);
+});
+
+function getPostId() {
+  return props.postData.id.substring(props.postData.id.lastIndexOf("/") + 1);
 }
 
 async function deletePost() {
