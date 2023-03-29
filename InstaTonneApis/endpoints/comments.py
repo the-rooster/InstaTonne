@@ -18,7 +18,7 @@ class SingleAuthorPostCommentsAPIView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     @swagger_auto_schema(
-        operation_description="get the list of comments of the post whose id is post_id",
+        operation_description="Get the list of comments of the post whose id is post_id (paginated).",
         operation_id="single_post_comments_get",
         responses={200: CommentsResponseSerializer()},
         manual_parameters=[
@@ -59,7 +59,7 @@ class SingleAuthorPostCommentsAPIView(APIView):
             return single_post_comments_get(request, author_id, post_id)
         
     @swagger_auto_schema(
-        operation_description="add a comment to the post whose id is post_id",
+        operation_description="Add a comment to the post whose id is post_id.",
         operation_id="single_post_comments_post",
         responses={204: 'success',},
         request_body=openapi.Schema(
@@ -98,7 +98,7 @@ class SingleAuthorPostCommentAPIView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     @swagger_auto_schema(
-        operation_description="get the comment whose id is comment_id",
+        operation_description="Get the comment whose id is comment_id.",
         operation_id="single_post_comment_get",
         responses={200: CommentResponseSerializer()},
         manual_parameters=[
