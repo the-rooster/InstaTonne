@@ -17,7 +17,7 @@ class SingleAuthorPostLikesAPIView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     @swagger_auto_schema(
-        operation_description="get the list of likes of the post whose id is post_id",
+        operation_description="Get the list of likes of the post whose id is post_id.",
         operation_id="single_post_likes_get",
         responses={200: LikesResponseSerializer()},
         manual_parameters=[
@@ -44,7 +44,7 @@ class SingleAuthorPostLikesAPIView(APIView):
             return single_post_likes_get(request, author_id, post_id)
         
     @swagger_auto_schema(
-        operation_description="add a like to the post whose id is post_id",
+        operation_description="Add a like to the post whose id is post_id.",
         operation_id="single_post_likes_post",
         responses={204: 'success'},
         manual_parameters=[
@@ -74,7 +74,7 @@ class SingleAuthorPostCommentLikesAPIView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     @swagger_auto_schema(
-        operation_description="get the list of likes of the comment whose id is comment_id",
+        operation_description="Get the list of likes of the comment whose id is comment_id.",
         operation_id="single_comment_likes_get",
         responses={200: LikesResponseSerializer()},
         manual_parameters=[
@@ -108,7 +108,7 @@ class SingleAuthorPostCommentLikesAPIView(APIView):
             return single_comment_likes_get(request, author_id, post_id, comment_id)
         
     @swagger_auto_schema(
-        operation_description="add a like to the comment whose id is comment_id",
+        operation_description="Add a like to the comment whose id is comment_id.",
         operation_id="single_comment_likes_post",
         responses={204: 'success'},
         manual_parameters=[
@@ -146,7 +146,7 @@ class SingleAuthorLikesAPIView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     @swagger_auto_schema(
-        operation_description="get the list of likes of the author whose id is author_id",
+        operation_description="Get the list of likes of the author whose id is author_id.",
         operation_id="single_author_likes",
         responses={200: LikesResponseSerializer()},
         manual_parameters=[
@@ -170,7 +170,7 @@ class SingleAuthorPostLikeAPIView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     @swagger_auto_schema(
-        operation_description="get the like whose id is like_id of the post whose id is post_id",
+        operation_description="Get the like whose id is like_id of the post whose id is post_id.",
         operation_id="single_post_like_get",
         responses={200: LikeResponseSerializer()},
         manual_parameters=[
@@ -205,7 +205,7 @@ class SingleAuthorPostCommentLikeAPIView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     @swagger_auto_schema(
-        operation_description="get the like whose id is like_id of the comment whose id is comment_id",
+        operation_description="Get the like whose id is like_id of the comment whose id is comment_id.",
         operation_id="single_comment_like_get",
         responses={200: LikeResponseSerializer()},
         manual_parameters=[
