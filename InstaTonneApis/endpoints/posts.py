@@ -25,7 +25,7 @@ class SingleAuthorPostAPIView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     @swagger_auto_schema(
-        operation_description="get a post of author_id",
+        operation_description="Get a post of author_id.",
         operation_id="single_author_post_get",
         responses={200: PostSerializer(),},
         manual_parameters=[
@@ -52,7 +52,7 @@ class SingleAuthorPostAPIView(APIView):
             return single_author_post_get(request, author_id, post_id)
 
     @swagger_auto_schema(
-        operation_description="update a post of author_id",
+        operation_description="Update the post with post_id of author_id.",
         operation_id="single_author_post_post",
         responses={204: 'success',},
         request_body=openapi.Schema(
@@ -88,7 +88,7 @@ class SingleAuthorPostAPIView(APIView):
         return single_author_post_post(request, author_id, post_id)
 
     @swagger_auto_schema(
-        operation_description="remove a post of author_id",
+        operation_description="Remove the post with post_id of author_id.",
         operation_id="single_author_post_delete",
         responses={204: 'success',},
         manual_parameters=[
@@ -112,7 +112,7 @@ class SingleAuthorPostAPIView(APIView):
         return single_author_post_delete(request, author_id, post_id)
 
     @swagger_auto_schema(
-        operation_description="create a post of author_id",
+        operation_description="Create a post of author_id.",
         operation_id="single_author_post_put",
         responses={204: 'success',},
         request_body=openapi.Schema(
@@ -155,7 +155,7 @@ class SingleAuthorPostsAPIView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     @swagger_auto_schema(
-        operation_description="get the posts of author_id",
+        operation_description="Get the most recent  of author_id.",
         responses={200: PostsResponseSerializer(),},
         manual_parameters=[
             openapi.Parameter(
@@ -188,7 +188,7 @@ class SingleAuthorPostsAPIView(APIView):
             return single_author_posts_get(request, author_id)
 
     @swagger_auto_schema(
-        operation_description="create a post as author_id",
+        operation_description="Create a post as author_id.",
         responses={204: 'success',},
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
@@ -223,9 +223,9 @@ class SingleAuthorPostImageAPIView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     @swagger_auto_schema(
-        operation_description="get the image in a post of author_id",
+        operation_description="Get the public post of author_id converted to binary as an image. This endpoint decode image posts as images. This allows the use of image tags in markdown. You can use this to proxy or cache images.",
         operation_id="single_author_post_image_get",
-        responses={200: 'the image itself',},
+        responses={200: 'the image itself', 404: 'if not an image'},
         manual_parameters=[
             openapi.Parameter(
                 'author_id',
