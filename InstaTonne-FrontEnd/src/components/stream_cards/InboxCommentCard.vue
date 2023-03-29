@@ -9,8 +9,8 @@
     <v-card-actions>
       <v-list-item class="w-100">
         <v-list-item-title
-          ><a :href="`/app/ProfilePage/${encodeURIComponent(author.url)}/`">{{
-            author.displayName
+          ><a :href="`/app/ProfilePage/${encodeURIComponent(commentData.author.url)}/`">{{
+            commentData.author.displayName
           }}</a>
           commented on your post</v-list-item-title
         >
@@ -24,7 +24,7 @@
             justify-content: space-between;
           "
         >
-          <img :src="author.profileImage" class="profile-picture" />
+          <img :src="commentData.author.profileImage" class="profile-picture" />
           <v-list-item>{{ props.commentData.comment }}</v-list-item>
           <a v-bind:href="postUrl">
             <div class="post-tiny">
