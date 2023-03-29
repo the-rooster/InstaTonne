@@ -19,13 +19,13 @@ class SingleAuthorFollowersAPIView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     @swagger_auto_schema(
-        operation_description="get the followers of author_id",
+        operation_description="Get a list of authors who are AUTHOR_ID's followers.",
         responses={200: FollowersResponseSerializer(),},
         manual_parameters=[
             openapi.Parameter(
                 'author_id',
                 in_=openapi.IN_PATH,
-                description='- ID of the author stored on this server\n\nOR\n\n- URL to a followers endpoint [FOR LOCAL USE]',
+                description='- ID of an author stored on this server\n\nOR\n\n- URL to an author [FOR LOCAL USE]',
                 type=openapi.TYPE_STRING,
                 default='1',
             ),
@@ -43,7 +43,7 @@ class SingleAuthorFollowerAPIView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     @swagger_auto_schema(
-        operation_description="check if foreign_author_id is following author_id",
+        operation_description="Check if foreign_author_id is following author_id.",
         responses={204: 'success',},
         manual_parameters=[
             openapi.Parameter(
@@ -69,7 +69,7 @@ class SingleAuthorFollowerAPIView(APIView):
             return check_author_follower(request, author_id, foreign_author_id)
         
     @swagger_auto_schema(
-        operation_description="send a follow request to foreign_author_id from author_id ",
+        operation_description="Send a follow request to foreign_author_id from author_id.",
         responses={204: 'success',},
         manual_parameters=[
             openapi.Parameter(
@@ -92,7 +92,7 @@ class SingleAuthorFollowerAPIView(APIView):
         return post_author_follower(request, author_id, foreign_author_id)
 
     @swagger_auto_schema(
-        operation_description="remove foreign_author_id as a follower of author_id",
+        operation_description="Remove foreign_author_id as a follower of author_id.",
         responses={204: 'success',},
         manual_parameters=[
             openapi.Parameter(
@@ -115,7 +115,7 @@ class SingleAuthorFollowerAPIView(APIView):
         return delete_author_follower(request, author_id, foreign_author_id)
 
     @swagger_auto_schema(
-        operation_description="accept a follow request from foreign_author_id as author_id",
+        operation_description="Accept a follow request from foreign_author_id as author_id.",
         responses={204: 'success',},
         manual_parameters=[
             openapi.Parameter(
