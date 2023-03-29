@@ -233,7 +233,7 @@ async function getPostLikeCount() {
   if (!props.postData.author) {
     return;
   }
-  await createHTTP(`/authors/${encodeURI(props.postData.origin)}/likes/`)
+  await createHTTP(`/authors/${encodeURI(props.postData.author.url)}/posts/${encodeURI(props.postData.source)}/likes/`)
     .get()
     .then((response: { data: object }) => {
       console.log(response.data, "get post like count");
