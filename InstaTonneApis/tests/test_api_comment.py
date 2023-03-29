@@ -1,5 +1,5 @@
 from rest_framework import status
-from InstaTonneApis.models import Comment, CommentSerializer
+from InstaTonneApis.models import Comment, CommentSerializer, Author, AuthorSerializer
 from django.http import HttpResponse
 import json
 from unittest.mock import patch, ANY, MagicMock
@@ -10,6 +10,7 @@ class CommentApiTestCase(AbstractApiTestCase):
     def test_get_post_comments(self):
         expected_comment = Comment.objects.all().filter(id_url=HOST + '/authors/1/posts/1/comments/1').first()
         serialized_expected_comment = CommentSerializer(expected_comment).data
+        serialized_expected_comment["author"] = {'error url': 'http://127.0.0.1:8001/authors/1'}
     
         response : HttpResponse = self.client.get(
             HOST + '/authors/1/posts/1/comments?page=1&size=1',
@@ -47,6 +48,7 @@ class CommentApiTestCase(AbstractApiTestCase):
     def test_get_post_comment(self):
         comment = Comment.objects.all().filter(id_url=HOST + '/authors/1/posts/1/comments/1').first()
         serialized_comment = CommentSerializer(comment).data
+        serialized_comment["author"] = {'error url': 'http://127.0.0.1:8001/authors/1'}
     
         response : HttpResponse = self.client.get(
             HOST + '/authors/1/posts/1/comments/1',
