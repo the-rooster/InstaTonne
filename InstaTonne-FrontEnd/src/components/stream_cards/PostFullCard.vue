@@ -195,7 +195,7 @@ async function likePost() {
     return;
   }
   console.log(props.postData.origin, "originn");
-  await createHTTP(`/authors/${encodeURIComponent(props.postData.author.url)}/posts/${encodeURIComponent(props.postData.origin)}/likes/`)
+  await createHTTP(`/authors/${encodeURIComponent(props.postData.author.url)}/posts/${encodeURIComponent(props.postData.id)}/likes/`)
     .post("")
     .then((response: { data: object }) => {
       console.log(response.data);
@@ -210,7 +210,7 @@ async function checkIfLiked() {
   if (!props.postData.author) {
     return;
   }
-  await createHTTP(`/authors/${encodeURIComponent(props.postData.author.url)}/posts/${encodeURIComponent(props.postData.origin)}/likes/`)
+  await createHTTP(`/authors/${encodeURIComponent(props.postData.author.url)}/posts/${encodeURIComponent(props.postData.id)}/likes/`)
     .get()
     .then((response: { data: object }) => {
       console.log(response.data, "check if liked");
