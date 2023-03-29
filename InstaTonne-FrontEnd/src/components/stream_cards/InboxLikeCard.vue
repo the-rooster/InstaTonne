@@ -126,4 +126,10 @@ console.log(toRaw(props.likeData).id, 555);
   align-items: center;
   font-size: 60%;
 }
+
+.profile-picture {
+  width: 10vw;
+  height: 10vw;
+  border-radius: 100%;
+}
 </style>

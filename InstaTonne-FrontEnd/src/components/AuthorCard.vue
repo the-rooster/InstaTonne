@@ -44,9 +44,8 @@ authorInfo: {
     justify-content: center;
 }
 .profile-picture {
-  width: 60%;
-  height: 60%;
-
+  width: 10vw;
+  height: 10vw;
   border-radius: 100%;
 }
 </style>
