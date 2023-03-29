@@ -12,8 +12,11 @@
     />
     <div v-else>
       {{ }}
-      <div style="display: flex; flex-direction: column;">
-        Followers
+      Followers
+      <div
+        v-if="followers.length > 0"
+        style="display: flex; flex-direction: column;"
+      >
         <FriendCard
           v-for="request in followers"
           :key="request"
@@ -22,8 +25,14 @@
           style="margin: 1em;"
         />
       </div>
-      <div style="display: flex; flex-direction: column;">
-        Follow Requests
+      <div v-else> 
+        No Followers :(
+      </div>
+      Follow Requests
+      <div
+        v-if="followRequests.length > 0"
+        style="display: flex; flex-direction: column;"
+      >
         <FollowRequestCard
           v-for="request in followRequests"
           :key="request.displayName"
@@ -32,6 +41,9 @@
           style="margin: 1em;"
           @update="removeRequest(request)"
         />
+      </div>
+      <div v-else> 
+        No Follow Requests
       </div>
     </div>
   </div>
@@ -46,7 +58,8 @@ import Cookies from "js-cookie";
 
 const loading = ref(true)
 // number of calls to make
-const loadingCounter = ref(2);
+const loadingCounter = ref(3);
+const followingData = ref({});
 const followersData = ref({});
 const requestData = ref({});
 
@@ -58,6 +71,13 @@ const removeRequest = ((request) => {
 })
 
 onBeforeMount(async () => {
+  await createHTTP(`authors/${authorId}/followers/${encodeURI("http://127.0.0.1:8000")}/authors/1/`).get().then((response: { data: object }) => {
+    followingData.value = response.data;
+    loadingCounter.value = loadingCounter.value - 1;
+    if (loadingCounter.value == 0) {
+      loading.value = false;
+    }
+  });
   await createHTTP(`authors/${authorId}/followers/`).get().then((response: { data: object }) => {
     followersData.value = response.data;
     loadingCounter.value = loadingCounter.value - 1;
