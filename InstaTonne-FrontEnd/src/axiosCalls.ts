@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const backend_url = "https://cmput404-group6-instatonne.herokuapp.com";
+const backend_url = "https://evil-instatonne.herokuapp.com";
 
 // try{
 //   if(import.meta.env.DEV){
