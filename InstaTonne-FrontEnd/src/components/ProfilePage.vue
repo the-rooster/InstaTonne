@@ -1,33 +1,30 @@
 <template>
   <div class="viewBox">
-    <!-- <h3>
-      InstaTonne Profile page
-    </h3> -->
-    <br />
-    <h1>{{ profileData.displayName }}</h1>
-    <br />
-    <v-btn
-      v-if="profileId === Cookies.get(USER_AUTHOR_ID_COOKIE)"
-      v-bind:href="`/app/authors/${profileId}/edit`"
-      >Edit Profile</v-btn
-    >
-    <a v-bind:href="profileData.github"
-      ><p>Github: {{ profileData.github }}</p></a
-    >
-    <a v-bind:href="profileData.host"
-      ><p>Origin: {{ profileData.host }}</p></a
-    >
-    <br />
-    <div class="flex-container">
-      <img class="profile-picture" v-bind:src="profileData.profileImage" />
-      <a class="flex-content">
-        <span class="followers"><br /><br />Followers: {{ follow_count }}</span>
-      </a>
+    <div class="profile-data-container">
+      <img class="profile-picture mx-5" v-bind:src="profileData.profileImage" />
+      <div class="profile-details">
+        <h1>{{ profileData.displayName }}</h1>
+        <h3>
+          Github:
+          <a v-bind:href="profileData.github">{{ profileData.github }}</a>
+        </h3>
+        <br />
+        <h3>
+          Server: <a v-bind:href="profileData.host">{{ profileData.host }}</a>
+        </h3>
+        <br />
+        <h3 class="followers">Followers: {{ follow_count }}</h3>
+        <br />
+        <v-btn
+          v-if="profileId === Cookies.get(USER_AUTHOR_ID_COOKIE)"
+          v-bind:href="`/app/authors/${profileId}/edit`"
+          >Edit Profile</v-btn
+        >
+        <v-btn v-else @click="follow()" :disabled="!canFollow"> Follow </v-btn>
+      </div>
     </div>
-    <v-btn @click="follow()" :disabled="!canFollow"> Follow </v-btn>
     <br />
-    <br />
-    <div class="flex-container">
+    <div class="post-container">
       <PostPreviewCard
         class="post-preview-card"
         v-for="post in posts"
@@ -141,7 +138,12 @@ function follow() {
 .read-the-docs {
   color: #888;
 }
-.flex-container {
+
+.profile-data-container {
+  display: flex;
+  align-items: center;
+}
+.post-container {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -157,9 +159,17 @@ function follow() {
   align-items: center;
 }
 .profile-picture {
-  width: 9vw;
-  height: 9vw;
+  width: 16vw;
+  height: 16vw;
   border-radius: 100%;
+}
+
+.profile-details {
+  margin-left: 1.5em;
+  min-width: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .post-preview-card {

@@ -7,27 +7,35 @@
   >
     <v-card class="mx-4 my-4 rounded-xl" min-height="30vh">
       <v-list-item-title
-        ><h3>{{ props.postData.title }}</h3></v-list-item-title
+        ><h2 class="my-4">{{ props.postData.title }}</h2></v-list-item-title
       >
-      <v-img v-if="isImage" :src="require('${ props.postData.content }')" />
-      <v-card-text class="my-10" v-else>
+      <v-img
+        v-if="isImage"
+        :src="require('${ props.postData.content }')"
+        class="cropped-image"
+      />
+      <v-card-text v-else>
         <div
           v-html="content"
           v-if="props.postData.contentType == 'text/markdown'"
+          class="content-container"
         ></div>
-        <span
+        <h3
           v-if="
             props.postData.contentType == 'text/plain' ||
             props.postData.contentType == 'application/base64'
           "
-          >{{ content }}</span
+          class="content-container"
         >
+          {{ content }}
+        </h3>
         <img
           v-bind:src="content"
           v-if="
             props.postData.contentType == 'image/png;base64' ||
             props.postData.contentType == 'image/jpeg;base64'
           "
+          class="cropped-image"
         />
       </v-card-text>
     </v-card>
@@ -82,5 +90,19 @@ onMounted(() => {
 <style scoped>
 .read-the-docs {
   color: #888;
+}
+
+.content-container {
+  max-height: 30vh;
+  overflow: hidden;
+  position: relative;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.cropped-image {
+  max-height: 30vh;
+  object-fit: cover;
 }
 </style>
