@@ -28,35 +28,15 @@
     <br />
     <br />
     <div class="flex-container">
-      <div v-for="post in posts" :key="post.id" class="post-tiny">
-        <a
-          v-bind:href="`/app/authors/${encodeURIComponent(
-            profileData.id
-          )}/posts/${encodeURIComponent(post.id)}/`"
-        >
-          <div class="post-tiny">
-            <h1
-              style="
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                max-width: 100%;
-                overflow: hidden;
-              "
-            >
-              {{ post.title }}
-            </h1>
-            <span
-              style="
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                max-width: 100%;
-                overflow: hidden;
-              "
-              >{{ post.description }}</span
-            >
-          </div>
-        </a>
-      </div>
+      <PostPreviewCard
+        class="post-preview-card"
+        v-for="post in posts"
+        v-bind:key="post.id_url"
+        v-bind:postData="post"
+        v-bind:href="`/app/authors/${encodeURIComponent(
+          profileData.id
+        )}/posts/${encodeURIComponent(post.id)}/`"
+      />
       <v-snackbar v-model="showStatus">
         {{ statusMessage }}
 
@@ -75,6 +55,7 @@ import { ref, onMounted, computed } from "vue";
 import { USER_AUTHOR_ID_COOKIE, createHTTP } from "../axiosCalls";
 import { useRoute } from "vue-router";
 import Cookies from "js-cookie";
+import PostPreviewCard from "./stream_cards/PostPreviewCard.vue";
 
 const route = useRoute();
 
@@ -161,9 +142,9 @@ function follow() {
   color: #888;
 }
 .flex-container {
-  display: grid;
-  grid-template-columns: auto auto auto;
-  max-width: 36em;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
 }
 .flex-content {
   width: 10em;
@@ -175,22 +156,14 @@ function follow() {
   flex-direction: column;
   align-items: center;
 }
-.post-tiny {
-  border: 0.2em solid black;
-  padding: 1em;
-  margin: 1em;
-  width: 10vw;
-  height: 10vw;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  font-size: 60%;
-}
-
 .profile-picture {
   width: 9vw;
   height: 9vw;
   border-radius: 100%;
+}
+
+.post-preview-card {
+  flex: 0 1 calc(33.333% - 1em);
+  margin-bottom: 1em;
 }
 </style>
