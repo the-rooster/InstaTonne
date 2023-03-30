@@ -1,6 +1,6 @@
 <template>
   <div class="viewBox">
-    <h1>Just some text</h1>
+    <h1>Profile Editor</h1>
     <v-text-field
       v-model="authorData.displayName"
       label="Display Name"
@@ -37,29 +37,29 @@ const route = useRoute();
 const loading = ref(true);
 const authorData = ref({});
 const disableSaving = computed(() => authorData.value.displayName === "");
-const profileId  = ref("");
+const profileId = ref("");
 onBeforeMount(() => {
-  if(route.params.id){
+  if (route.params.id) {
     profileId.value = route.params.id;
   }
   if (!profileId.value) {
     profileId.value = Cookies.get(USER_AUTHOR_ID_COOKIE);
   }
   createHTTP("authors/" + profileId.value + "/")
-  .get()
-  .then((response) => {
-    console.log(response.data, 51515);
-    authorData.value = response.data;
-    console.log(response.data, 567);
-  });
-})
+    .get()
+    .then((response) => {
+      console.log(response.data, 51515);
+      authorData.value = response.data;
+      console.log(response.data, 567);
+    });
+});
 async function savePost() {
   loading.value = true;
   await createHTTP(`authors/${profileId.value}`)
     .post(JSON.stringify(authorData.value))
     .then((response: { data: object }) => {
       loading.value = false;
-      router.push(`/ProfilePage/${encodeURIComponent(authorData.value.id)}/`)
+      router.push(`/ProfilePage/${encodeURIComponent(authorData.value.id)}/`);
     });
 }
 </script>
