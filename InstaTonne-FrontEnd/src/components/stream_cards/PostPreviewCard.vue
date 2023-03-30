@@ -80,8 +80,8 @@ onMounted(() => {
   console.log("POSTDATA for PostPreview", props.postData);
 
   isImage.value =
-    props.postData.author.contentType === "image/png;base64" ||
-    props.postData.author.contentType === "image/jpeg;base64";
+    props.postData.contentType === "image/png;base64" ||
+    props.postData.contentType === "image/jpeg;base64";
 });
 
 // defineProps<{ msg: string }>()
