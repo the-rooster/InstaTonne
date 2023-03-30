@@ -137,6 +137,8 @@ def authors_get(request: HttpRequest):
 # get all remote authors
 def authors_get_remote(request: HttpRequest, remote_authors: str):
     url = remote_authors
+
+    print("GETTING REMOTE AUTHORS: ",url)
     response: requests.Response = requests.get(url, headers=get_auth_headers(url))
 
     print(response.content)

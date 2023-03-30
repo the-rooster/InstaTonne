@@ -1,62 +1,39 @@
 <template>
   <div class="viewBox">
-    <!-- <h3>
-      InstaTonne Profile page
-    </h3> -->
-    <br />
-    <h1>{{ profileData.displayName }}</h1>
-    <br />
-    <v-btn
-      v-if="profileId === Cookies.get(USER_AUTHOR_ID_COOKIE)"
-      v-bind:href="`/app/authors/${profileId}/edit`"
-      >Edit Profile</v-btn
-    >
-    <a v-bind:href="profileData.github"
-      ><p>Github: {{ profileData.github }}</p></a
-    >
-    <a v-bind:href="profileData.host"
-      ><p>Origin: {{ profileData.host }}</p></a
-    >
-    <br />
-    <div class="flex-container">
-      <img class="profile-picture" v-bind:src="profileData.profileImage" />
-      <a class="flex-content">
-        <span class="followers"><br /><br />Followers: {{ follow_count }}</span>
-      </a>
-    </div>
-    <v-btn @click="follow()" :disabled="!canFollow"> Follow </v-btn>
-    <br />
-    <br />
-    <div class="flex-container">
-      <div v-for="post in posts" :key="post.id" class="post-tiny">
-        <a
-          v-bind:href="`/app/authors/${encodeURIComponent(
-            profileData.id
-          )}/posts/${encodeURIComponent(post.id)}/`"
+    <div class="profile-data-container">
+      <img class="profile-picture mx-5" v-bind:src="profileData.profileImage" />
+      <div class="profile-details">
+        <h1>{{ profileData.displayName }}</h1>
+        <h3>
+          Github:
+          <a v-bind:href="profileData.github">{{ profileData.github }}</a>
+        </h3>
+        <br />
+        <h3>
+          Server: <a v-bind:href="profileData.host">{{ profileData.host }}</a>
+        </h3>
+        <br />
+        <h3 class="followers">Followers: {{ follow_count }}</h3>
+        <br />
+        <v-btn
+          v-if="profileId === Cookies.get(USER_AUTHOR_ID_COOKIE)"
+          v-bind:href="`/app/authors/${profileId}/edit`"
+          >Edit Profile</v-btn
         >
-          <div class="post-tiny">
-            <h1
-              style="
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                max-width: 100%;
-                overflow: hidden;
-              "
-            >
-              {{ post.title }}
-            </h1>
-            <span
-              style="
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                max-width: 100%;
-                overflow: hidden;
-              "
-              >{{ post.description }}</span
-            >
-          </div>
-        </a>
+        <v-btn v-else @click="follow()" :disabled="!canFollow"> Follow </v-btn>
       </div>
+    </div>
+    <br />
+    <div class="post-container">
+      <PostPreviewCard
+        class="post-preview-card"
+        v-for="post in posts"
+        v-bind:key="post.id_url"
+        v-bind:postData="post"
+        v-bind:href="`/app/authors/${encodeURIComponent(
+          profileData.id
+        )}/posts/${encodeURIComponent(post.id)}/`"
+      />
       <v-snackbar v-model="showStatus">
         {{ statusMessage }}
 
@@ -75,6 +52,7 @@ import { ref, onMounted, computed } from "vue";
 import { USER_AUTHOR_ID_COOKIE, createHTTP } from "../axiosCalls";
 import { useRoute } from "vue-router";
 import Cookies from "js-cookie";
+import PostPreviewCard from "./stream_cards/PostPreviewCard.vue";
 
 const route = useRoute();
 
@@ -160,10 +138,15 @@ function follow() {
 .read-the-docs {
   color: #888;
 }
-.flex-container {
-  display: grid;
-  grid-template-columns: auto auto auto;
-  max-width: 36em;
+
+.profile-data-container {
+  display: flex;
+  align-items: center;
+}
+.post-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
 }
 .flex-content {
   width: 10em;
@@ -175,22 +158,22 @@ function follow() {
   flex-direction: column;
   align-items: center;
 }
-.post-tiny {
-  border: 0.2em solid black;
-  padding: 1em;
-  margin: 1em;
-  width: 10vw;
-  height: 10vw;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  font-size: 60%;
+.profile-picture {
+  width: 16vw;
+  height: 16vw;
+  border-radius: 100%;
 }
 
-.profile-picture {
-  width: 9vw;
-  height: 9vw;
-  border-radius: 100%;
+.profile-details {
+  margin-left: 1.5em;
+  min-width: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.post-preview-card {
+  flex: 0 1 calc(33.333% - 1em);
+  margin-bottom: 1em;
 }
 </style>

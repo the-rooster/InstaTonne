@@ -11,9 +11,7 @@
           <v-avatar
             size="70"
             color="grey-darken-3"
-            :image="
-              props.postData.author.profileImage
-              "
+            :image="props.postData.author.profileImage"
           ></v-avatar>
         </template>
 
@@ -80,14 +78,17 @@
         <div
           v-html="content"
           v-if="props.postData.contentType == 'text/markdown'"
+          class="content-container"
         ></div>
-        <span
+        <div
           v-if="
             props.postData.contentType == 'text/plain' ||
             props.postData.contentType == 'application/base64'
           "
-          >{{ content }}</span
+          class="content-container"
         >
+          {{ content }}
+        </div>
         <img
           v-bind:src="content"
           v-if="
@@ -195,7 +196,11 @@ async function likePost() {
     return;
   }
   console.log(props.postData.origin, "originn");
-  await createHTTP(`/authors/${encodeURIComponent(props.postData.author.url)}/posts/${encodeURIComponent(props.postData.id)}/likes/`)
+  await createHTTP(
+    `/authors/${encodeURIComponent(
+      props.postData.author.url
+    )}/posts/${encodeURIComponent(props.postData.id)}/likes/`
+  )
     .post("")
     .then((response: { data: object }) => {
       console.log(response.data);
@@ -210,7 +215,11 @@ async function checkIfLiked() {
   if (!props.postData.author) {
     return;
   }
-  await createHTTP(`/authors/${encodeURIComponent(props.postData.author.url)}/posts/${encodeURIComponent(props.postData.id)}/likes/`)
+  await createHTTP(
+    `/authors/${encodeURIComponent(
+      props.postData.author.url
+    )}/posts/${encodeURIComponent(props.postData.id)}/likes/`
+  )
     .get()
     .then((response: { data: object }) => {
       console.log(response.data, "check if liked");
@@ -233,7 +242,11 @@ async function getPostLikeCount() {
   if (!props.postData.author) {
     return;
   }
-  await createHTTP(`/authors/${encodeURI(props.postData.author.url)}/posts/${encodeURI(props.postData.id)}/likes/`)
+  await createHTTP(
+    `/authors/${encodeURI(props.postData.author.url)}/posts/${encodeURI(
+      props.postData.id
+    )}/likes/`
+  )
     .get()
     .then((response: { data: object }) => {
       console.log(response.data, "get post like count");
@@ -378,5 +391,9 @@ function getComments() {
 <style scoped>
 .read-the-docs {
   color: #888;
+}
+
+.content-container {
+  font-size: large;
 }
 </style>
