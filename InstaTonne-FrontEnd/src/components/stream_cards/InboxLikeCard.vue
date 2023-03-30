@@ -4,50 +4,32 @@
     color="#E3F2FD"
     theme="light"
     max-width="80%"
+    style="margin: 5%"
   >
     <v-card-actions>
       <v-list-item class="w-100">
-        <v-list-item-title
-          ><a :href="`/app/ProfilePage/${encodeURIComponent(author.url)}/`">{{
-            author.displayName
-          }}</a>
-          liked your post</v-list-item-title
-        >
-        <template v-slot:append>
-          <div class="justify-self-end"></div>
-        </template>
-        <div
-          style="
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-          "
-        >
-          <img :src="author.profileImage" class="profile-picture" />
-          <v-list-item>{{ props.likeData.summary }}</v-list-item>
-          <a v-bind:href="postUrl">
-            <div class="post-tiny">
-              <h1
-                style="
-                  text-overflow: ellipsis;
-                  white-space: nowrap;
-                  max-width: 100%;
-                  overflow: hidden;
-                "
+        <div class="main-container">
+          <div class="avatar-liked-container mt-2">
+            <v-avatar
+              size="70"
+              color="grey-darken-3"
+              :image="author.profileImage"
+            ></v-avatar>
+            <h3 class="who-liked">
+              <a
+                :href="`/app/ProfilePage/${encodeURIComponent(author.url)}/`"
+                >{{ author.displayName }}</a
               >
-                {{ postData.title }}
-              </h1>
-              <span
-                style="
-                  text-overflow: ellipsis;
-                  white-space: nowrap;
-                  max-width: 100%;
-                  overflow: hidden;
-                "
-                >{{ postData.description }}</span
-              >
-            </div>
-          </a>
+              liked your <i>{{ postData.title }} </i> post!
+            </h3>
+          </div>
+          <div class="preview-card-container">
+            <PostPreviewCard
+              class="post-preview-card"
+              :postData="postData"
+              :href="postUrl"
+            />
+          </div>
         </div>
       </v-list-item>
     </v-card-actions>
@@ -58,6 +40,7 @@
 import { onBeforeMount } from "vue";
 import { createHTTP } from "../../axiosCalls";
 import { defineProps, ref, toRaw } from "vue";
+import PostPreviewCard from "./PostPreviewCard.vue";
 
 const postData = ref({});
 const postUrl = ref({});
@@ -114,22 +97,25 @@ console.log(toRaw(props.likeData).id, 555);
   color: #888;
 }
 
-.post-tiny {
-  border: 0.2em solid black;
-  padding: 1em;
-  margin: 1em;
-  width: 10vw;
-  height: 10vw;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  font-size: 60%;
-}
-
 .profile-picture {
   width: 10vw;
   height: 10vw;
   border-radius: 100%;
+}
+
+.avatar-liked-container {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+}
+
+.who-liked {
+  margin-left: 1rem;
+}
+
+.post-preview-card {
+  min-width: 100;
+  border-width: 0.1em;
+  border-color: #fefefe;
 }
 </style>

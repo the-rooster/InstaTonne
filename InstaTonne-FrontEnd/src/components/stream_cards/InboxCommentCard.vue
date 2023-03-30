@@ -110,10 +110,16 @@ onBeforeMount(() => {
 .avatar-comment-container {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: left;
 }
 
 .who-commented {
   margin-left: 1rem;
+}
+
+.post-preview-card {
+  min-width: 100;
+  border-width: 0.1em;
+  border-color: #fefefe;
 }
 </style>

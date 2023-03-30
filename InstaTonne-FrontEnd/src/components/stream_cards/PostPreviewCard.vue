@@ -3,7 +3,7 @@
     class="mx-auto my-5 rounded-xl"
     color="#E3F2FD"
     theme="light"
-    max-width="80%"
+    max-width="100%"
   >
     <v-card class="mx-4 my-4 rounded-xl" min-height="30vh">
       <v-list-item-title
@@ -20,7 +20,7 @@
           v-if="props.postData.contentType == 'text/markdown'"
           class="content-container"
         ></div>
-        <h3
+        <div
           v-if="
             props.postData.contentType == 'text/plain' ||
             props.postData.contentType == 'application/base64'
@@ -28,7 +28,7 @@
           class="content-container"
         >
           {{ content }}
-        </h3>
+        </div>
         <img
           v-bind:src="content"
           v-if="
@@ -99,6 +99,7 @@ onMounted(() => {
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
+  font-size: large;
 }
 
 .cropped-image {
