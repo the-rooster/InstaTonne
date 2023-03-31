@@ -160,7 +160,6 @@ import Cookies from "js-cookie";
 const loading = ref(true)
 // number of calls to make
 const loadingCounter = ref(2);
-const followingData = ref({});
 const followersData = ref({});
 const requestData = ref({});
 
