@@ -173,7 +173,8 @@ function follow() {
 }
 
 .post-preview-card {
-  flex: 0 1 calc(33.333% - 1em);
   margin-bottom: 1em;
+  width: 33vw;
+  height: 33vw;
 }
 </style>
