@@ -5,7 +5,7 @@ from .utils import get_one_url, make_author_url, send_to_single_inbox, check_aut
 import requests
 import re
 from InstaTonne.settings import HOSTNAME
-from adapters.adapters import adapter_get_remote_single_post, adapter_get_remote_posts, adapter_inbox_like
+from ..adapters.adapters import adapter_get_remote_single_post, adapter_get_remote_posts, adapter_inbox_like
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, permissions, serializers
