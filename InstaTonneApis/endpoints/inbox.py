@@ -160,7 +160,7 @@ def get_ginbox(request: HttpRequest, author_id: str):
     all_data.sort(key=lambda x: x['created_at'], reverse=True)
 
     res = json.dumps({
-        "type" : "inbox",
+        "type" : "ginbox",
         "author" : author.id_url,
         "items" : all_data
     })
