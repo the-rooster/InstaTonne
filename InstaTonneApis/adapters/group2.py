@@ -20,7 +20,7 @@ def group2_like_inbox_adapter(content : dict):
             "summary" : "An author liked your post!"
         }
     """
-    new_obj = {
+    new_author = {
 
         "type": "author",
         "host": content["author"],
@@ -30,7 +30,22 @@ def group2_like_inbox_adapter(content : dict):
         "github" : "",
         "profileImage" : ""
     }
-    content["author"] = new_obj
+
+
+    new_obj = {
+        "type" : "like",
+        "summary" : content["summary"],
+        "author" : new_author,
+        "object" : content["object"]
+    }
+
+
+
+
+    content["author"] = new_author
+    content["object"] = new_obj
+
+    
 
 
     print("ADAPTER TIME:",content)
