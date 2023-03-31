@@ -10,40 +10,55 @@
       style="margin: 10em;"
       class="loadingIcon"
     />
-    <div v-else>
-      {{ }}
-      Followers
-      <div
-        v-if="followers.length > 0"
-        style="display: flex; flex-direction: column;"
-      >
-        <FriendCard
-          v-for="request in followers"
-          :key="request"
-          :request-data="request"
-          :author-id="authorId"
-          style="margin: 1em;"
-        />
+    <div
+      v-else
+      class="flex-container"
+    >
+      <div class="followers">
+        <b>Followers</b>
+        <div
+          v-if="followers.length > 0"
+          style="display: flex; flex-direction: column;"
+        >
+          <div
+            v-for="follower in followers"
+            :key="follower.displayName"
+          >
+            <FriendCard
+              :key="follower"
+              :request-data="follower"
+              :author-id="authorId"
+              style="margin: 1em;"
+            />
+          </div>
+        </div>
+        <div v-else> 
+          No Followers :(
+        </div>
       </div>
-      <div v-else> 
-        No Followers :(
-      </div>
-      Follow Requests
-      <div
-        v-if="followRequests.length > 0"
-        style="display: flex; flex-direction: column;"
-      >
-        <FollowRequestCard
-          v-for="request in followRequests"
-          :key="request.displayName"
-          :request-data="request"
-          :author-id="authorId"
-          style="margin: 1em;"
-          @update="removeRequest(request)"
-        />
-      </div>
-      <div v-else> 
-        No Follow Requests
+      <div class="requests">
+        <b>Follow Requests</b>
+        <div
+          v-if="followRequests.length > 0"
+          style="display: flex; flex-direction: column;"
+        >
+          <div
+            v-for="request in followRequests"
+            :key="request.displayName"
+          >
+            <FollowRequestCard
+            
+              :key="request.displayName"
+              :request-data="request"
+              :author-id="authorId"
+              style="margin: 1em;"
+              @update="removeRequest(request)"
+            />
+          </div>
+        </div>
+        <div v-else> 
+          No Follow Requests
+        </div>
       </div>
     </div>
   </div>
@@ -58,7 +73,7 @@ import Cookies from "js-cookie";
 
 const loading = ref(true)
 // number of calls to make
-const loadingCounter = ref(3);
+const loadingCounter = ref(2);
 const followingData = ref({});
 const followersData = ref({});
 const requestData = ref({});
@@ -71,13 +86,6 @@ const removeRequest = ((request) => {
 })
 
 onBeforeMount(async () => {
-  await createHTTP(`authors/${authorId}/followers/${encodeURI("http://127.0.0.1:8000")}/authors/1/`).get().then((response: { data: object }) => {
-    followingData.value = response.data;
-    loadingCounter.value = loadingCounter.value - 1;
-    if (loadingCounter.value == 0) {
-      loading.value = false;
-    }
-  });
   await createHTTP(`authors/${authorId}/followers/`).get().then((response: { data: object }) => {
     followersData.value = response.data;
     loadingCounter.value = loadingCounter.value - 1;
@@ -101,5 +109,23 @@ const followRequests = computed(() => requestData.value?.items?.filter(item => i
 </script>
 
 <style scoped>
+.flex-container {
+  display: flex;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: row;
+  width: 100%;
+}
+.viewBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+.followers{
+  width: 50%;
+}
+.requests{
+  width: 50%
+}
 </style>
   

@@ -6,7 +6,10 @@
     max-width="80%"
   >
     <v-card-actions>
-      <v-list-item v-if="loading" class="w-100">
+      <v-list-item
+        v-if="loading"
+        class="w-100"
+      >
         <v-progress-circular
           indeterminate
           width="20"
@@ -14,10 +17,27 @@
           class="loadingIcon"
         />
       </v-list-item>
-      <v-list-item v-else class="w-100">
+      <v-list-item
+        v-else
+        class="w-100"
+      >
         <v-list-item-title />
         <template #append>
-          {{ props.requestData.displayName }}
+          <router-link :to="`ProfilePage/${encodeURIComponent(requestData.url)}/`">
+            <div>
+              <img
+                class="profile-picture"
+                :src="requestData.profileImage"
+              >
+              {{ props.requestData.displayName }}
+            </div>
+          </router-link>
+          <v-list-item>
+            <v-btn @click="removeFriend">
+              Remove
+            </v-btn>
+            {{ error }}
+          </v-list-item>
         </template>
       </v-list-item>
     </v-card-actions>
@@ -45,6 +65,17 @@ const props = defineProps({
 const emit = defineEmits(["update"]);
 
 const error = ref("");
+
+async function removeFriend() {
+  loading.value = true;
+  const foreignId = encodeURIComponent(props.requestData.id);
+  await createHTTP(`authors/${props.authorId}/followers/${foreignId}`)
+    .delete(JSON.stringify({}))
+    .then(() => {
+      emit("update");
+      loading.value = false;
+    });
+}
 </script>
 
 <style scoped>
