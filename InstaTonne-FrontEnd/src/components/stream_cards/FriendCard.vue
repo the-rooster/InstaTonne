@@ -17,29 +17,40 @@
           class="loadingIcon"
         />
       </v-list-item>
-      <v-list-item
+      <v-row
         v-else
-        class="w-100"
+        class="flex-container"
       >
-        <v-list-item-title />
-        <template #append>
-          <router-link :to="`ProfilePage/${encodeURIComponent(requestData.url)}/`">
-            <div>
+        <v-col>
+          <router-link
+            id="router"
+            :to="`ProfilePage/${encodeURIComponent(requestData.url)}/`"
+            class="flex-container"
+          >
+            <v-col>
               <img
                 class="profile-picture"
-                :src="requestData.profileImage"
+                src="../../assets/pfp.png"
               >
-              {{ props.requestData.displayName }}
-            </div>
+            </v-col>
+            <v-col class="d-flex justify-center align-center">
+              <div>
+                <h2>{{ props.requestData.displayName }}</h2>
+                <h3>GitHub: {{ props.requestData.github }}</h3>
+              </div>
+            </v-col>
           </router-link>
-          <v-list-item>
-            <v-btn @click="removeFriend">
-              Remove
-            </v-btn>
-            {{ error }}
-          </v-list-item>
-        </template>
-      </v-list-item>
+        </v-col>
+        <v-col
+          cols="3"
+          class="d-flex justify-center align-center"
+        >
+          <v-btn @click="removeFriend">
+            Remove
+          </v-btn>
+          {{ error }}
+        </v-col>
+      </v-row>
     </v-card-actions>
   </v-card>
 </template>
@@ -81,5 +92,14 @@ async function removeFriend() {
 <style scoped>
 .read-the-docs {
   color: #888;
+}
+.flex-container {
+  display: flex;
+  grid-auto-flow: row;
+  width: 100%;
+  justify-content: space-around;
+}
+#router {
+  width: px;
 }
 </style>
