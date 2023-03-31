@@ -20,8 +20,7 @@ def group2_like_inbox_adapter(content : dict):
             "summary" : "An author liked your post!"
         }
     """
-    new_obj = {}
-    new_obj["id"] = {
+    new_obj = {
 
         "type": "author",
         "host": content["author"],
