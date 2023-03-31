@@ -30,7 +30,7 @@
             <v-col>
               <img
                 class="profile-picture"
-                src="../../assets/pfp.png"
+                :src="requestData.profileImage"
               >
             </v-col>
             <v-col class="d-flex justify-center align-center">
