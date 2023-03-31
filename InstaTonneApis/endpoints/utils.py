@@ -79,7 +79,7 @@ def send_to_single_inbox(author_url : str, data : dict):
     if not can_send_request(author_url):
         return (401,str("NOT IN LIST OF ACCEPTED SERVERS"))
     
-    inbox_url: str = author_url + '/inbox/'
+    inbox_url: str = author_url + '/inbox'
     try:
         response: requests.Response = requests.post(inbox_url,
                                                     json.dumps(data),headers={"Origin" : HOSTNAME, 
@@ -127,7 +127,7 @@ def author_follows_follower(author_url: str, follower_url: str) -> bool:
 
 def post_to_follower_inbox(follower_url: str, data: dict) -> bool:
     follower_url = follower_url.strip("/")
-    inbox_url: str = follower_url + '/inbox/'
+    inbox_url: str = follower_url + '/inbox'
     headers = get_auth_headers(follower_url)
     headers['Content-Type'] = "application/json"
     try:
