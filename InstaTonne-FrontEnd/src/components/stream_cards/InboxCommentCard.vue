@@ -1,39 +1,44 @@
 <template>
-  <v-card class="mx-auto" color="#fff" theme="light" max-width="90%" style="margin:5%">
+  <v-card
+    class="mx-auto my-5 rounded-xl"
+    color="#E3F2FD"
+    theme="light"
+    max-width="80%"
+    style="margin: 5%"
+  >
     <v-card-actions>
       <v-list-item class="w-100">
-        <v-list-item-title><a :href="`/app/ProfilePage/${encodeURIComponent(author.url)}/`">{{ author.displayName }}</a> commented on your post</v-list-item-title>
-        <template v-slot:append>
-          <div class="justify-self-end">
+        <div class="main-container">
+          <div class="avatar-comment-container mt-2">
+            <v-avatar
+              size="70"
+              color="grey-darken-3"
+              :image="commentData.author.profileImage"
+            ></v-avatar>
+            <h3 class="who-commented">
+              <a
+                :href="`/app/ProfilePage/${encodeURIComponent(
+                  commentData.author.url
+                )}/`"
+              >
+                {{ commentData.author.displayName }}
+              </a>
+              commented on your <i>{{ postData.title }} </i> post:
+            </h3>
           </div>
-        </template>
-        <div style="display:flex;flex-direction:row;justify-content:space-between">
-          <img :src="author.profileImage" class="profile-picture">
-          <v-list-item>{{ props.commentData.comment }}</v-list-item>
-          <a v-bind:href="postUrl">
-              <div class="post-tiny" >
-                  <h1
-                  style="
-                      text-overflow: ellipsis;
-                      white-space: nowrap;
-                      max-width: 100%;
-                      overflow: hidden;
-                  "
-                  >
-                  {{ postData.title }}
-                  </h1>
-                  <span
-                  style="
-                      text-overflow: ellipsis;
-                      white-space: nowrap;
-                      max-width: 100%;
-                      overflow: hidden;
-                  "
-                  >{{ postData.description }}</span>
-              </div>
-          </a>
+          <h4 class="comment-content">
+            <v-list-item
+              ><i> {{ props.commentData.comment }}</i></v-list-item
+            >
+          </h4>
+          <div class="preview-card-container">
+            <PostPreviewCard
+              class="post-preview-card"
+              :postData="postData"
+              :href="postUrl"
+            />
           </div>
-
+        </div>
       </v-list-item>
     </v-card-actions>
   </v-card>
@@ -43,6 +48,7 @@
 import { onBeforeMount } from "vue";
 import { createHTTP } from "../../axiosCalls";
 import { defineProps, ref, toRaw } from "vue";
+import PostPreviewCard from "./PostPreviewCard.vue";
 
 const postData = ref({});
 const postUrl = ref({});
@@ -56,38 +62,42 @@ const props = defineProps({
 });
 
 onBeforeMount(() => {
+  let commentId: string = props.commentData.id;
 
-  let commentId : string = props.commentData.id
+  let groups = commentId.match(
+    /(.*)\/authors\/(?<authorId>.*)\/posts\/(?<postId>.*)\/comments\//
+  )?.groups;
 
-  let groups = commentId.match(/(.*)\/authors\/(?<authorId>.*)\/posts\/(?<postId>.*)\/comments\//)?.groups;
-
-
-  
   let authorId = "";
   let postId = "";
-  if (groups){
-      authorId = groups.authorId;
-      postId = groups.postId
+  if (groups) {
+    authorId = groups.authorId;
+    postId = groups.postId;
   }
 
-  postUrl.value=`authors/${encodeURIComponent(authorId)}/posts/${encodeURIComponent(postId)}`;
+  postUrl.value = `authors/${encodeURIComponent(
+    authorId
+  )}/posts/${encodeURIComponent(postId)}`;
 
-  console.log("POSTID",postId)
-  console.log("AUTHORID",authorId)
-  createHTTP(`authors/${encodeURIComponent(authorId)}/posts/${encodeURIComponent(postId)}`).get()
-  .then((result) => {
-      console.log("POST",result.data)
+  console.log("POSTID", postId);
+  console.log("AUTHORID", authorId);
+  createHTTP(
+    `authors/${encodeURIComponent(authorId)}/posts/${encodeURIComponent(
+      postId
+    )}`
+  )
+    .get()
+    .then((result) => {
+      console.log("POST", result.data);
       postData.value = result.data;
-  })
+    });
 
   createHTTP(`authors/${encodeURIComponent(props.commentData.author)}`)
-  .get()
-  .then((response) => {
-    author.value = response.data;
-  });
-})
-
-
+    .get()
+    .then((response) => {
+      author.value = response.data;
+    });
+});
 
 // defineProps<{ msg: string }>();
 </script>
@@ -97,22 +107,19 @@ onBeforeMount(() => {
   color: #888;
 }
 
-.profile-picture {
-  width: 10vw;
-  height: 10vw;
-  border-radius: 100%;
+.avatar-comment-container {
+  display: flex;
+  align-items: center;
+  justify-content: left;
 }
 
-.post-tiny {
-  border: 0.2em solid black;
-  padding: 1em;
-  margin: 1em;
-  width: 10vw;
-  height: 10vw;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  font-size: 60%;
+.who-commented {
+  margin-left: 1rem;
+}
+
+.post-preview-card {
+  min-width: 100;
+  border-width: 0.1em;
+  border-color: #fefefe;
 }
 </style>

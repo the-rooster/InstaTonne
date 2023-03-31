@@ -2,7 +2,7 @@
   <div class="viewBox">
     <h2>User Search</h2>
     <!-- server list -->
-    <h4 style="padding: 0px">Connected Servers</h4>
+    <h4 style="padding: 0">Connected Servers</h4>
     <div class="server-list">
       <div v-for="server in servers" :key="server.host" class="server-display">
         <v-btn
@@ -27,7 +27,7 @@
     <br />
     <div class="flex-container">
       <div
-        v-for="user in myVal"
+        v-for="user in filteredUsers"
         :key="user.displayName"
         class="flex-content"
         src="ProfilePage.vue"
@@ -138,7 +138,7 @@ async function fetchAuthors() {
 
 // fetch all authors from a remote server
 async function fetchRemoteAuthors(server: string) {
-  let total_remote_author_urls = encodeURI(
+  let total_remote_author_urls = encodeURIComponent(
     server + `/authors?page=${pageNum.page}&size=${pageSize}/`
   );
   await createHTTP(`remote-authors/${total_remote_author_urls}`)
@@ -156,7 +156,7 @@ onBeforeMount(() => {
   getAllServers();
 });
 
-const myVal = computed({
+const filteredUsers = computed({
   get() {
     return authorsList.value.filter((u) => {
       return (

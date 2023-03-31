@@ -1,39 +1,36 @@
 <template>
-  <v-card class="mx-auto" color="#fff" theme="light" max-width="90%">
+  <v-card
+    class="mx-auto my-5 rounded-xl"
+    color="#E3F2FD"
+    theme="light"
+    max-width="80%"
+    style="margin: 5%"
+  >
     <v-card-actions>
       <v-list-item class="w-100">
-        <v-list-item-title><a :href="`/app/ProfilePage/${encodeURIComponent(author.url)}/`">{{ author.displayName }}</a> liked your post</v-list-item-title>
-        <template v-slot:append>
-          <div class="justify-self-end">
+        <div class="main-container">
+          <div class="avatar-liked-container mt-2">
+            <v-avatar
+              size="70"
+              color="grey-darken-3"
+              :image="author.profileImage"
+            ></v-avatar>
+            <h3 class="who-liked">
+              <a
+                :href="`/app/ProfilePage/${encodeURIComponent(author.url)}/`"
+                >{{ author.displayName }}</a
+              >
+              liked your <i>{{ postData.title }} </i> post!
+            </h3>
           </div>
-        </template>
-        <div style="display:flex;flex-direction:row;justify-content:space-between">
-          <img :src="author.profileImage" class="profile-picture">
-          <v-list-item>{{ props.likeData.summary }}</v-list-item>
-          <a v-bind:href="postUrl">
-              <div class="post-tiny" >
-                  <h1
-                  style="
-                      text-overflow: ellipsis;
-                      white-space: nowrap;
-                      max-width: 100%;
-                      overflow: hidden;
-                  "
-                  >
-                  {{ postData.title }}
-                  </h1>
-                  <span
-                  style="
-                      text-overflow: ellipsis;
-                      white-space: nowrap;
-                      max-width: 100%;
-                      overflow: hidden;
-                  "
-                  >{{ postData.description }}</span>
-              </div>
-          </a>
+          <div class="preview-card-container">
+            <PostPreviewCard
+              class="post-preview-card"
+              :postData="postData"
+              :href="postUrl"
+            />
           </div>
-
+        </div>
       </v-list-item>
     </v-card-actions>
   </v-card>
@@ -43,6 +40,7 @@
 import { onBeforeMount } from "vue";
 import { createHTTP } from "../../axiosCalls";
 import { defineProps, ref, toRaw } from "vue";
+import PostPreviewCard from "./PostPreviewCard.vue";
 
 const postData = ref({});
 const postUrl = ref({});
@@ -56,42 +54,40 @@ const props = defineProps({
 });
 
 onBeforeMount(() => {
+  let postId: string = props.likeData.object;
 
-  let postId : string = props.likeData.object;
+  let groups = postId.match(
+    /http:\/\/(.*)\/authors\/(?<authorId>.*)\/posts\//
+  )?.groups;
 
-  let groups = postId.match(/http:\/\/(.*)\/authors\/(?<authorId>.*)\/posts\//)?.groups;
-
-
-  
   let authorId = "";
 
-  if (groups){
-      authorId = groups.authorId;
+  if (groups) {
+    authorId = groups.authorId;
   }
-  postUrl.value=`authors/${encodeURIComponent(authorId)}/posts/${encodeURIComponent(postId)}/`;
-  
+  postUrl.value = `authors/${encodeURIComponent(
+    authorId
+  )}/posts/${encodeURIComponent(postId)}/`;
 
-  console.log("POSTID",postId);
-  console.log("AUTHORID",authorId);
-  createHTTP(`authors/${authorId}/posts/${postId}`).get()
-  .then((result) => {
-      console.log("POST",result.data)
+  console.log("POSTID", postId);
+  console.log("AUTHORID", authorId);
+  createHTTP(`authors/${authorId}/posts/${postId}`)
+    .get()
+    .then((result) => {
+      console.log("POST", result.data);
       postData.value = result.data;
-  })
+    });
 
   createHTTP(`authors/${encodeURIComponent(props.likeData.author)}/`)
-  .get()
-  .then((response) => {
-    console.log(response.data, 51515);
-    author.value = response.data;
-    console.log(response.data, 567);
-    
-  });
-})
+    .get()
+    .then((response) => {
+      console.log(response.data, 51515);
+      author.value = response.data;
+      console.log(response.data, 567);
+    });
+});
 
 console.log(toRaw(props.likeData).id, 555);
-
-
 
 // defineProps<{ msg: string }>();
 </script>
@@ -101,16 +97,25 @@ console.log(toRaw(props.likeData).id, 555);
   color: #888;
 }
 
-.post-tiny {
-  border: 0.2em solid black;
-  padding: 1em;
-  margin: 1em;
+.profile-picture {
   width: 10vw;
   height: 10vw;
+  border-radius: 100%;
+}
+
+.avatar-liked-container {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
   align-items: center;
-  font-size: 60%;
+  justify-content: left;
+}
+
+.who-liked {
+  margin-left: 1rem;
+}
+
+.post-preview-card {
+  min-width: 100;
+  border-width: 0.1em;
+  border-color: #fefefe;
 }
 </style>

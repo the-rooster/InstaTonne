@@ -1,30 +1,46 @@
 <template>
   <div class="viewBox">
-    <div style="justify-content:center;align-items:center;position:relative;top:0%;left:43%;z-index:100">
-    <v-card height="5vh" width="10vw">
-      <h3 id="homeHeader">Your Stream</h3>
-      <br>
-    </v-card>
+    <div
+      style="
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        top: 0%;
+        left: 43%;
+        z-index: 100;
+      "
+    >
+      <v-card height="5vh" width="10vw">
+        <h3 id="homeHeader">Your Stream</h3>
+        <br />
+      </v-card>
     </div>
 
     <br />
-    <div style="padding-bottom:5em">
+    <div style="padding-bottom: 5em">
       <div v-for="item in posts" v-bind:key="item.id_url">
         <PostFullCard
           v-bind:postData="item"
-          v-if="(item.type == 'post')"
+          v-if="item.type == 'post'"
         ></PostFullCard>
         <InboxCommentCard
           v-bind:commentData="item"
-          v-if="(item.type == 'comment')"
+          v-if="item.type == 'comment'"
         ></InboxCommentCard>
         <LikeCommentCard
           v-bind:likeData="item"
-          v-if="(item.type == 'like')"
+          v-if="item.type == 'like'"
         ></LikeCommentCard>
       </div>
     </div>
-    <v-btn class="mx-auto clear-inbox" @click="() => {clearInbox()}">
+    <v-btn
+      class="mx-auto clear-inbox"
+      @click="
+        () => {
+          clearInbox();
+        }
+      "
+    >
       clear your inbox
     </v-btn>
     <div id="app"></div>
@@ -44,24 +60,25 @@ let posts = ref({});
 
 onBeforeMount(() => {
   getInbox();
-})
+});
 
-function clearInbox(){
-  createHTTP(`authors/${Cookies.get(USER_AUTHOR_ID_COOKIE)}/inbox/`).delete().then((msg) => {
-    getInbox();
-  })
+function clearInbox() {
+  createHTTP(`authors/${Cookies.get(USER_AUTHOR_ID_COOKIE)}/inbox/`)
+    .delete()
+    .then((msg) => {
+      getInbox();
+    });
 }
 
-function getInbox(){
+function getInbox() {
   createHTTP(`authors/${Cookies.get(USER_AUTHOR_ID_COOKIE)}/inbox/`)
-  .get()
-  .then((response) => {
-    console.log(response.data, 3454545);
-    posts.value = response.data.items;
-    console.log(response.data.items,125125125);
-  })
-  }
-
+    .get()
+    .then((response) => {
+      console.log(response.data, 3454545);
+      posts.value = response.data.items.reverse();
+      console.log(response.data.items, 125125125);
+    });
+}
 </script>
 
 <style scoped>
@@ -72,8 +89,8 @@ function getInbox(){
 .clear-inbox {
   color: black;
   background-color: red;
-  position:fixed;
-  bottom:5%;
-  right:1%;
+  position: fixed;
+  bottom: 5%;
+  right: 1%;
 }
 </style>

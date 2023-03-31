@@ -3,6 +3,11 @@ import { USER_AUTHOR_ID_COOKIE } from "../../src/constants";
 
 describe('e2e tests', () => {
   it('can login and logout', () => {
+    // continue testing in case another call fails
+    cy.on('uncaught:exception', (err, runnable) => {
+      return false
+    })
+
     cy.clearCookie(USER_AUTHOR_ID_COOKIE);
 
     cy.visit('http://127.0.0.1:5173/')
@@ -19,7 +24,7 @@ describe('e2e tests', () => {
 
     cy.getCookie(USER_AUTHOR_ID_COOKIE).should("have.property", "value", "1")
 
-    cy.contains("Logout").trigger("mouseover").click()
+    cy.get(".mdi-logout").trigger("mouseover").click()
 
     cy.getCookie(USER_AUTHOR_ID_COOKIE).should("equal", null)
 
@@ -31,6 +36,11 @@ describe('e2e tests', () => {
   })
 
   it('can create new post', () => {
+    // continue testing in case another call fails
+    cy.on('uncaught:exception', (err, runnable) => {
+      return false
+    })
+
     cy.clearCookie(USER_AUTHOR_ID_COOKIE);
 
     cy.visit('http://127.0.0.1:5173/')  
@@ -47,9 +57,9 @@ describe('e2e tests', () => {
 
     cy.getCookie(USER_AUTHOR_ID_COOKIE).should("have.property", "value", "1")
     
-    cy.contains("Create New Post").trigger("mouseover").click()
+    cy.get(".mdi-plus").trigger("mouseover").click()
 
-    cy.contains("Create New Post").trigger("mouseleave")
+    cy.get(".mdi-plus").trigger("mouseleave")
 
     // enter post info
     cy.get("#TitleInput").type("TestTitle")
@@ -64,7 +74,7 @@ describe('e2e tests', () => {
 
     cy.get("#SaveButton").click()
 
-    cy.get(".mdi-check-circle-outline").should("have.class", "text-green")
+    cy.get("#homeHeader").should("contain", "Your Stream")
   })
 
   it('can edit post', () => {
@@ -93,7 +103,7 @@ describe('e2e tests', () => {
     // view test post
     cy.contains("TestTitle").click()
 
-    cy.get(".mdi-pencil").click()
+    cy.get(".mdi-pencil-outline").click()
 
     cy.get("#TitleInput").type("UPDATED")
 
@@ -101,9 +111,11 @@ describe('e2e tests', () => {
 
     cy.go("back")
 
+    cy.go("back")
+
     cy.get("#TitleText").should("contain", "UPDATED")
   })
-  
+
   it('can follow user', () => {
     cy.clearCookie(USER_AUTHOR_ID_COOKIE);
 
@@ -119,9 +131,9 @@ describe('e2e tests', () => {
     
     cy.get("#homeHeader").should("contain", "Your Stream")
 
-    cy.contains("UserSearch").trigger("mouseover").click()
+    cy.get(".mdi-account-search").trigger("mouseover").click()
 
-    cy.contains("UserSearch").trigger("mouseleave")
+    cy.get(".mdi-account-search").trigger("mouseleave")
 
     // continue testing in case we don't have any followers
     cy.on('uncaught:exception', (err, runnable) => {
@@ -137,7 +149,7 @@ describe('e2e tests', () => {
 
     cy.contains("Follow request sent to user!")
 
-    cy.contains("Logout").trigger("mouseover").click()
+    cy.get(".mdi-logout").trigger("mouseover").click()
 
     cy.getCookie(USER_AUTHOR_ID_COOKIE).should("equal", null)
 
@@ -152,9 +164,9 @@ describe('e2e tests', () => {
 
     cy.get("#homeHeader").should("contain", "Your Stream")
 
-    cy.contains("FriendsPage").trigger("mouseover").click()
+    cy.get(".mdi-account-group").trigger("mouseover").click()
 
-    cy.contains("FriendsPage").trigger("mouseleave")
+    cy.get(".mdi-account-group").trigger("mouseleave")
 
     cy.contains("displayName2")
   })

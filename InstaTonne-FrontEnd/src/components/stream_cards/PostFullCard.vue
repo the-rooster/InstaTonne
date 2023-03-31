@@ -1,21 +1,30 @@
 <template>
-  <v-card class="mx-auto" color="#eee" theme="light" max-width="80%">
+  <v-card
+    class="mx-auto my-5 rounded-xl"
+    color="#E3F2FD"
+    theme="light"
+    max-width="80%"
+  >
     <v-card-actions>
       <v-list-item class="w-100">
-        <!-- <template v-slot:prepend>
+        <template v-slot:prepend>
           <v-avatar
+            size="70"
             color="grey-darken-3"
-            image="{{
-            props.postData.author.profileImage
-            }}"
+            :image="props.postData.author.profileImage"
           ></v-avatar>
-        </template> -->
+        </template>
 
-        <v-list-item-title><a :href="`/app/ProfilePage/${encodeURIComponent(props.postData.author?.url)}/`">{{
-          props.postData.author?.displayName
-        }}</a></v-list-item-title>
+        <v-list-item-title class="text-h6"
+          ><a
+            :href="`/app/ProfilePage/${encodeURIComponent(
+              props.postData.author?.url
+            )}/`"
+            >{{ props.postData.author?.displayName }}</a
+          ></v-list-item-title
+        >
 
-        <v-list-item-subtitle>{{
+        <v-list-item-subtitle class="text-h7">{{
           props.postData.author?.host
         }}</v-list-item-subtitle>
 
@@ -25,24 +34,42 @@
               v-bind:to="`/editPost/${encodeURIComponent(getPostId())}/`"
             >
               <v-btn v-if="isAuthorsPost"
-                ><v-icon class="me-1" icon="mdi-pencil"></v-icon
+                ><v-icon
+                  class="me-1"
+                  icon="mdi-pencil-outline"
+                  color="black"
+                ></v-icon
               ></v-btn>
             </router-link>
             <v-btn v-if="isAuthorsPost" @click="deletePost"
-              ><v-icon class="me-1" icon="mdi-delete"></v-icon
+              ><v-icon class="me-1" icon="mdi-delete-outline"></v-icon
             ></v-btn>
-            <v-btn @click="likePost"
-              ><v-icon class="me-1" icon="mdi-heart"></v-icon
+          </div>
+          <p>{{ numberOfLikes }} Likes</p>
+          <div class="justify-self-end">
+            <v-btn v-if="isLiked"
+              ><v-icon class="me-1" icon="mdi-heart" color="blue"></v-icon
             ></v-btn>
-            <v-btn @click="sharePost"
-              ><v-icon class="me-1" icon="mdi-share-variant"></v-icon
+            <v-btn v-else @click="likePost"
+              ><v-icon class="me-1" icon="mdi-heart-outline"></v-icon
+            ></v-btn>
+
+            <v-btn v-if="isShared"
+              ><v-icon
+                class="me-1"
+                icon="mdi-share-variant"
+                color="blue"
+              ></v-icon
+            ></v-btn>
+            <v-btn v-else @click="sharePost"
+              ><v-icon class="me-1" icon="mdi-share-variant-outline"></v-icon
             ></v-btn>
           </div>
         </template>
       </v-list-item>
     </v-card-actions>
 
-    <v-card class="mx-4" min-height="30vh">
+    <v-card class="mx-4 rounded-xl" min-height="30vh">
       <v-list-item-title
         ><h3 id="TitleText">{{ props.postData.title }}</h3></v-list-item-title
       >
@@ -51,14 +78,17 @@
         <div
           v-html="content"
           v-if="props.postData.contentType == 'text/markdown'"
+          class="content-container"
         ></div>
-        <span
+        <div
           v-if="
             props.postData.contentType == 'text/plain' ||
             props.postData.contentType == 'application/base64'
           "
-          >{{ content }}</span
+          class="content-container"
         >
+          {{ content }}
+        </div>
         <img
           v-bind:src="content"
           v-if="
@@ -69,13 +99,14 @@
       </v-card-text>
     </v-card>
     <v-text-field
+      class="mx-4 my-2 rounded-xl"
       v-model="newComment"
       label="Comment"
       placeholder="Comment"
       clearable
       @keyup.enter="saveComment"
     />
-    <v-card-actions>
+    <v-card-actions v-if="hasComments">
       <v-btn variant="text"> Comments </v-btn>
 
       <v-spacer />
@@ -110,7 +141,7 @@
 
 <script setup lang="ts">
 import { ref, toRaw, onBeforeMount, computed } from "vue";
-import {router} from "../../main";
+import { router } from "../../main";
 import CommentCard from "./CommentCard.vue";
 import Cookies from "js-cookie";
 import { marked } from "marked";
@@ -126,8 +157,6 @@ import { onMounted } from "vue";
 let comments = ref({});
 const isImage = ref(false);
 const show = ref(false);
-const authorId = Cookies.get(USER_AUTHOR_ID_COOKIE);
-const loading = ref(true);
 
 const props = defineProps({
   postData: {
@@ -142,15 +171,6 @@ const props = defineProps({
     type: Object,
     required: true,
   },
-});
-
-const isAuthorsPost = computed(() => {
-  if (!props.postData.author) {
-    return false;
-  }
-  let author_id = props.postData.author.id;
-  console.log(author_id.endsWith(authorId), 8988);
-  return author_id.endsWith(authorId);
 });
 
 let content = computed(() => {
@@ -169,20 +189,75 @@ let content = computed(() => {
   return props.postData.content;
 });
 
+// console.log(toRaw(props.postData).id, 1000);
+// console.log(toRaw(props.postData));
+
 async function likePost() {
   if (!props.postData.author) {
     return;
   }
+  console.log(props.postData.origin, "originn");
   await createHTTP(
     `/authors/${encodeURIComponent(
-      props.postData.author.id
+      props.postData.author.url
     )}/posts/${encodeURIComponent(props.postData.id)}/likes/`
   )
     .post("")
     .then((response: { data: object }) => {
       console.log(response.data);
+      router.go(0);
     });
 }
+
+const isLiked = ref(false);
+
+// Check if I liked the post
+async function checkIfLiked() {
+  if (!props.postData.author) {
+    return;
+  }
+  await createHTTP(
+    `/authors/${encodeURIComponent(
+      props.postData.author.url
+    )}/posts/${encodeURIComponent(props.postData.id)}/likes/`
+  )
+    .get()
+    .then((response: { data: object }) => {
+      console.log(response.data, "check if liked");
+      response.data.items.forEach((item: any) => {
+        console.log("author id", authorId);
+        const item_author_id = item.author.substring(
+          item.author.lastIndexOf("/") + 1
+        );
+        console.log("item_author_id", item_author_id);
+        if (item_author_id == authorId) {
+          isLiked.value = true;
+        }
+      });
+    });
+}
+
+const numberOfLikes = ref(0);
+
+async function getPostLikeCount() {
+  if (!props.postData.author) {
+    return;
+  }
+  await createHTTP(
+    `/authors/${encodeURI(props.postData.author.url)}/posts/${encodeURI(
+      props.postData.id
+    )}/likes/`
+  )
+    .get()
+    .then((response: { data: object }) => {
+      console.log(response.data, "get post like count");
+      numberOfLikes.value = response.data.items.length;
+      console.log(numberOfLikes.value, "number of likes");
+    });
+}
+
+const authorId = Cookies.get(USER_AUTHOR_ID_COOKIE);
+const loading = ref(true);
 
 async function sharePost() {
   if (!authorId) {
@@ -197,7 +272,46 @@ async function sharePost() {
     .post(JSON.stringify(updatedPost))
     .then((response: { data: object }) => {
       loading.value = false;
+      router.go(0);
     });
+}
+
+const isShared = ref(false);
+
+// Check if I have a post with the same ID
+async function checkIfShared() {
+  if (!authorId) {
+    return;
+  }
+  await createHTTP(`authors/${authorId}/posts/`)
+    .get()
+    .then((response: { data: object }) => {
+      console.log(response.data, "check if shared");
+      for (let i = 0; i < response.data.items.length; i++) {
+        if (response.data.items[i].id == props.postData.id) {
+          console.log(
+            "sharedd",
+            response.data.items[i].id,
+            props.postData.content
+          );
+          isShared.value = true;
+          break;
+        }
+      }
+    });
+}
+
+const isAuthorsPost = computed(() => {
+  if (!props.postData.author) {
+    return false;
+  }
+  let author_id = props.postData.author.id;
+  console.log(author_id.endsWith(authorId), 8988);
+  return author_id.endsWith(authorId);
+});
+
+function getPostId() {
+  return props.postData.id.substring(props.postData.id.lastIndexOf("/") + 1);
 }
 
 async function deletePost() {
@@ -223,9 +337,9 @@ async function saveComment() {
   }
   console.log("newComment", newComment.value);
   await createHTTP(
-    `/authors/${encodeURIComponent(
-      props.postData.author.id
-    )}/posts/${encodeURIComponent(props.postData.id)}/comments/`
+    `/authors/${encodeURI(props.postData.author.id)}/posts/${encodeURI(
+      props.postData.id
+    )}/comments/`
   )
     .post(
       JSON.stringify({
@@ -243,15 +357,22 @@ async function saveComment() {
 onMounted(() => {
   console.log("POSTDATA", props.postData);
   getComments();
+  getPostLikeCount();
+  checkIfLiked();
+  checkIfShared();
+
+  console.log("isShared", isShared.value);
 
   isImage.value =
     props.postData.author.contentType === "image/png;base64" ||
     props.postData.author.contentType === "image/jpeg;base64";
 });
 
+const hasComments = ref(false);
+
 function getComments() {
   createHTTP(
-    `authors/${encodeURI(props.postData.author.id)}/posts/${encodeURI(
+    `/authors/${encodeURI(props.postData.author.id)}/posts/${encodeURI(
       props.postData.id
     )}/comments/`
   )
@@ -259,11 +380,10 @@ function getComments() {
     .then((response) => {
       console.log(response.data, 4567);
       comments.value = response.data.comments;
+      if (comments.value.length > 0) {
+        hasComments.value = true;
+      }
     });
-}
-
-function getPostId() {
-  return props.postData.id.substring(props.postData.id.lastIndexOf("/") + 1);
 }
 
 // defineProps<{ msg: string }>()
@@ -272,5 +392,9 @@ function getPostId() {
 <style scoped>
 .read-the-docs {
   color: #888;
+}
+
+.content-container {
+  font-size: large;
 }
 </style>

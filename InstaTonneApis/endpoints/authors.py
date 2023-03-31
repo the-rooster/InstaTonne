@@ -19,7 +19,7 @@ class RemoteAuthorsAPIView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     @swagger_auto_schema(
-        operation_description="get all the authors stored on a remote server [FOR LOCAL USE]",
+        operation_description="Get all the authors stored on a remote server [FOR LOCAL USE].",
         responses={200: AuthorsResponseSerializer(),},
         manual_parameters=[
             openapi.Parameter(
@@ -40,7 +40,7 @@ class AuthorsAPIView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     @swagger_auto_schema(
-        operation_description="get all the authors stored on this server",
+        operation_description="Get all the authors stored on this server.",
         responses={200: AuthorsResponseSerializer(),},
         manual_parameters=[
             openapi.Parameter(
@@ -74,7 +74,7 @@ class SingleAuthorApiView(APIView):
             openapi.Parameter(
                 'author_id',
                 in_=openapi.IN_PATH,
-                description='- ID of an author stored on this server\n\nOR\n\n- URL to an author [FOR LOCAL USE]',
+                description=' - ID of an author stored on this server\n\nOR\n\n - URL to an author [FOR LOCAL USE].',
                 type=openapi.TYPE_STRING,
                 default='1',
             ),
@@ -87,7 +87,7 @@ class SingleAuthorApiView(APIView):
             return single_author_get(request, author_id)
         
     @swagger_auto_schema(
-        operation_description="update an author stored on this server",
+        operation_description="Update an Author's profile locally [stored on this server]",
         responses={200: AuthorSerializer(),},
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
@@ -137,6 +137,8 @@ def authors_get(request: HttpRequest):
 # get all remote authors
 def authors_get_remote(request: HttpRequest, remote_authors: str):
     url = remote_authors
+
+    print("GETTING REMOTE AUTHORS: ",url)
     response: requests.Response = requests.get(url, headers=get_auth_headers(url))
 
     print(response.content)

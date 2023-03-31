@@ -9,7 +9,7 @@
           fixed
           permanent
           rail-width="60"
-          width="500"
+          width="200"
         >
           <v-list>
             <v-list-item
@@ -28,16 +28,14 @@
 
           <v-divider />
 
-          <v-list
-            density="compact"
-            nav
-          >
+          <v-list density="compact" nav>
             <v-list-item
               v-for="route in routes"
               :key="route.path"
-              color="red"
+              color="blue"
               :title="route.name"
               :to="route.path"
+              :prepend-icon="route.icon"
             />
           </v-list>
           <v-list>
@@ -45,14 +43,15 @@
               v-if="loggedIn"
               title="Logout"
               @click="logout"
+              prepend-icon="mdi-logout"
             />
           </v-list>
-        </v-navigation-drawer>        
+        </v-navigation-drawer>
         <v-main>
           <router-view v-if="loggedIn" />
           <login-page
             v-else
-            @logged-in="(authorId) => activeUserId = authorId"
+            @logged-in="(authorId) => (activeUserId = authorId)"
           />
         </v-main>
       </v-layout>
@@ -69,39 +68,40 @@ import { USER_AUTHOR_ID_COOKIE } from './constants'
 import LoginPage from './components/LoginPage.vue'
 import Cookies from 'js-cookie';
 
-const loading = ref(true)
+const loading = ref(true);
 const authorData = ref({});
-const activeUserId = ref("")
+const activeUserId = ref("");
 
 const loggedIn = computed(() => activeUserId.value != undefined);
 
 const logout = () => {
-  Cookies.remove(USER_AUTHOR_ID_COOKIE)
-  router.push({ path: "/" })
-}
+  Cookies.remove(USER_AUTHOR_ID_COOKIE);
+  router.push({ path: "/" });
+  window.location.reload();
+};
 
-const route = useRoute()
+const route = useRoute();
 watch(route, () => {
-  activeUserId.value = Cookies.get(USER_AUTHOR_ID_COOKIE)
-})
+  activeUserId.value = Cookies.get(USER_AUTHOR_ID_COOKIE);
+});
 
 onBeforeMount(async () => {
-  activeUserId.value = Cookies.get(USER_AUTHOR_ID_COOKIE)
+  activeUserId.value = Cookies.get(USER_AUTHOR_ID_COOKIE);
 
-  if (!activeUserId.value){
+  if (!activeUserId.value) {
     loading.value = false;
     return;
   }
 
-  await createHTTP(`authors/${activeUserId.value}`).get().then((response: { data: object }) => {
-    authorData.value = response.data;
-    loading.value = false;
-    console.log(response.data);
-    console.log("GOT AUTHOR DATA!");
-  });
-})
+  await createHTTP(`authors/${activeUserId.value}`)
+    .get()
+    .then((response: { data: object }) => {
+      authorData.value = response.data;
+      loading.value = false;
+      console.log(response.data);
+      console.log("GOT AUTHOR DATA!");
+    });
+});
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -129,3 +129,6 @@ dmypy.json
 
 *.splite3
 .vscode
+
+# Cypress Videos
+InstaTonne-FrontEnd/cypress
