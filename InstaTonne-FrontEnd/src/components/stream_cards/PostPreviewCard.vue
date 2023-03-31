@@ -10,8 +10,8 @@
         ><h2 class="my-4">{{ props.postData.title }}</h2></v-list-item-title
       >
       <v-img
-        v-if="isImage"
-        :src="require('${ props.postData.content }')"
+        v-if="isImage && props.postData.content"
+        :src="props.postData.content"
         class="cropped-image"
       />
       <v-card-text v-else>
