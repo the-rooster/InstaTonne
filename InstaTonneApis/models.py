@@ -3,6 +3,7 @@ from rest_framework import serializers
 import json
 import uuid
 from InstaTonne.settings import HOSTNAME
+from django.utils import timezone
 
 def default_id_generator():
     return ''.join(str(uuid.uuid4()).split("-"))
@@ -209,12 +210,26 @@ class InboxSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='id_url')
     class Meta:
         model = Inbox
-        fields = ['id', 'author', 'url', 'published']   
+        fields = ['id', 'author', 'url', 'published']
 
 
 class InboxResponseSerializer(serializers.Serializer):
     type = serializers.CharField(default='inbox')
     items = InboxSerializer(many=True)
+
+
+class GInboxSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='id_url')
+    created_at = serializers.DateTimeField(source='published')
+    class Meta:
+        model = Inbox
+        fields = ['id', 'author', 'url', 'published', 'created_at']
+
+
+class GInboxResponseSerializer(serializers.Serializer):
+    type = serializers.CharField(default='inbox')
+    author = serializers.CharField(default='http://host:port/author/1')
+    items = GInboxSerializer(many=True)
 
 
 class ConnectedServer(models.Model):
@@ -233,15 +248,25 @@ class ConnectedServerSerializer(serializers.ModelSerializer):
 
 class GithubActorResponseSerializer(serializers.Serializer):
     id = serializers.IntegerField(default=1)
-    login = serializers.CharField(default='<github user name>')
+    login = serializers.CharField(default='username1')
+    display_login = serializers.CharField(default='username1')
+    gravatar_id = serializers.CharField(default='')
+    url = serializers.CharField(default='https://api.github.com/users/username1')
+    avatar_url = serializers.CharField(default='https://avatars.githubusercontent.com/u/1?')
 
 class GithubRepoResponseSerializer(serializers.Serializer):
     id = serializers.IntegerField(default=1)
-    login = serializers.CharField(default='<github repo name>')
+    name = serializers.CharField(default='username1/repo1')
+    url = serializers.CharField(default='https://api.github.com/repos/username1/repo1')
+
+class GithubPayloadResponseSerializer(serializers.Serializer):
+    pass
 
 class GithubResponseSerializer(serializers.Serializer):
-    id = serializers.CharField(default='1')
-    type = serializers.CharField(default='<event type>')
+    id = serializers.IntegerField(default='1')
+    type = serializers.CharField(default='DeleteEvent')
     actor = GithubActorResponseSerializer()
     repo = GithubRepoResponseSerializer()
-    payload = serializers.CharField(default='<payload>')
+    payload = GithubPayloadResponseSerializer()
+    public = serializers.BooleanField(default=True)
+    created_at = serializers.DateTimeField(default=timezone.now)
