@@ -31,7 +31,7 @@ Frontend tests: npm run test. Runs tests in watch mode.
 Cypress E2E testing:
 
 To reset to the test db:
-1. delete /fixtures/pycache, and db
+1. delete pycache from Instatonne-Apis, and the db file
 2. python3 manage.py makemigrations InstaTonneApis
 3. python3 manage.py migrate --run-syncdb
 4. python3 manage.py loaddata test_data.json
