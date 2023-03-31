@@ -6,7 +6,10 @@
     max-width="80%"
   >
     <v-card-actions>
-      <v-list-item v-if="loading" class="w-100">
+      <v-list-item
+        v-if="loading"
+        class="w-100"
+      >
         <v-progress-circular
           indeterminate
           width="20"
@@ -14,7 +17,10 @@
           class="loadingIcon"
         />
       </v-list-item>
-      <v-list-item v-else class="w-100">
+      <v-list-item
+        v-else
+        class="w-100"
+      >
         <template #append>
           {{ props.requestData.displayName }}
         </template>
@@ -28,8 +34,12 @@
           </router-link>
         </v-list-item>
         <v-list-item>
-          <v-btn @click="acceptRequest()"> Accept </v-btn>
-          <v-btn @click="rejectRequest"> Reject </v-btn>
+          <v-btn @click="acceptRequest()">
+            Accept
+          </v-btn>
+          <v-btn @click="rejectRequest">
+            Reject
+          </v-btn>
           {{ error }}
         </v-list-item>
       </v-list-item>

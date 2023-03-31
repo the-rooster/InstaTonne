@@ -183,7 +183,7 @@ def post_author_follower(request: HttpRequest, author_id : str, foreign_author_i
 
 # get the followers of an author
 def single_author_followers_get(request: HttpRequest, author_id: str):
-    follows = Follow.objects.all().filter(object=author_id)
+    follows = Follow.objects.all().filter(object=author_id, accepted=True)
 
     serialized_data = []
     for follow in follows:
