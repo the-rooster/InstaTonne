@@ -1,6 +1,20 @@
 <template>
   <div class="viewBox">
-    <h2>User Search</h2>
+    <div
+      style="
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        top: 0%;
+        left: 0%;
+        z-index: 100;
+      "
+    >
+      <v-card height="6vh" width="12vw">
+        <h2>User Search</h2>
+        <br />
+      </v-card>
+    </div>
     <!-- server list -->
     <h4 style="padding: 0">Connected Servers</h4>
     <div class="server-list">
