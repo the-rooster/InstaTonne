@@ -1,6 +1,6 @@
 from django.http import HttpRequest, HttpResponse
 import json
-from InstaTonneApis.models import Author, AuthorSerializer, AuthorsResponseSerializer
+from InstaTonneApis.models import Author, AuthorSerializer, AuthorsResponseSerializer, AuthorExampleSerializer
 from InstaTonneApis.endpoints.utils import valid_requesting_user, check_auth_header, isaURL, get_auth_headers
 from django.core.paginator import Paginator
 import requests
@@ -69,7 +69,7 @@ class SingleAuthorApiView(APIView):
 
     @swagger_auto_schema(
         operation_description="get author_id",
-        responses={200: AuthorSerializer(),},
+        responses={200: AuthorExampleSerializer(),},
         manual_parameters=[
             openapi.Parameter(
                 'author_id',
@@ -88,7 +88,7 @@ class SingleAuthorApiView(APIView):
         
     @swagger_auto_schema(
         operation_description="Update an Author's profile locally [stored on this server]",
-        responses={200: AuthorSerializer(),},
+        responses={204: 'success',},
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={

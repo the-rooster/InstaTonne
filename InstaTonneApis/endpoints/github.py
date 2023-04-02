@@ -15,7 +15,7 @@ class GithubAPIView(APIView):
     @swagger_auto_schema(
         operation_description="get the github activity of author_id\nurl to the full docs: https://docs.github.com/en/rest/activity/events?apiVersion=2022-11-28#list-events-for-the-authenticated-user",
         operation_id="github_get",
-        responses={200: GithubResponseSerializer(),},
+        responses={200: GithubResponseSerializer(many=True),},
         manual_parameters=[
             openapi.Parameter(
                 'author_id',
