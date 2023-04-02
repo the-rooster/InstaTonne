@@ -177,8 +177,17 @@ def get_inbox(request: HttpRequest, author_id: str):
 
     inboxes = Inbox.objects.all().filter(author=author.id).order_by('published')
 
-    serialized_data = []
+    urls = set()
+    result = []
+    #get only results with a unique url
     for inbox in inboxes:
+        if inbox.url in urls:
+            continue
+        urls.add(inbox.url)
+        result.append(inbox)
+
+    serialized_data = []
+    for inbox in result:
         try:
             response: requests.Response = requests.get(inbox.url, headers=get_auth_headers(inbox.url))
             if response.status_code == 204:
