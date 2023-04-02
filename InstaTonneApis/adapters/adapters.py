@@ -55,3 +55,12 @@ def adapter_inbox_follow(post : dict,url):
         return group2_follow_inbox_adapter(post)
     
     return post
+
+def adapter_get_comments(content : dict,url):
+
+    hostname = urlparse(url).hostname
+
+    if hostname == group2_hostname:
+        return group2_get_comments(content)
+    
+    return content

@@ -297,3 +297,14 @@ def group2_follow_inbox_adapter(content : dict):
     }
 
     return new_content
+
+def group2_get_comments(returned : dict):
+
+    """
+    rename items field to comments
+    """
+
+    returned["comments"] = returned["items"]
+    del returned["items"]
+
+    return returned
