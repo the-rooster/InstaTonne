@@ -10,8 +10,8 @@
         z-index: 100;
       "
     >
-      <v-card height="5vh" width="10vw">
-        <h3>Your Stream</h3>
+      <v-card height="6vh" width="12vw">
+        <h2>Your Stream</h2>
         <br />
       </v-card>
     </div>

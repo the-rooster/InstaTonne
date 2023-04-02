@@ -17,7 +17,7 @@
           padding-top: 10em;
         "
       >
-        <img src="../assets/EpicLogo.svg" style="width: 9em; padding: 2em" />
+        <img src="../assets/MediumLogo.png" style="width: 9em; padding: 2em" />
         <h1>InstaTonne</h1>
       </div>
       <div
