@@ -185,11 +185,11 @@ def single_post_comments_get_remote(request: HttpRequest, author_id: str, post_i
         return HttpResponse(status=500)
     
 
-    content = adapter_get_comments(content)
+    content = adapter_get_comments(content, post_id)
     return HttpResponse(
         status=response.status_code,
         content_type=response.headers['Content-Type'],
-        content=content
+        content=json.dumps(content)
     )
 
 
