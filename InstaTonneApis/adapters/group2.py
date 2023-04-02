@@ -274,13 +274,13 @@ def group2_follow_inbox_adapter(content : dict):
     new_content : dict = {
         "@context": "https://www.w3.org/ns/activitystreams",
         "type": "follow",
-        "summary": content["actor"] + " wants to follow " + content["object"]["displayName"],
+        "summary": content["actor"]["id"] + " wants to follow " + content["object"]["displayName"],
         "actor": {
             "type": "author",
-            "id": content["actor"],
-            "url": content["actor"],
-            "host": content["actor"],
-            "displayName": content["actor"],
+            "id": content["actor"]["id"],
+            "url": content["actor"]["id"],
+            "host": content["actor"]["id"],
+            "displayName": content["actor"]["id"],
             "github": "",
             "profileImage": ""
         },
