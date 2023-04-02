@@ -73,7 +73,10 @@
       <v-list-item-title
         ><h3>{{ props.postData.title }}</h3></v-list-item-title
       >
-      <v-img v-if="isImage && props.postData.content" :src="props.postData.content" />
+      <v-img
+        v-if="isImage && props.postData.content"
+        :src="props.postData.content"
+      />
       <v-card-text class="my-10" v-else>
         <div
           v-html="content"
@@ -204,7 +207,9 @@ async function likePost() {
     .post("")
     .then((response: { data: object }) => {
       console.log(response.data);
-      router.go(0);
+      getPostLikeCount();
+      isLiked.value = true;
+      this.$forceUpdate();
     });
 }
 
@@ -350,6 +355,7 @@ async function saveComment() {
     .then((response: { data: object }) => {
       loading.value = false;
       getComments();
+      this.$forceUpdate();
     });
 }
 

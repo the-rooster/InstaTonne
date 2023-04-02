@@ -3,6 +3,7 @@ from rest_framework import serializers
 import json
 import uuid
 from InstaTonne.settings import HOSTNAME
+from django.utils import timezone
 
 def default_id_generator():
     return ''.join(str(uuid.uuid4()).split("-"))
@@ -32,11 +33,19 @@ class AuthorSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return Author.objects.create(**validated_data)
-    
+
+class AuthorExampleSerializer(serializers.Serializer):
+    type = serializers.CharField(default='author')
+    id = serializers.CharField(default='http://servicehost/author/1')
+    url = serializers.CharField(default='http://servicehost/author/1')
+    host = serializers.CharField(default='http://servicehost')
+    displayName = serializers.CharField(default='displayname1')
+    github = serializers.CharField(default='http://github.com/username1')
+    profileImage = serializers.CharField(default='http://imagehost/img.jpeg')
 
 class AuthorsResponseSerializer(serializers.Serializer):
     type = serializers.CharField(default='authors')
-    items = AuthorSerializer(many=True)
+    items = AuthorExampleSerializer(many=True)
 
 
 class Follow(models.Model):
@@ -58,7 +67,7 @@ class FollowSerializer(serializers.ModelSerializer):
 
 class FollowersResponseSerializer(serializers.Serializer):
     type = serializers.CharField(default='followers')
-    items = AuthorSerializer(many=True)
+    items = AuthorExampleSerializer(many=True)
 
 
 class Post(models.Model):
@@ -98,9 +107,31 @@ class PostSerializer(serializers.ModelSerializer):
         return Post.objects.create(**validated_data)
 
 
+class PostExampleSerializer(serializers.Serializer):
+    type = serializers.CharField(default='post')
+    title = serializers.CharField(default='title1')
+    id = serializers.CharField(default='http://servicehost/posts/1')
+    source = serializers.CharField(default='http://servicehost/posts/1')
+    origin = serializers.CharField(default='http://servicehost/posts/1')
+
+    description = serializers.CharField(default='description1')
+    contentType = serializers.CharField(default='text/plain')
+    content = serializers.CharField(default='content1')
+
+    author = AuthorExampleSerializer()
+    categories = serializers.ListField(child=serializers.CharField(), default=[])
+
+    published = serializers.DateTimeField(default=timezone.now)
+    visibility = serializers.CharField(default='PUBLIC')
+    unlisted = serializers.BooleanField(default=False)
+
+    count = serializers.IntegerField(default=1)
+    comments = serializers.CharField(default='http://servicehost/posts/1/comments')
+
+
 class PostsResponseSerializer(serializers.Serializer):
     type = serializers.CharField(default='posts')
-    items = PostSerializer(many=True)
+    items = PostExampleSerializer(many=True)
 
 
 class Request(models.Model):
@@ -147,20 +178,20 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class CommentResponseSerializer(serializers.Serializer):
-    type = serializers.CharField(default='string')
-    id = serializers.CharField(default='string')
-    contentType = serializers.CharField(default='string')
-    comment = serializers.CharField(default='string')
-    published = serializers.CharField(default='string')
-    author = AuthorSerializer()
+    type = serializers.CharField(default='comment')
+    id = serializers.CharField(default='http://servicehost/authors/1/posts/1/comments/1')
+    contentType = serializers.CharField(default='text/plain')
+    comment = serializers.CharField(default='comment1')
+    published = serializers.DateTimeField(default=timezone.now)
+    author = AuthorExampleSerializer()
 
 
 class CommentsResponseSerializer(serializers.Serializer):
     type = serializers.CharField(default='comments')
     page = serializers.CharField(default='1')
     size = serializers.CharField(default='1')
-    post = serializers.CharField(default='<url to the post>')
-    id = serializers.CharField(default='<url to the comments>')
+    post = serializers.CharField(default='http://servicehost/authors/1/posts/1')
+    id = serializers.CharField(default='http://servicehost/authors/1/posts/1/comments')
     items = CommentResponseSerializer(many=True)
 
 
@@ -185,16 +216,28 @@ class LikeSerializer(serializers.ModelSerializer):
         fields = ['type', 'summary', 'author', 'comment', 'post']
 
 
-class LikeResponseSerializer(serializers.Serializer):
+class LikePostResponseSerializer(serializers.Serializer):
     type = serializers.CharField(default='like')
-    summary = serializers.CharField(default='string')
-    author = serializers.CharField(default='<url to the author>')
-    object = serializers.CharField(default='<url to the post or comment>')
+    summary = serializers.CharField(default='summary1')
+    author = serializers.CharField(default='http://servicehost/author/1')
+    object = serializers.CharField(default='http://servicehost/author/1/posts/1')
 
 
-class LikesResponseSerializer(serializers.Serializer):
+class LikeCommentResponseSerializer(serializers.Serializer):
+    type = serializers.CharField(default='like')
+    summary = serializers.CharField(default='summary1')
+    author = serializers.CharField(default='http://servicehost/author/1')
+    object = serializers.CharField(default='http://servicehost/author/1/posts/1/comments/1')
+
+
+class LikesPostResponseSerializer(serializers.Serializer):
     type = serializers.CharField(default='likes')
-    items = LikeResponseSerializer(many=True)
+    items = LikePostResponseSerializer(many=True)
+
+
+class LikesCommentResponseSerializer(serializers.Serializer):
+    type = serializers.CharField(default='likes')
+    items = LikeCommentResponseSerializer(many=True)
 
 
 class Inbox(models.Model):
@@ -209,12 +252,38 @@ class InboxSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='id_url')
     class Meta:
         model = Inbox
-        fields = ['id', 'author', 'url', 'published']   
+        fields = ['id', 'author', 'url', 'published']
 
+class InboxExampleSerializer(serializers.Serializer):
+    type = serializers.CharField(default='like')
+    summary = serializers.CharField(default='summary1')
+    author = serializers.CharField(default='http://servicehost/author/1')
+    object = serializers.CharField(default='http://servicehost/author/1/posts/1')
 
 class InboxResponseSerializer(serializers.Serializer):
     type = serializers.CharField(default='inbox')
-    items = InboxSerializer(many=True)
+    author = serializers.CharField(default='http://servicehost/author/1')
+    items = InboxExampleSerializer(many=True)
+
+
+class GInboxSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='id_url')
+    created_at = serializers.DateTimeField(source='published')
+    class Meta:
+        model = Inbox
+        fields = ['id', 'author', 'url', 'published', 'created_at']
+
+class GInboxExampleSerializer(serializers.Serializer):
+    type = serializers.CharField(default='like')
+    summary = serializers.CharField(default='summary1')
+    author = serializers.CharField(default='http://servicehost/author/1')
+    object = serializers.CharField(default='http://servicehost/author/1/posts/1')
+    created_at = serializers.DateTimeField(default=timezone.now)
+
+class GInboxResponseSerializer(serializers.Serializer):
+    type = serializers.CharField(default='ginbox')
+    author = serializers.CharField(default='http://servicehost/author/1')
+    items = GInboxExampleSerializer(many=True)
 
 
 class ConnectedServer(models.Model):
@@ -233,15 +302,25 @@ class ConnectedServerSerializer(serializers.ModelSerializer):
 
 class GithubActorResponseSerializer(serializers.Serializer):
     id = serializers.IntegerField(default=1)
-    login = serializers.CharField(default='<github user name>')
+    login = serializers.CharField(default='username1')
+    display_login = serializers.CharField(default='username1')
+    gravatar_id = serializers.CharField(default='')
+    url = serializers.CharField(default='https://api.github.com/users/username1')
+    avatar_url = serializers.CharField(default='https://avatars.githubusercontent.com/u/1?')
 
 class GithubRepoResponseSerializer(serializers.Serializer):
     id = serializers.IntegerField(default=1)
-    login = serializers.CharField(default='<github repo name>')
+    name = serializers.CharField(default='username1/repo1')
+    url = serializers.CharField(default='https://api.github.com/repos/username1/repo1')
+
+class GithubPayloadResponseSerializer(serializers.Serializer):
+    pass
 
 class GithubResponseSerializer(serializers.Serializer):
-    id = serializers.CharField(default='1')
-    type = serializers.CharField(default='<event type>')
+    id = serializers.IntegerField(default='1')
+    type = serializers.CharField(default='DeleteEvent')
     actor = GithubActorResponseSerializer()
     repo = GithubRepoResponseSerializer()
-    payload = serializers.CharField(default='<payload>')
+    payload = GithubPayloadResponseSerializer()
+    public = serializers.BooleanField(default=True)
+    created_at = serializers.DateTimeField(default=timezone.now)

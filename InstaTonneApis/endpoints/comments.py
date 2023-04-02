@@ -3,6 +3,7 @@ import json
 from ..models import Post, PostSerializer, Comment, Author, CommentSerializer, CommentsResponseSerializer, CommentResponseSerializer
 from django.core.paginator import Paginator
 from .utils import make_comment_url, make_comments_url, get_one_url, make_author_url, send_to_single_inbox, check_authenticated, check_auth_header, isaURL, get_auth_headers
+from ..adapters.adapters import adapter_inbox_comment
 import requests
 import re
 from InstaTonne.settings import HOSTNAME
@@ -203,6 +204,8 @@ def single_post_comments_post_remote(request: HttpRequest, author_id : str, post
             "post" : post_id
         }
 
+        comment = adapter_inbox_comment(comment,post_id)
+
         status_code = send_to_single_inbox(post_id.split('/posts')[0], comment)
 
         return HttpResponse(status=status_code)
@@ -237,6 +240,8 @@ def single_post_comments_post(request: HttpRequest, author_id: str, post_id: str
         }
 
         author_inbox_url = make_author_url(HOSTNAME, author_id)
+
+        comment = adapter_inbox_comment(comment,post_id)
 
         status_code = send_to_single_inbox(author_inbox_url, comment)
 

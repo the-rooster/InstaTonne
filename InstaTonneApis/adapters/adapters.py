@@ -20,13 +20,38 @@ def adapter_get_remote_single_post(post : dict,url):
     
     return post
 
-
-
 def adapter_inbox_like(post : dict,url):
 
     hostname = urlparse(url).hostname
 
     if hostname == group2_hostname:
         return group2_like_inbox_adapter(post)
+    
+    return post
+
+def adapter_inbox_post(post : dict,url):
+
+    hostname = urlparse(url).hostname
+
+    if hostname == group2_hostname:
+        return group2_post_inbox_adapter(post)
+    
+    return post
+
+def adapter_inbox_comment(post : dict,url):
+
+    hostname = urlparse(url).hostname
+
+    if hostname == group2_hostname:
+        return group2_comment_inbox_adapter(post)
+    
+    return post
+
+def adapter_inbox_follow(post : dict,url):
+
+    hostname = urlparse(url).hostname
+
+    if hostname == group2_hostname:
+        return group2_follow_inbox_adapter(post)
     
     return post
