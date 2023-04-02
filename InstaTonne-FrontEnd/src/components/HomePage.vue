@@ -10,40 +10,50 @@
         z-index: 100;
       "
     >
-      <v-card height="6vh" width="12vw">
+      <v-card
+        height="6vh"
+        width="12vw"
+      >
         <h2>Your Stream</h2>
-        <br />
+        <br>
       </v-card>
-    </div>
-
-    <br />
+    </div>  
+    <br>
     <div style="padding-bottom: 5em">
-      <div v-for="item in posts" v-bind:key="item.id_url">
+      <div
+        v-for="item in posts"
+        :key="item.id_url"
+      >
         <PostFullCard
-          v-bind:postData="item"
           v-if="item.type == 'post'"
-        ></PostFullCard>
+          :post-data="item"
+        />
         <InboxCommentCard
-          v-bind:commentData="item"
           v-if="item.type == 'comment'"
-        ></InboxCommentCard>
+          :comment-data="item"
+        />
         <LikeCommentCard
-          v-bind:likeData="item"
           v-if="item.type == 'like'"
-        ></LikeCommentCard>
+          :like-data="item"
+        />
       </div>
     </div>
+    <ConfirmationModal
+      ref="showConfirmation"
+      message="Are you sure you want to clear your inbox?"
+      @selected="(value) => clearInbox(value)"
+    />
     <v-btn
       class="mx-auto clear-inbox"
       @click="
         () => {
-          clearInbox();
+          showConfirmation.show = true
         }
       "
     >
       clear your inbox
     </v-btn>
-    <div id="app"></div>
+    <div id="app" />
   </div>
 </template>
 
@@ -52,6 +62,7 @@ import { ref, onBeforeMount } from "vue";
 import PostFullCard from "./stream_cards/PostFullCard.vue";
 import InboxCommentCard from "./stream_cards/InboxCommentCard.vue";
 import LikeCommentCard from "./stream_cards/InboxLikeCard.vue";
+import ConfirmationModal from "./ConfirmationModal.vue"
 import Cookies from "js-cookie";
 // defineProps<{ msg: string }>()
 
@@ -63,12 +74,17 @@ onBeforeMount(() => {
   getInbox();
 });
 
-function clearInbox() {
-  createHTTP(`authors/${Cookies.get(USER_AUTHOR_ID_COOKIE)}/inbox/`)
+const showConfirmation =  ref(false)
+
+function clearInbox(value: boolean) {
+  if (value) {
+    createHTTP(`authors/${Cookies.get(USER_AUTHOR_ID_COOKIE)}/inbox/`)
     .delete()
     .then((msg) => {
       getInbox();
     });
+  }
+  showConfirmation.value.show = false;
 }
 
 function getInbox() {
