@@ -177,8 +177,17 @@ def get_inbox(request: HttpRequest, author_id: str):
 
     inboxes = Inbox.objects.all().filter(author=author.id).order_by('published')
 
-    serialized_data = []
+    urls = set()
+    result = []
+    #get only results with a unique url
     for inbox in inboxes:
+        if inbox.url in urls:
+            continue
+        urls.add(inbox.url)
+        result.append(inbox)
+
+    serialized_data = []
+    for inbox in result:
         try:
             response: requests.Response = requests.get(inbox.url, headers=get_auth_headers(inbox.url))
             if response.status_code == 204:
@@ -256,13 +265,31 @@ def parse_inbox_like(data):
     except:
         print('ERROR: bad object field')
         return None
+    
+    #check that all fields are present
+    if "summary" not in data:
+        print('ERROR: no summary field in body')
+        return None
+    if "author" not in data:
+        print('ERROR: no author field in body')
+        return None
+    
 
     comment: Comment | None = Comment.objects.all().filter(id_url=object_url).first()
     post: Post | None = Post.objects.all().filter(id_url=object_url).first()
 
     if comment is not None:
+
+        if Like.objects.all().filter(comment=comment,author=data["author"]).count() > 0:
+            print('ERROR: already liked')
+            return None
         like = Like.objects.create(type="like", comment=comment, post=None)
     elif post is not None:
+
+        if Like.objects.all().filter(post=post,author=data["author"]).count() > 0:
+            print('ERROR: already liked')
+            return None
+
         like = Like.objects.create(type="like", post=post, comment=None)
     else:
         print('ERROR: object does not exist')
@@ -295,6 +322,10 @@ def parse_inbox_follow_request(data : dict, user: Author):
     except Exception as e:
         print("INBOX FOLLOW REQUEST BROKEN!")
         print(e)
+        return None
+    
+    if Follow.objects.all().filter(follower_url=actor_id, object=user).exists():
+        print("FOLLOW REQUEST ALREADY EXISTS!")
         return None
 
     obj = Follow.objects.create(object=user,follower_url=actor_id,accepted=False,summary=summary)

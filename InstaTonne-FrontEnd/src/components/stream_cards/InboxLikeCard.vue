@@ -71,10 +71,10 @@ onBeforeMount(() => {
 
   console.log("POSTID", postId);
   console.log("AUTHORID", authorId);
-  createHTTP(`authors/${authorId}/posts/${postId}`)
+  createHTTP(`authors/${encodeURIComponent(authorId)}/posts/${encodeURIComponent(postId)}`)
     .get()
     .then((result) => {
-      console.log("POST", result.data);
+      console.log("POSTASFSAF", result.data);
       postData.value = result.data;
     });
 
