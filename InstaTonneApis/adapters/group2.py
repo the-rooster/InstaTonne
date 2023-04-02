@@ -119,8 +119,8 @@ def group2_post_inbox_adapter(content : dict):
             "url": content["author"]["id"],
             "host": content["author"]["host"],
             "displayName": content["author"]["displayName"],
-            "github": content["author"]["github"],
-            "profileImage": content["author"]["profileImage"]
+            "github": "",
+            "profileImage": ""
         },
         "object": {
             "type": "post",
@@ -137,8 +137,8 @@ def group2_post_inbox_adapter(content : dict):
                 "url": content["author"]["id"],
                 "host": content["author"]["host"],
                 "displayName": content["author"]["displayName"],
-                "github": content["author"]["github"],
-                "profileImage": content["author"]["profileImage"]
+                "github": "",
+                "profileImage": ""
             },
             "categories": content["categories"],
             "count": content["count"],
