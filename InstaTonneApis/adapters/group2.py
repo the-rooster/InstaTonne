@@ -1,6 +1,6 @@
 from uuid import uuid4
 
-group2_hostname = "social-distribution-media-2.herokuapp.com"
+group2_hostname = "social-distribution-media.herokuapp.com"
 
 
 
@@ -297,3 +297,16 @@ def group2_follow_inbox_adapter(content : dict):
     }
 
     return new_content
+
+def group2_get_comments(returned : dict):
+
+    """
+    rename items field to comments
+    """
+
+    returned["comments"] = returned["items"]
+    del returned["items"]
+
+    print("OOOOOO",returned)
+
+    return returned
