@@ -33,7 +33,7 @@ from InstaTonneApis.endpoints.followers import SingleAuthorFollowersAPIView, Sin
 from InstaTonneApis.endpoints.posts import SingleAuthorPostsAPIView, SingleAuthorPostAPIView, SingleAuthorPostImageAPIView
 from InstaTonneApis.endpoints.comments import SingleAuthorPostCommentsAPIView, SingleAuthorPostCommentAPIView
 from InstaTonneApis.endpoints.likes import SingleAuthorPostLikesAPIView, SingleAuthorPostCommentLikesAPIView, SingleAuthorLikesAPIView, SingleAuthorPostCommentLikeAPIView, SingleAuthorPostLikeAPIView
-from InstaTonneApis.endpoints.inbox import InboxAPIView
+from InstaTonneApis.endpoints.inbox import InboxAPIView, GInboxAPIView
 from InstaTonneApis.endpoints.github import GithubAPIView
 
 # Routers provide an easy way of automatically determining the URL conf.
@@ -60,6 +60,7 @@ urlpatterns = [
 
     re_path(r"^remote-authors\/(?P<remote>.+?)\/?$", RemoteAuthorsAPIView.as_view()),
     re_path(r"^authors\/(?P<author_id>.+?)\/inbox\/?$", InboxAPIView.as_view()),
+    re_path(r"^authors\/(?P<author_id>.+?)\/ginbox\/?$", GInboxAPIView.as_view()),
     re_path(r"^authors\/(?P<author_id>.+?)\/liked\/?$", SingleAuthorLikesAPIView.as_view()),
     re_path(r"^authors\/(.+?)\/followers\/(.+?)\/request\/?$", get_request_object),
     re_path(r"^authors\/(?P<author_id>.+?)\/posts\/(?P<post_id>.+?)\/image\/?$", SingleAuthorPostImageAPIView.as_view()),

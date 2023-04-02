@@ -1,7 +1,8 @@
 from django.http import HttpRequest, HttpResponse
 import json
-from ..models import Post, Comment, Author, Like, LikeSerializer, LikesResponseSerializer, LikeResponseSerializer
+from ..models import Post, Comment, Author, Like, LikeSerializer, LikeCommentResponseSerializer, LikePostResponseSerializer, LikesCommentResponseSerializer, LikesPostResponseSerializer
 from .utils import get_one_url, make_author_url, send_to_single_inbox, check_auth_header, get_auth_headers, isaURL
+from ..adapters.adapters import *
 import requests
 import re
 from InstaTonne.settings import HOSTNAME
@@ -19,7 +20,7 @@ class SingleAuthorPostLikesAPIView(APIView):
     @swagger_auto_schema(
         operation_description="Get the list of likes of the post whose id is post_id.",
         operation_id="single_post_likes_get",
-        responses={200: LikesResponseSerializer()},
+        responses={200: LikesPostResponseSerializer()},
         manual_parameters=[
             openapi.Parameter(
                 'author_id',
@@ -76,7 +77,7 @@ class SingleAuthorPostCommentLikesAPIView(APIView):
     @swagger_auto_schema(
         operation_description="Get the list of likes of the comment whose id is comment_id.",
         operation_id="single_comment_likes_get",
-        responses={200: LikesResponseSerializer()},
+        responses={200: LikesCommentResponseSerializer()},
         manual_parameters=[
             openapi.Parameter(
                 'author_id',
@@ -148,7 +149,7 @@ class SingleAuthorLikesAPIView(APIView):
     @swagger_auto_schema(
         operation_description="Get the list of likes of the author whose id is author_id.",
         operation_id="single_author_likes",
-        responses={200: LikesResponseSerializer()},
+        responses={200: LikesPostResponseSerializer()},
         manual_parameters=[
             openapi.Parameter(
                 'author_id',
@@ -172,7 +173,7 @@ class SingleAuthorPostLikeAPIView(APIView):
     @swagger_auto_schema(
         operation_description="Get the like whose id is like_id of the post whose id is post_id.",
         operation_id="single_post_like_get",
-        responses={200: LikeResponseSerializer()},
+        responses={200: LikePostResponseSerializer()},
         manual_parameters=[
             openapi.Parameter(
                 'author_id',
@@ -207,7 +208,7 @@ class SingleAuthorPostCommentLikeAPIView(APIView):
     @swagger_auto_schema(
         operation_description="Get the like whose id is like_id of the comment whose id is comment_id.",
         operation_id="single_comment_like_get",
-        responses={200: LikeResponseSerializer()},
+        responses={200: LikeCommentResponseSerializer()},
         manual_parameters=[
             openapi.Parameter(
                 'author_id',
@@ -235,7 +236,7 @@ class SingleAuthorPostCommentLikeAPIView(APIView):
                 in_=openapi.IN_PATH,
                 description='ID of a like stored on this server',
                 type=openapi.TYPE_STRING,
-                default='1',
+                default='2',
             ),
         ],
     )
@@ -258,6 +259,8 @@ def single_post_likes_post_remote(request : HttpRequest,author_id : str,post_id 
             "object" : post_id,
             "summary" : "An author liked your post!"
         }
+
+        like = adapter_inbox_like(like, post_id)
 
         status_code = send_to_single_inbox(post_id.split('/posts')[0], like)
 
@@ -290,6 +293,8 @@ def single_post_likes_post(request : HttpRequest,author_id : str,post_id : str):
 
         author_inbox_url = make_author_url(HOSTNAME, author_id)
 
+        like = adapter_inbox_like(like, post_id)
+
         status_code = send_to_single_inbox(author_inbox_url, like)
 
         return HttpResponse(status=status_code)
@@ -312,6 +317,8 @@ def single_comment_likes_post_remote(request: HttpRequest, author_id: str, post_
             "object" : comment_id,
             "summary" : "An author liked your post!"
         }
+
+        like = adapter_inbox_like(like, post_id)
 
         send_to_single_inbox(comment_id.split('/posts')[0], like)
 
@@ -342,6 +349,8 @@ def single_comment_likes_post(request: HttpRequest, author_id: str, post_id: str
         }
 
         author_inbox_url = make_author_url(HOSTNAME, author_id)
+
+        like = adapter_inbox_like(like, post_id)
 
         status_code = send_to_single_inbox(author_inbox_url,like)
 

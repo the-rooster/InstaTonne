@@ -32,7 +32,7 @@ def get_all_urls(urls: list[str]):
                 return
             try:
                 response : requests.Response = requests.get(url,headers={"Origin":HOSTNAME,
-                                                                         "Authentication" : get_auth_header_for_server(url)})
+                                                                         "Authorization" : get_auth_header_for_server(url)})
                 print("STATUS: ",response.status_code)
                 if response.status_code >= 200 and response.status_code < 300:
                     print(response.text)
@@ -65,7 +65,7 @@ def get_one_url(url: str):
     
     try:
         response: requests.Response = requests.get(url,headers={"Origin":HOSTNAME,
-                                                                "Authentication" : get_auth_header_for_server(url)})
+                                                                "Authorization" : get_auth_header_for_server(url)})
         
         return (response.status_code, response.text, response.headers['Content-Type'])
     except Exception as e:
@@ -83,7 +83,7 @@ def send_to_single_inbox(author_url : str, data : dict):
     try:
         response: requests.Response = requests.post(inbox_url,
                                                     json.dumps(data),headers={"Origin" : HOSTNAME, 
-                                                                            "Authentication" : get_auth_header_for_server(author_url),
+                                                                            "Authorization" : get_auth_header_for_server(author_url),
                                                                             "Content-Type":"application/json"})
     except Exception as e:
         print(e)

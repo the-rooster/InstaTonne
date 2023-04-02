@@ -13,6 +13,8 @@ from rest_framework import status, permissions, serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from ..adapters.adapters import adapter_inbox_follow
+
 
 class SingleAuthorFollowersAPIView(APIView):
     #permission_classes = (permissions.AllowAny,CustomPermission,)
@@ -163,6 +165,8 @@ def post_author_follower(request: HttpRequest, author_id : str, foreign_author_i
         "object": author_response.json(),
         "summary": author.displayName + " wants to follow " + author_response.json()["displayName"]
     }
+
+    serialized_follow = adapter_inbox_follow(serialized_follow, foreign_author_id)
 
     headers = get_auth_headers(foreign_author_id)
 
