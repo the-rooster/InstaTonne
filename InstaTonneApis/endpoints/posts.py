@@ -1,6 +1,6 @@
 from django.http import HttpRequest, HttpResponse
 import json
-from InstaTonneApis.models import Post, PostSerializer, Comment, Author, Follow, PostsResponseSerializer, AuthorSerializer
+from InstaTonneApis.models import Post, PostSerializer, Comment, Author, Follow, PostsResponseSerializer, PostExampleSerializer, AuthorSerializer
 from django.core.paginator import Paginator
 from InstaTonneApis.endpoints.utils import make_comments_url, make_post_url, valid_requesting_user, send_to_inboxes, check_auth_header, isaURL, get_auth_headers, send_to_single_inbox, get_author, check_if_friends_local, check_if_friends_remote
 import requests
@@ -27,7 +27,7 @@ class SingleAuthorPostAPIView(APIView):
     @swagger_auto_schema(
         operation_description="Get a post of author_id.",
         operation_id="single_author_post_get",
-        responses={200: PostSerializer(),},
+        responses={200: PostExampleSerializer(),},
         manual_parameters=[
             openapi.Parameter(
                 'author_id',

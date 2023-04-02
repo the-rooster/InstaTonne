@@ -14,7 +14,7 @@
           <v-list>
             <v-list-item
               v-if="loading"
-              prepend-avatar="./assets/EpicLogo.svg"
+              prepend-avatar="./assets/SmallLogo.png"
               title="---"
               subtitle="---"
             />

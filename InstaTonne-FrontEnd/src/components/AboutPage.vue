@@ -43,7 +43,15 @@
 </style>
 <template>
   <div class="viewBox">
-    <h1>Welcome to InstaTonne!</h1>
+    <span>
+      <v-img
+        src="../src/assets/MediumLogo.png"
+        height="100"
+        width="100"
+        class="mx-auto my-5"
+      />
+      <h1>Welcome to InstaTonne!</h1>
+    </span>
     <p>
       InstaTonne is a revolutionary social networking app that embraces the
       interconnectedness and the web's peer-to-peer nature. Our aim is to

@@ -1,7 +1,21 @@
 <template>
   <div class="viewBox">
     <div>
-
+      <div
+        style="
+          justify-content: center;
+          align-items: center;
+          position: relative;
+          top: 0%;
+          left: 43%;
+          z-index: 100;
+        "
+      >
+        <v-card height="6vh" width="12vw">
+          <h2>Post Editor</h2>
+          <br />
+        </v-card>
+      </div>
       <v-text-field
         v-model="postData.title"
         label="Title"

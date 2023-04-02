@@ -1,6 +1,6 @@
 from django.http import HttpRequest, HttpResponse
 import json
-from ..models import Post, Comment, Author, Like, LikeSerializer, LikesResponseSerializer, LikeResponseSerializer
+from ..models import Post, Comment, Author, Like, LikeSerializer, LikeCommentResponseSerializer, LikePostResponseSerializer, LikesCommentResponseSerializer, LikesPostResponseSerializer
 from .utils import get_one_url, make_author_url, send_to_single_inbox, check_auth_header, get_auth_headers, isaURL
 from ..adapters.adapters import *
 import requests
@@ -20,7 +20,7 @@ class SingleAuthorPostLikesAPIView(APIView):
     @swagger_auto_schema(
         operation_description="Get the list of likes of the post whose id is post_id.",
         operation_id="single_post_likes_get",
-        responses={200: LikesResponseSerializer()},
+        responses={200: LikesPostResponseSerializer()},
         manual_parameters=[
             openapi.Parameter(
                 'author_id',
@@ -77,7 +77,7 @@ class SingleAuthorPostCommentLikesAPIView(APIView):
     @swagger_auto_schema(
         operation_description="Get the list of likes of the comment whose id is comment_id.",
         operation_id="single_comment_likes_get",
-        responses={200: LikesResponseSerializer()},
+        responses={200: LikesCommentResponseSerializer()},
         manual_parameters=[
             openapi.Parameter(
                 'author_id',
@@ -149,7 +149,7 @@ class SingleAuthorLikesAPIView(APIView):
     @swagger_auto_schema(
         operation_description="Get the list of likes of the author whose id is author_id.",
         operation_id="single_author_likes",
-        responses={200: LikesResponseSerializer()},
+        responses={200: LikesPostResponseSerializer()},
         manual_parameters=[
             openapi.Parameter(
                 'author_id',
@@ -173,7 +173,7 @@ class SingleAuthorPostLikeAPIView(APIView):
     @swagger_auto_schema(
         operation_description="Get the like whose id is like_id of the post whose id is post_id.",
         operation_id="single_post_like_get",
-        responses={200: LikeResponseSerializer()},
+        responses={200: LikePostResponseSerializer()},
         manual_parameters=[
             openapi.Parameter(
                 'author_id',
@@ -208,7 +208,7 @@ class SingleAuthorPostCommentLikeAPIView(APIView):
     @swagger_auto_schema(
         operation_description="Get the like whose id is like_id of the comment whose id is comment_id.",
         operation_id="single_comment_like_get",
-        responses={200: LikeResponseSerializer()},
+        responses={200: LikeCommentResponseSerializer()},
         manual_parameters=[
             openapi.Parameter(
                 'author_id',
@@ -236,7 +236,7 @@ class SingleAuthorPostCommentLikeAPIView(APIView):
                 in_=openapi.IN_PATH,
                 description='ID of a like stored on this server',
                 type=openapi.TYPE_STRING,
-                default='1',
+                default='2',
             ),
         ],
     )
