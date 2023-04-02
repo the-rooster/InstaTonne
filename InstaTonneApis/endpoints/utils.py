@@ -83,7 +83,7 @@ def send_to_single_inbox(author_url : str, data : dict):
     try:
         response: requests.Response = requests.post(inbox_url,
                                                     json.dumps(data),headers={"Origin" : HOSTNAME, 
-                                                                            "Authentication" : get_auth_header_for_server(author_url),
+                                                                            "Authorization" : get_auth_header_for_server(author_url),
                                                                             "Content-Type":"application/json"})
     except Exception as e:
         print(e)

@@ -1,6 +1,6 @@
 from django.http import HttpRequest, HttpResponse
 import json
-from InstaTonneApis.models import Post, PostSerializer, Comment, Author, Follow, PostsResponseSerializer
+from InstaTonneApis.models import Post, PostSerializer, Comment, Author, Follow, PostsResponseSerializer, AuthorSerializer
 from django.core.paginator import Paginator
 from InstaTonneApis.endpoints.utils import make_comments_url, make_post_url, valid_requesting_user, send_to_inboxes, check_auth_header, isaURL, get_auth_headers, send_to_single_inbox, get_author, check_if_friends_local, check_if_friends_remote
 import requests
@@ -13,7 +13,7 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, permissions, serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from ..adapters.adapters import adapter_get_remote_posts, adapter_get_remote_single_post
+from ..adapters.adapters import adapter_get_remote_posts, adapter_get_remote_single_post, adapter_inbox_post
 
 
 PNG_CONTENT_TYPE = "image/png;base64"
@@ -468,8 +468,12 @@ def single_author_posts_post(request: HttpRequest, author_id: str):
 
         data : dict = {
             "type" : "post",
-            "id" : post.id_url
+            "id" : post.id_url,
+            "author" : AuthorSerializer(author).data
         }
+
+        data = adapter_inbox_post(data,author.id_url)
+
         send_to_inboxes(author_id, author.id_url, data, body["visibility"])
         send_to_single_inbox(HOSTNAME + "/authors/" + author_id,data)
 

@@ -2,6 +2,7 @@ from django.http import HttpRequest, HttpResponse
 import json
 from ..models import Post, Comment, Author, Like, LikeSerializer, LikesResponseSerializer, LikeResponseSerializer
 from .utils import get_one_url, make_author_url, send_to_single_inbox, check_auth_header, get_auth_headers, isaURL
+from ..adapters.adapters import *
 import requests
 import re
 from InstaTonne.settings import HOSTNAME
@@ -259,6 +260,8 @@ def single_post_likes_post_remote(request : HttpRequest,author_id : str,post_id 
             "summary" : "An author liked your post!"
         }
 
+        like = adapter_inbox_like(like, post_id)
+
         status_code = send_to_single_inbox(post_id.split('/posts')[0], like)
 
         return HttpResponse(status=status_code)
@@ -290,6 +293,8 @@ def single_post_likes_post(request : HttpRequest,author_id : str,post_id : str):
 
         author_inbox_url = make_author_url(HOSTNAME, author_id)
 
+        like = adapter_inbox_like(like, post_id)
+
         status_code = send_to_single_inbox(author_inbox_url, like)
 
         return HttpResponse(status=status_code)
@@ -312,6 +317,8 @@ def single_comment_likes_post_remote(request: HttpRequest, author_id: str, post_
             "object" : comment_id,
             "summary" : "An author liked your post!"
         }
+
+        like = adapter_inbox_like(like, post_id)
 
         send_to_single_inbox(comment_id.split('/posts')[0], like)
 
@@ -342,6 +349,8 @@ def single_comment_likes_post(request: HttpRequest, author_id: str, post_id: str
         }
 
         author_inbox_url = make_author_url(HOSTNAME, author_id)
+
+        like = adapter_inbox_like(like, post_id)
 
         status_code = send_to_single_inbox(author_inbox_url,like)
 
