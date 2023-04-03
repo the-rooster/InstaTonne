@@ -47,9 +47,11 @@
             <v-list-item
               v-if="loggedIn"
               title="Logout"
-              @click="() => {
-                showConfirmation.show = true
-              }"
+              @click="
+                () => {
+                  showConfirmation.show = true;
+                }
+              "
               prepend-icon="mdi-logout"
             />
           </v-list>
@@ -67,20 +69,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onBeforeMount, computed, watch } from 'vue'
-import { RouterView, useRoute } from 'vue-router';
-import { nav_bar_routes as routes, router } from "./main"
-import { createHTTP } from './axiosCalls'
-import { USER_AUTHOR_ID_COOKIE } from './constants'
-import LoginPage from './components/LoginPage.vue'
-import ConfirmationModal from "./components/ConfirmationModal.vue"
-import Cookies from 'js-cookie';
+import { ref, onBeforeMount, computed, watch } from "vue";
+import { RouterView, useRoute } from "vue-router";
+import { nav_bar_routes as routes, router } from "./main";
+import { createHTTP } from "./axiosCalls";
+import { USER_AUTHOR_ID_COOKIE } from "./constants";
+import LoginPage from "./components/LoginPage.vue";
+import ConfirmationModal from "./components/ConfirmationModal.vue";
+import Cookies from "js-cookie";
 
 const loading = ref(true);
 const authorData = ref({});
 const activeUserId = ref("");
 
-const showConfirmation =  ref(false)
+const showConfirmation = ref(false);
 
 const loggedIn = computed(() => activeUserId.value != undefined);
 
@@ -90,7 +92,7 @@ const logout = (value: boolean) => {
     router.push({ path: "/" });
     router.go();
   }
-  showConfirmation.value.show = false  
+  showConfirmation.value.show = false;
 };
 
 const route = useRoute();
