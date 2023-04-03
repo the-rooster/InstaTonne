@@ -5,7 +5,7 @@
     color="#E3F2FD"
     theme="light"
   >
-    {{ props.authorInfo?.displayName }}
+    <h3>{{ props.authorInfo?.displayName }}</h3>
 
     <v-card-item>
       <img

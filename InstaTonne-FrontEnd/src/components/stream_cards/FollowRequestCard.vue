@@ -1,15 +1,12 @@
 <template>
   <v-card
-    class="mx-auto my-5 rounded-l"
+    class="mx-auto my-5 rounded-xl"
     color="#E3F2FD"
     theme="light"
     max-width="80%"
   >
     <v-card-actions>
-      <v-list-item
-        v-if="loading"
-        class="w-100"
-      >
+      <v-list-item v-if="loading" class="w-100">
         <v-progress-circular
           indeterminate
           width="20"
@@ -17,10 +14,7 @@
           class="loadingIcon"
         />
       </v-list-item>
-      <v-list-item
-        v-else
-        class="w-100"
-      >
+      <v-list-item v-else class="w-100">
         <template #append>
           {{ props.requestData.displayName }}
         </template>
@@ -34,12 +28,8 @@
           </router-link>
         </v-list-item>
         <v-list-item>
-          <v-btn @click="acceptRequest()">
-            Accept
-          </v-btn>
-          <v-btn @click="rejectRequest">
-            Reject
-          </v-btn>
+          <v-btn class="accept-button" @click="acceptRequest()"> Accept </v-btn>
+          <v-btn class="reject-button" @click="rejectRequest"> Reject </v-btn>
           {{ error }}
         </v-list-item>
       </v-list-item>
@@ -76,6 +66,7 @@ async function acceptRequest() {
     .then(() => {
       emit("update");
       loading.value = false;
+      window.location.reload();
     });
 }
 
@@ -87,6 +78,7 @@ async function rejectRequest() {
     .then(() => {
       emit("update");
       loading.value = false;
+      this.$forceUpdate();
     });
 }
 </script>
@@ -94,5 +86,15 @@ async function rejectRequest() {
 <style scoped>
 .read-the-docs {
   color: #888;
+}
+
+.accept-button {
+  background-color: #c9fab6;
+  color: #000000;
+}
+
+.reject-button {
+  background-color: #ff9797;
+  color: #000000;
 }
 </style>
