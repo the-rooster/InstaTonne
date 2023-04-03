@@ -91,11 +91,11 @@ type ConnectedServer = {
 };
 
 const servers: any = ref([]);
-const servershown: any = ref({});
+const servershown: any = ref({host : "local", api : ""});
 
 function nextPage() {
   pageNum.page++;
-  if (servershown.value == "local") {
+  if (servershown.value.host == "local") {
     fetchAuthors();
     return;
   }
@@ -104,19 +104,17 @@ function nextPage() {
 }
 
 function previousPage() {
+
   if (pageNum.page > 1) {
     pageNum.page--;
 
-    if (pageNum.page > 1) {
-      pageNum.page--;
-
-      if (servershown.value.host == "local") {
-        fetchAuthors();
-        return;
-      }
-      fetchRemoteAuthors(servershown.value.api);
+    if (servershown.value.host == "local") {
+      fetchAuthors();
+      return;
     }
+    fetchRemoteAuthors(servershown.value.api);
   }
+  
 }
 
 async function getAllServers() {
