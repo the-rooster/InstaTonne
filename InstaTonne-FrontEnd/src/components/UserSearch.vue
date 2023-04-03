@@ -95,7 +95,7 @@ const servershown: any = ref({});
 
 function nextPage() {
   pageNum.page++;
-  if (servershown.value == "local") {
+  if (servershown.value.host == "local") {
     fetchAuthors();
     return;
   }
