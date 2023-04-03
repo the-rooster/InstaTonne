@@ -36,7 +36,7 @@
           v-if="item.type == 'like'"
           :like-data="item"
         />
-        <GithubCard v-if="(item.type != 'like' && item.type != 'post' && item.type != 'comment') && item.type" :github-data="item" />
+        <GithubCard v-if="(item.type.toLowerCase() != 'like' && item.type.toLowerCase() != 'post' && item.type.toLowerCase() != 'comment' && item.type.toLowerCase() != 'follow') && item.type" :github-data="item" />
       </div>
     </div>
     <ConfirmationModal
