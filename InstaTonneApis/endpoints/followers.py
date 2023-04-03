@@ -172,7 +172,7 @@ def post_author_follower(request: HttpRequest, author_id : str, foreign_author_i
 
     headers["Content-Type"] = "application/json"
 
-    inbox_response: requests.Response = requests.post(foreign_author_id + '/inbox/', json.dumps(serialized_follow), headers=headers)
+    inbox_response: requests.Response = requests.post(foreign_author_id + '/inbox', json.dumps(serialized_follow), headers=headers)
     
     # if content type is not set, it will be set to text/html
     if 'Content-Type' not in inbox_response.headers:
