@@ -39,11 +39,11 @@
     </div>
     <br />
     <br />
-    <div class="flex-container">
+    <div class="flex-container my-2">
       <div
         v-for="user in filteredUsers"
         :key="user.displayName"
-        class="flex-content"
+        class="flex-content my-6"
         src="ProfilePage.vue"
       >
         <router-link v-bind:to="`ProfilePage/${encodeURIComponent(user.url)}/`">
@@ -51,7 +51,7 @@
         </router-link>
       </div>
     </div>
-    <div class="arrows">
+    <div class="arrows mt-8">
       <v-icon
         icon="mdi-arrow-left-bold-outline"
         size="x-large"
@@ -233,7 +233,7 @@ br {
 }
 .authorCard {
   width: 100%;
-  height: 100%;
+  height: 24vh;
 }
 .arrows {
   display: flex;
