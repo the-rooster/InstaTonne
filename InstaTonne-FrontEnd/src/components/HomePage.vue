@@ -10,35 +10,26 @@
         z-index: 100;
       "
     >
-      <v-card
-        height="6vh"
-        width="12vw"
-      >
-        <h2 id="homeHeader">
-          Your Stream
-        </h2>
-        <br>
+      <v-card height="6vh" width="12vw">
+        <h2 id="homeHeader">Your Stream</h2>
+        <br />
       </v-card>
-    </div>  
-    <br>
+    </div>
+    <br />
     <div style="padding-bottom: 5em">
-      <div
-        v-for="item in posts"
-        :key="item.id_url"
-      >
-        <PostFullCard
-          v-if="item.type == 'post'"
-          :post-data="item"
-        />
+      <div v-for="item in posts" :key="item.id_url">
+        <PostFullCard v-if="item.type === 'post'" :post-data="item" />
         <InboxCommentCard
-          v-if="item.type == 'comment'"
+          v-else-if="item.type === 'comment'"
           :comment-data="item"
         />
-        <LikeCommentCard
-          v-if="item.type == 'like'"
-          :like-data="item"
+        <LikeCommentCard v-else-if="item.type === 'like'" :like-data="item" />
+        <GithubCard
+          v-else-if="
+            item.type !== 'follow' && item.type !== 'Follow' && item.type
+          "
+          :github-data="item"
         />
-        <GithubCard v-if="(item.type.toLowerCase() != 'like' && item.type.toLowerCase() != 'post' && item.type.toLowerCase() != 'comment' && item.type.toLowerCase() != 'follow') && item.type" :github-data="item" />
       </div>
     </div>
     <ConfirmationModal
@@ -50,7 +41,7 @@
       class="mx-auto clear-inbox"
       @click="
         () => {
-          showConfirmation.show = true
+          showConfirmation.show = true;
         }
       "
     >
@@ -59,25 +50,19 @@
 
     <v-btn
       class="mx-auto change-github"
-      @click="
-        changeGithubView
-      "
-
+      @click="changeGithubView"
       v-if="!usingGithub"
     >
       Enable GitHub Updates
     </v-btn>
 
     <v-btn
-    class="mx-auto turn-off-github"
-    @click="
-      changeGithubView
-    "
-
-    v-if="usingGithub"
-  >
-    Disable GitHub Updates
-  </v-btn>
+      class="mx-auto turn-off-github"
+      @click="changeGithubView"
+      v-if="usingGithub"
+    >
+      Disable GitHub Updates
+    </v-btn>
     <div id="app" />
   </div>
 </template>
@@ -87,7 +72,7 @@ import { ref, onBeforeMount } from "vue";
 import PostFullCard from "./stream_cards/PostFullCard.vue";
 import InboxCommentCard from "./stream_cards/InboxCommentCard.vue";
 import LikeCommentCard from "./stream_cards/InboxLikeCard.vue";
-import ConfirmationModal from "./ConfirmationModal.vue"
+import ConfirmationModal from "./ConfirmationModal.vue";
 import GithubCard from "./stream_cards/GithubCard.vue";
 import Cookies from "js-cookie";
 import { createHTTP } from "../axiosCalls";
@@ -99,11 +84,10 @@ onBeforeMount(() => {
   getInbox();
 });
 
-const showConfirmation =  ref(false)
+const showConfirmation = ref(false);
 const usingGithub = ref(false);
 
-
-function changeGithubView(){
+function changeGithubView() {
   console.log(usingGithub);
   usingGithub.value = !usingGithub.value;
   getInbox();
@@ -112,20 +96,19 @@ function changeGithubView(){
 function clearInbox(value: boolean) {
   if (value) {
     createHTTP(`authors/${Cookies.get(USER_AUTHOR_ID_COOKIE)}/inbox/`)
-    .delete()
-    .then((msg) => {
-      getInbox();
-    });
+      .delete()
+      .then((msg) => {
+        getInbox();
+      });
   }
   showConfirmation.value.show = false;
 }
 
 function getInbox() {
-
-  let inbox_endpoint = '/inbox/';
+  let inbox_endpoint = "/inbox/";
 
   if (usingGithub.value) {
-    inbox_endpoint = '/ginbox/';
+    inbox_endpoint = "/ginbox/";
   }
 
   createHTTP(`authors/${Cookies.get(USER_AUTHOR_ID_COOKIE)}${inbox_endpoint}`)
