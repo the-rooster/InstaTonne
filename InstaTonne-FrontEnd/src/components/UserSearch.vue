@@ -39,11 +39,11 @@
     </div>
     <br />
     <br />
-    <div class="flex-container">
+    <div class="flex-container my-2">
       <div
         v-for="user in filteredUsers"
         :key="user.displayName"
-        class="flex-content"
+        class="flex-content my-6"
         src="ProfilePage.vue"
       >
         <router-link v-bind:to="`ProfilePage/${encodeURIComponent(user.url)}/`">
@@ -51,7 +51,7 @@
         </router-link>
       </div>
     </div>
-    <div class="arrows">
+    <div class="arrows mt-8">
       <v-icon
         icon="mdi-arrow-left-bold-outline"
         size="x-large"
@@ -91,7 +91,7 @@ type ConnectedServer = {
 };
 
 const servers: any = ref([]);
-const servershown: any = ref({host : "local", api : ""});
+const servershown: any = ref({ host: "local", api: "" });
 
 function nextPage() {
   pageNum.page++;
@@ -104,7 +104,6 @@ function nextPage() {
 }
 
 function previousPage() {
-
   if (pageNum.page > 1) {
     pageNum.page--;
 
@@ -114,7 +113,6 @@ function previousPage() {
     }
     fetchRemoteAuthors(servershown.value.api);
   }
-  
 }
 
 async function getAllServers() {
@@ -231,7 +229,7 @@ br {
 }
 .authorCard {
   width: 100%;
-  height: 100%;
+  height: 24vh;
 }
 .arrows {
   display: flex;
