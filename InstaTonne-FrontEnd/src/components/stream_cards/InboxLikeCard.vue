@@ -20,7 +20,9 @@
                 :href="`/app/ProfilePage/${encodeURIComponent(author.url)}/`"
                 >{{ author.displayName }}</a
               >
-              liked your <i>{{ postData.title }} </i> post!
+              liked your
+              <span v-if="isCommentLike">comment on the </span>
+              <i> {{ postData.title }} </i> post!
             </h3>
           </div>
           <div class="preview-card-container">
@@ -45,6 +47,7 @@ import PostPreviewCard from "./PostPreviewCard.vue";
 const postData = ref({});
 const postUrl = ref({});
 let author = ref({});
+const isCommentLike = ref(false);
 
 const props = defineProps({
   likeData: {
@@ -62,6 +65,14 @@ onBeforeMount(() => {
 
   let authorId = "";
 
+  console.log(props.likeData, "LIKE DATA");
+
+  // If props.likeData.object contains "comment", then it's a comment like. Remove the comment id from the string.
+  if (props.likeData.object.includes("comment")) {
+    isCommentLike.value = true;
+    postId = postId.replace(/\/comments\/(.*)/, "");
+  }
+
   if (groups) {
     authorId = groups.authorId;
   }
@@ -71,7 +82,11 @@ onBeforeMount(() => {
 
   console.log("POSTID", postId);
   console.log("AUTHORID", authorId);
-  createHTTP(`authors/${encodeURIComponent(authorId)}/posts/${encodeURIComponent(postId)}`)
+  createHTTP(
+    `authors/${encodeURIComponent(authorId)}/posts/${encodeURIComponent(
+      postId
+    )}`
+  )
     .get()
     .then((result) => {
       console.log("POSTASFSAF", result.data);
