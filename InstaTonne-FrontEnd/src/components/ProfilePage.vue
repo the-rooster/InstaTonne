@@ -144,9 +144,10 @@ function follow() {
   align-items: center;
 }
 .post-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: auto auto auto;
+  column-gap: 2em;
+  max-width: 100%;
 }
 .flex-content {
   width: 10em;
@@ -173,8 +174,8 @@ function follow() {
 }
 
 .post-preview-card {
-  margin-bottom: 1em;
   width: 33vw;
   height: 33vw;
+  margin: 1vw;
 }
 </style>

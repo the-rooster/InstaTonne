@@ -17,7 +17,10 @@
           padding-top: 10em;
         "
       >
-        <img src="../assets/MediumLogo.png" style="width: 9em; padding: 2em" />
+        <img
+          src="../assets/MediumLogo.png"
+          style="width: 9em; padding: 2em"
+        >
         <h1>InstaTonne</h1>
       </div>
       <div
@@ -29,7 +32,10 @@
         "
         @keyup.enter="registerMode ? register() : login()"
       >
-        <v-text-field v-model="username" label="Username" />
+        <v-text-field
+          v-model="username"
+          label="Username"
+        />
         <v-text-field
           v-model="password"
           label="Password"
@@ -46,7 +52,9 @@
             :append-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
             @click:append="showConfirmPassword = !showConfirmPassword"
           />
-          <div v-if="!passwordsMatch">Passwords must match</div>
+          <div v-if="!passwordsMatch">
+            Passwords must match
+          </div>
         </div>
         <div>
           <v-btn
@@ -58,7 +66,10 @@
           </v-btn>
         </div>
         <div>
-          <v-btn class="button" @click="registerMode = !registerMode">
+          <v-btn
+            class="button"
+            @click="registerMode = !registerMode"
+          >
             {{ registerMode ? "Return To Login" : "Register" }}
           </v-btn>
         </div>
@@ -66,31 +77,27 @@
           {{ errorMessage }}
 
           <template #actions>
-            <v-btn color="blue" variant="text" @click="errorMessage = ''">
+            <v-btn
+              color="blue"
+              variant="text"
+              @click="errorMessage = ''"
+            >
               Close
             </v-btn>
           </template>
         </v-snackbar>
-        <!-- <v-btn
-          class="button"
-          @click="() => $emit('LoggedIn', true)"
-        >
-          FORCE LOGIN
-        </v-btn> -->
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onBeforeMount, computed } from "vue";
+import { ref, computed } from "vue";
 import Cookies from "js-cookie";
 import {
   createHTTP,
-  createFormBody,
   USER_AUTHOR_ID_COOKIE,
 } from "../axiosCalls";
-import { router } from "../main";
 
 const emits = defineEmits(["LoggedIn"]);
 
@@ -132,17 +139,14 @@ async function login() {
       Cookies.set(USER_AUTHOR_ID_COOKIE, response.authorId, { expires: 0.5 });
       emits("LoggedIn", response.authorId);
       loading.value = false;
-      router.go();
     })
     .catch((response) => {
-      console.log(response);
-      // TODO: Uncomment this section
-      // if(response.status === 403){
-      //   errorMessage.value = "Admin has not approved of your account yet."
-      // }
-      // else{
-      //   errorMessage.value = "Login failed"
-      // }
+      if(response.status === 403){
+        errorMessage.value = "Admin has not approved of your account yet."
+      }
+      else{
+        errorMessage.value = "Login failed"
+      }
 
       loading.value = false;
     });
@@ -150,7 +154,6 @@ async function login() {
 
 async function register() {
   loading.value = true;
-  // await createHTTP('login/').post('').then((response: { data: object }) => {
   // NOT WORKING YET
   const credentials = {
     username: username.value,
@@ -159,8 +162,7 @@ async function register() {
   };
   await createHTTP("register/")
     .post(credentials)
-    .then((response) => {
-      // responseData.value = response.data;
+    .then(() => {
       loading.value = false;
       registerMode.value = false;
     })
@@ -172,15 +174,7 @@ async function register() {
 }
 
 const loading = ref(false);
-const postData = ref({});
-// onBeforeMount(async () => {
-//   await createHTTP("authors/1/posts/1/")
-//     .get()
-//     .then((response: { data: object }) => {
-//       postData.value = response.data;
-//       loading.value = false;
-//     });
-// });
+
 </script>
 
 <style scoped>

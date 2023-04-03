@@ -39,10 +39,17 @@
             />
           </v-list>
           <v-list>
+            <ConfirmationModal
+              ref="showConfirmation"
+              message="Are you sure you want to logout?"
+              @selected="(value) => logout(value)"
+            />
             <v-list-item
               v-if="loggedIn"
               title="Logout"
-              @click="logout"
+              @click="() => {
+                showConfirmation.show = true
+              }"
               prepend-icon="mdi-logout"
             />
           </v-list>
@@ -65,18 +72,24 @@ import { RouterView, useRoute } from "vue-router";
 import { nav_bar_routes as routes, router } from "./main";
 import { createHTTP, USER_AUTHOR_ID_COOKIE } from "./axiosCalls";
 import LoginPage from "./components/LoginPage.vue";
+import ConfirmationModal from "./components/ConfirmationModal.vue"
 import Cookies from "js-cookie";
 
 const loading = ref(true);
 const authorData = ref({});
 const activeUserId = ref("");
 
+const showConfirmation =  ref(false)
+
 const loggedIn = computed(() => activeUserId.value != undefined);
 
-const logout = () => {
-  Cookies.remove(USER_AUTHOR_ID_COOKIE);
-  router.push({ path: "/" });
-  window.location.reload();
+const logout = (value: boolean) => {
+  if (value) {
+    Cookies.remove(USER_AUTHOR_ID_COOKIE);
+    router.push({ path: "/" });
+    router.go();
+  }
+  showConfirmation.value.show = false  
 };
 
 const route = useRoute();
