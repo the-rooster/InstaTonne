@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 #Configure this before deployment
 HOSTNAME = os.environ["HOSTNAME"] if "HOSTNAME" in os.environ else "http://127.0.0.1:8000"
 FRONTEND = os.environ["FRONTEND"] if "FRONTEND" in os.environ else "http://127.0.0.1:5173"
-GITHUB_TOKEN = "<TOKEN>"
+GITHUB_TOKEN = os.environ["GITHUB_TOKEN"] if "GITHUB_TOKEN" in os.environ else "TOKEN!!!!1"
 
 print(HOSTNAME,FRONTEND)
 # Quick-start development settings - unsuitable for production
