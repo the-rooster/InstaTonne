@@ -59,9 +59,7 @@ const props = defineProps({
 onBeforeMount(() => {
   let postId: string = props.likeData.object;
 
-  let groups = postId.match(
-    /http:\/\/(.*)\/authors\/(?<authorId>.*)\/posts\//
-  )?.groups;
+  let groups = postId.match(/(.*)\/authors\/(?<authorId>.*)\/posts\//)?.groups;
 
   let authorId = "";
 
