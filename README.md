@@ -1,5 +1,5 @@
 # InstaTonne
-[InstaTonne](https://cmput404-group6-instatonne.herokuapp.com/app/) is a revolutionary social networking app that embraces the interconnectedness and the web's peer-to-peer nature. Our aim is to provide users with more autonomy and choice while connecting them to various independent social networks without being limited to a single platform like Facebook, Instagram or Twitter.
+[InstaTonne](https://cmput404-group6-instatonne.herokuapp.com/app/) is a revolutionary social networking app that embraces the interconnectedness and the web's peer-to-peer nature. 
 
 Join us in redefining the social networking experience by taking control of your own content and connections. Welcome to InstaTonne!
 
