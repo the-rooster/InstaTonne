@@ -20,6 +20,7 @@
         v-model="postData.title"
         label="Title"
         class="my-10"
+        id="TitleInput"
         clearable
       />
       <v-select
@@ -51,18 +52,21 @@
         v-model="postData.content"
         label="Content"
         class="my-10"
+        id="ContentInput"
         clearable
       />
       <v-textarea
         v-model="postData.description"
         label="Description"
         class="my-10"
+        id="DescriptionInput"
         clearable
       />
       <v-select
         v-model="postData.visibility"
         label="Visibility"
         :items="['PUBLIC', 'FRIENDS']"
+        id="VisibilitySelector"
         class="my-10"
       />
       <v-combobox
@@ -86,7 +90,7 @@
         </template>
       </v-combobox>
       <v-checkbox v-model="postData.unlisted" label="Unlisted"></v-checkbox>
-      <v-btn :disabled="disableSaving" @click="savePost"> SAVE </v-btn>
+      <v-btn :disabled="disableSaving" @click="savePost" id="SaveButton"> SAVE </v-btn>
     </div>
   </div>
 </template>
@@ -103,10 +107,6 @@ const props = defineProps({
   },
   saveFunction: {
     type: Function,
-    required: true,
-  },
-  requireExtra: {
-    type: Boolean,
     required: true,
   },
 });

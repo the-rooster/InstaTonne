@@ -34,8 +34,20 @@ Access the live website at: https://cmput404-group6-instatonne.herokuapp.com/app
  - Run `npm i` then `npm run dev`
  - Access the locally running app with sample data at http://127.0.0.1:5173/
  
-## Running Tests
+## Running Backend Tests
 Run tests with python manage.py test
+
+## Running Frontend Tests
+To reset the test db:
+1. delete pycache from Instatonne-Apis, and the db file
+2. python3 manage.py makemigrations InstaTonneApis
+3. python3 manage.py migrate --run-syncdb
+4. python3 manage.py loaddata test_data.json
+
+To run the E2E tests:
+5. Run backend: python3 manage.py runserver
+6. Run frontend: /InstaTonne-Frontend npm run dev
+7. Run Cypress: From InstaTonne-Frontend: npx cypress open
 
 ## OpenAPI Specification
 Find the OpenAPI Specification at: https://cmput404-group6-instatonne.herokuapp.com/docs/
@@ -72,4 +84,3 @@ THIS WORK IS PROVIDED "AS IS," AND COPYRIGHT HOLDERS MAKE NO REPRESENTATIONS OR 
 COPYRIGHT HOLDERS WILL NOT BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF ANY USE OF THE SOFTWARE OR DOCUMENT.
      
 The name and trademarks of copyright holders may NOT be used in advertising or publicity pertaining to the work without specific, written prior permission. Title to copyright in this work will at all times remain with copyright holders.```
-

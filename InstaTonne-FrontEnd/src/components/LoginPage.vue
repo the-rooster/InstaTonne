@@ -35,10 +35,12 @@
         <v-text-field
           v-model="username"
           label="Username"
+          class="UsernameField"
         />
         <v-text-field
           v-model="password"
           label="Password"
+          class="PasswordField"
           :type="showPassword ? 'text' : 'password'"
           :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
           hint="At least 8 characters"
@@ -59,6 +61,7 @@
         <div>
           <v-btn
             class="button"
+            id="loginButton"
             :disabled="!canLogin"
             @click="registerMode ? register() : login()"
           >
@@ -94,10 +97,8 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import Cookies from "js-cookie";
-import {
-  createHTTP,
-  USER_AUTHOR_ID_COOKIE,
-} from "../axiosCalls";
+import { createHTTP } from "../axiosCalls";
+import { USER_AUTHOR_ID_COOKIE } from "../constants";
 
 const emits = defineEmits(["LoggedIn"]);
 
@@ -174,7 +175,6 @@ async function register() {
 }
 
 const loading = ref(false);
-
 </script>
 
 <style scoped>

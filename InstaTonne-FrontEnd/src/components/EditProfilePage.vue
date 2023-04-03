@@ -28,7 +28,8 @@
 
 <script setup lang="ts">
 import { ref, computed, onBeforeMount } from "vue";
-import { createHTTP, USER_AUTHOR_ID_COOKIE } from "../axiosCalls";
+import { createHTTP } from "../axiosCalls";
+import { USER_AUTHOR_ID_COOKIE } from "../constants";
 import { useRoute } from "vue-router";
 import { router } from "../main";
 import Cookies from "js-cookie";

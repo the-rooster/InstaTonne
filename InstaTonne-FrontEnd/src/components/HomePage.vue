@@ -14,7 +14,9 @@
         height="6vh"
         width="12vw"
       >
-        <h2>Your Stream</h2>
+        <h2 id="homeHeader">
+          Your Stream
+        </h2>
         <br>
       </v-card>
     </div>  
@@ -88,9 +90,8 @@ import LikeCommentCard from "./stream_cards/InboxLikeCard.vue";
 import ConfirmationModal from "./ConfirmationModal.vue"
 import GithubCard from "./stream_cards/GithubCard.vue";
 import Cookies from "js-cookie";
-// defineProps<{ msg: string }>()
-
-import { USER_AUTHOR_ID_COOKIE, createHTTP } from "../axiosCalls";
+import { createHTTP } from "../axiosCalls";
+import { USER_AUTHOR_ID_COOKIE } from "../constants";
 
 let posts = ref({});
 

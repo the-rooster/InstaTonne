@@ -15,7 +15,6 @@
       v-else
       :post-data="postData"
       :save-function="savePost"
-      :require-extra="false"
     />
   </div>
 </template>
@@ -25,7 +24,8 @@ import { ref, onBeforeMount } from "vue";
 import { useRoute } from "vue-router";
 import PostEditor from "./PostEditor.vue";
 import ErrorPage from "./ErrorPage.vue";
-import { createHTTP, USER_AUTHOR_ID_COOKIE } from "../axiosCalls";
+import { createHTTP } from "../axiosCalls";
+import { USER_AUTHOR_ID_COOKIE } from "../constants";
 import Cookies from "js-cookie";
 
 const loading = ref(true);

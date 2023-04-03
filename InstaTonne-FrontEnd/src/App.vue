@@ -67,13 +67,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onBeforeMount, computed, watch } from "vue";
-import { RouterView, useRoute } from "vue-router";
-import { nav_bar_routes as routes, router } from "./main";
-import { createHTTP, USER_AUTHOR_ID_COOKIE } from "./axiosCalls";
-import LoginPage from "./components/LoginPage.vue";
+import { ref, onBeforeMount, computed, watch } from 'vue'
+import { RouterView, useRoute } from 'vue-router';
+import { nav_bar_routes as routes, router } from "./main"
+import { createHTTP } from './axiosCalls'
+import { USER_AUTHOR_ID_COOKIE } from './constants'
+import LoginPage from './components/LoginPage.vue'
 import ConfirmationModal from "./components/ConfirmationModal.vue"
-import Cookies from "js-cookie";
+import Cookies from 'js-cookie';
 
 const loading = ref(true);
 const authorData = ref({});
