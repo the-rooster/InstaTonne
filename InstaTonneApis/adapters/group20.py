@@ -13,4 +13,6 @@ def get_single_remote_post_adapter_group20(post : dict):
 
     post["id"] = post["origin"]
 
+    print("CHANGED ID TO ORIGIN")
+
     return post
