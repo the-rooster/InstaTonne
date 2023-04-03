@@ -36,6 +36,7 @@
           v-if="item.type == 'like'"
           :like-data="item"
         />
+        <GithubCard v-if="(item.type != 'like' && item.type != 'post' && item.type != 'comment') && item.type" :github-data="item" />
       </div>
     </div>
     <ConfirmationModal
@@ -53,6 +54,28 @@
     >
       clear your inbox
     </v-btn>
+
+    <v-btn
+      class="mx-auto change-github"
+      @click="
+        changeGithubView
+      "
+
+      v-if="!usingGithub"
+    >
+      Enable GitHub Updates
+    </v-btn>
+
+    <v-btn
+    class="mx-auto turn-off-github"
+    @click="
+      changeGithubView
+    "
+
+    v-if="usingGithub"
+  >
+    Disable GitHub Updates
+  </v-btn>
     <div id="app" />
   </div>
 </template>
@@ -63,6 +86,7 @@ import PostFullCard from "./stream_cards/PostFullCard.vue";
 import InboxCommentCard from "./stream_cards/InboxCommentCard.vue";
 import LikeCommentCard from "./stream_cards/InboxLikeCard.vue";
 import ConfirmationModal from "./ConfirmationModal.vue"
+import GithubCard from "./stream_cards/GithubCard.vue";
 import Cookies from "js-cookie";
 // defineProps<{ msg: string }>()
 
@@ -75,6 +99,14 @@ onBeforeMount(() => {
 });
 
 const showConfirmation =  ref(false)
+const usingGithub = ref(false);
+
+
+function changeGithubView(){
+  console.log(usingGithub);
+  usingGithub.value = !usingGithub.value;
+  getInbox();
+}
 
 function clearInbox(value: boolean) {
   if (value) {
@@ -88,7 +120,14 @@ function clearInbox(value: boolean) {
 }
 
 function getInbox() {
-  createHTTP(`authors/${Cookies.get(USER_AUTHOR_ID_COOKIE)}/inbox/`)
+
+  let inbox_endpoint = '/inbox/';
+
+  if (usingGithub.value) {
+    inbox_endpoint = '/ginbox/';
+  }
+
+  createHTTP(`authors/${Cookies.get(USER_AUTHOR_ID_COOKIE)}${inbox_endpoint}`)
     .get()
     .then((response) => {
       console.log(response.data, 3454545);
@@ -108,6 +147,22 @@ function getInbox() {
   background-color: red;
   position: fixed;
   bottom: 5%;
+  right: 1%;
+}
+
+.change-github {
+  color: black;
+  background-color: rgb(38, 106, 16);
+  position: fixed;
+  bottom: 10%;
+  right: 1%;
+}
+
+.turn-off-github {
+  color: black;
+  background-color: rgb(63, 190, 20);
+  position: fixed;
+  bottom: 10%;
   right: 1%;
 }
 </style>

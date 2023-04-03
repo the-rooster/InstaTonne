@@ -167,11 +167,11 @@ const props = defineProps({
   },
   commentData: {
     type: Object,
-    required: true,
+    required: false,
   },
   newComment: {
     type: Object,
-    required: true,
+    required: false,
   },
 });
 
