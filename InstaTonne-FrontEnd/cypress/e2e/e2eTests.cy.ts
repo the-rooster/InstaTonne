@@ -26,6 +26,8 @@ describe('e2e tests', () => {
 
     cy.get(".mdi-logout").trigger("mouseover").click()
 
+    cy.get(".confirmButton").click()
+
     cy.getCookie(USER_AUTHOR_ID_COOKIE).should("equal", null)
 
     cy.visit('http://127.0.0.1:5173/')
@@ -150,6 +152,8 @@ describe('e2e tests', () => {
     cy.contains("Follow request sent to user!")
 
     cy.get(".mdi-logout").trigger("mouseover").click()
+
+    cy.get(".confirmButton").click()
 
     cy.getCookie(USER_AUTHOR_ID_COOKIE).should("equal", null)
 

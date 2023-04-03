@@ -13,6 +13,8 @@ from rest_framework import status, permissions, serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from ..adapters.adapters import adapter_inbox_follow
+
 
 class SingleAuthorFollowersAPIView(APIView):
     #permission_classes = (permissions.AllowAny,CustomPermission,)
@@ -164,11 +166,13 @@ def post_author_follower(request: HttpRequest, author_id : str, foreign_author_i
         "summary": author.displayName + " wants to follow " + author_response.json()["displayName"]
     }
 
+    serialized_follow = adapter_inbox_follow(serialized_follow, foreign_author_id)
+
     headers = get_auth_headers(foreign_author_id)
 
     headers["Content-Type"] = "application/json"
 
-    inbox_response: requests.Response = requests.post(foreign_author_id + '/inbox/', json.dumps(serialized_follow), headers=headers)
+    inbox_response: requests.Response = requests.post(foreign_author_id + '/inbox', json.dumps(serialized_follow), headers=headers)
     
     # if content type is not set, it will be set to text/html
     if 'Content-Type' not in inbox_response.headers:
@@ -183,7 +187,7 @@ def post_author_follower(request: HttpRequest, author_id : str, foreign_author_i
 
 # get the followers of an author
 def single_author_followers_get(request: HttpRequest, author_id: str):
-    follows = Follow.objects.all().filter(object=author_id)
+    follows = Follow.objects.all().filter(object=author_id, accepted=True)
 
     serialized_data = []
     for follow in follows:

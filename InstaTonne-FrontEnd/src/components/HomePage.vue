@@ -10,40 +10,75 @@
         z-index: 100;
       "
     >
-      <v-card height="5vh" width="10vw">
-        <h3 id="homeHeader">Your Stream</h3>
-        <br />
+      <v-card
+        height="6vh"
+        width="12vw"
+      >
+        <h2 id="homeHeader">
+          Your Stream
+        </h2>
+        <br>
       </v-card>
-    </div>
-
-    <br />
+    </div>  
+    <br>
     <div style="padding-bottom: 5em">
-      <div v-for="item in posts" v-bind:key="item.id_url">
+      <div
+        v-for="item in posts"
+        :key="item.id_url"
+      >
         <PostFullCard
-          v-bind:postData="item"
           v-if="item.type == 'post'"
-        ></PostFullCard>
+          :post-data="item"
+        />
         <InboxCommentCard
-          v-bind:commentData="item"
           v-if="item.type == 'comment'"
-        ></InboxCommentCard>
+          :comment-data="item"
+        />
         <LikeCommentCard
-          v-bind:likeData="item"
           v-if="item.type == 'like'"
-        ></LikeCommentCard>
+          :like-data="item"
+        />
+        <GithubCard v-if="(item.type != 'like' && item.type != 'post' && item.type != 'comment') && item.type" :github-data="item" />
       </div>
     </div>
+    <ConfirmationModal
+      ref="showConfirmation"
+      message="Are you sure you want to clear your inbox?"
+      @selected="(value) => clearInbox(value)"
+    />
     <v-btn
       class="mx-auto clear-inbox"
       @click="
         () => {
-          clearInbox();
+          showConfirmation.show = true
         }
       "
     >
       clear your inbox
     </v-btn>
-    <div id="app"></div>
+
+    <v-btn
+      class="mx-auto change-github"
+      @click="
+        changeGithubView
+      "
+
+      v-if="!usingGithub"
+    >
+      Enable GitHub Updates
+    </v-btn>
+
+    <v-btn
+    class="mx-auto turn-off-github"
+    @click="
+      changeGithubView
+    "
+
+    v-if="usingGithub"
+  >
+    Disable GitHub Updates
+  </v-btn>
+    <div id="app" />
   </div>
 </template>
 
@@ -52,6 +87,8 @@ import { ref, onBeforeMount } from "vue";
 import PostFullCard from "./stream_cards/PostFullCard.vue";
 import InboxCommentCard from "./stream_cards/InboxCommentCard.vue";
 import LikeCommentCard from "./stream_cards/InboxLikeCard.vue";
+import ConfirmationModal from "./ConfirmationModal.vue"
+import GithubCard from "./stream_cards/GithubCard.vue";
 import Cookies from "js-cookie";
 import { createHTTP } from "../axiosCalls";
 import { USER_AUTHOR_ID_COOKIE } from "../constants";
@@ -62,16 +99,36 @@ onBeforeMount(() => {
   getInbox();
 });
 
-function clearInbox() {
-  createHTTP(`authors/${Cookies.get(USER_AUTHOR_ID_COOKIE)}/inbox/`)
+const showConfirmation =  ref(false)
+const usingGithub = ref(false);
+
+
+function changeGithubView(){
+  console.log(usingGithub);
+  usingGithub.value = !usingGithub.value;
+  getInbox();
+}
+
+function clearInbox(value: boolean) {
+  if (value) {
+    createHTTP(`authors/${Cookies.get(USER_AUTHOR_ID_COOKIE)}/inbox/`)
     .delete()
     .then((msg) => {
       getInbox();
     });
+  }
+  showConfirmation.value.show = false;
 }
 
 function getInbox() {
-  createHTTP(`authors/${Cookies.get(USER_AUTHOR_ID_COOKIE)}/inbox/`)
+
+  let inbox_endpoint = '/inbox/';
+
+  if (usingGithub.value) {
+    inbox_endpoint = '/ginbox/';
+  }
+
+  createHTTP(`authors/${Cookies.get(USER_AUTHOR_ID_COOKIE)}${inbox_endpoint}`)
     .get()
     .then((response) => {
       console.log(response.data, 3454545);
@@ -91,6 +148,22 @@ function getInbox() {
   background-color: red;
   position: fixed;
   bottom: 5%;
+  right: 1%;
+}
+
+.change-github {
+  color: black;
+  background-color: rgb(38, 106, 16);
+  position: fixed;
+  bottom: 10%;
+  right: 1%;
+}
+
+.turn-off-github {
+  color: black;
+  background-color: rgb(63, 190, 20);
+  position: fixed;
+  bottom: 10%;
   right: 1%;
 }
 </style>

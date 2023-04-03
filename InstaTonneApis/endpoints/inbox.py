@@ -1,5 +1,5 @@
 from django.http import HttpRequest, HttpResponse
-from ..models import Author, Follow, Inbox, Comment, Like, Post, LikeSerializer, InboxSerializer, InboxResponseSerializer
+from ..models import Author, Follow, Inbox, Comment, Like, Post, LikeSerializer, InboxSerializer, InboxResponseSerializer, GInboxSerializer, GInboxResponseSerializer
 import json
 import requests
 from InstaTonne.settings import HOSTNAME
@@ -97,6 +97,75 @@ class InboxAPIView(APIView):
     )
     def delete(self, request: HttpRequest, author_id: str):
         return delete_inbox(request, author_id)
+    
+
+class GInboxAPIView(APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    @swagger_auto_schema(
+        operation_description="get the inbox of author_id with github data",
+        operation_id="ginbox_get",
+        responses={200: GInboxResponseSerializer(),},
+        manual_parameters=[
+            openapi.Parameter(
+                'author_id',
+                in_=openapi.IN_PATH,
+                description='author id',
+                type=openapi.TYPE_STRING,
+                default='1',
+            ),
+        ],
+    )
+    def get(self, request: HttpRequest, author_id: str):
+        return get_ginbox(request, author_id)
+
+
+# get the items in an authors inbox
+def get_ginbox(request: HttpRequest, author_id: str):
+    author: Author | None = Author.objects.all().filter(pk=author_id).first()
+
+    if author is None:
+        return HttpResponse(status=404)
+
+    inboxes = Inbox.objects.all().filter(author=author.id).order_by('published')
+
+    github_url = author.id_url + '/github'
+    github_response: requests.Response = requests.get(github_url, headers=get_auth_headers(github_url))
+    if github_response.status_code != 200:
+        github_data = []
+        print('ERROR:', github_response.status_code)
+    else:
+        github_data = github_response.json()
+        #print('SUCCESS:', github_data)
+
+    serialized_data = []
+    for inbox in inboxes:
+        try:
+            response: requests.Response = requests.get(inbox.url, headers=get_auth_headers(inbox.url))
+
+            if response.status_code == 204:
+                response_data = {"found url": inbox.url}
+            elif response.status_code != 200:
+                response_data = {"error url": inbox.url}
+            else:
+                response_data = response.json()
+
+            response_data['created_at'] = inbox.published.strftime("%Y-%m-%dT%H:%M:%SZ")
+            serialized_data.append(response_data)
+        except Exception as e:
+            print('ERROR:', e)
+
+    #print('SERIAL', serialized_data)
+    all_data = serialized_data + github_data
+    all_data.sort(key=lambda x: x['created_at'], reverse=True)
+
+    res = json.dumps({
+        "type" : "ginbox",
+        "author" : author.id_url,
+        "items" : all_data
+    })
+        
+    return HttpResponse(content=res, status=200, content_type="application/json")
 
 
 # get the items in an authors inbox
@@ -108,8 +177,17 @@ def get_inbox(request: HttpRequest, author_id: str):
 
     inboxes = Inbox.objects.all().filter(author=author.id).order_by('published')
 
-    serialized_data = []
+    urls = set()
+    result = []
+    #get only results with a unique url
     for inbox in inboxes:
+        if inbox.url in urls:
+            continue
+        urls.add(inbox.url)
+        result.append(inbox)
+
+    serialized_data = []
+    for inbox in result:
         try:
             response: requests.Response = requests.get(inbox.url, headers=get_auth_headers(inbox.url))
             if response.status_code == 204:
@@ -187,13 +265,31 @@ def parse_inbox_like(data):
     except:
         print('ERROR: bad object field')
         return None
+    
+    #check that all fields are present
+    if "summary" not in data:
+        print('ERROR: no summary field in body')
+        return None
+    if "author" not in data:
+        print('ERROR: no author field in body')
+        return None
+    
 
     comment: Comment | None = Comment.objects.all().filter(id_url=object_url).first()
     post: Post | None = Post.objects.all().filter(id_url=object_url).first()
 
     if comment is not None:
+
+        if Like.objects.all().filter(comment=comment,author=data["author"]).count() > 0:
+            print('ERROR: already liked')
+            return None
         like = Like.objects.create(type="like", comment=comment, post=None)
     elif post is not None:
+
+        if Like.objects.all().filter(post=post,author=data["author"]).count() > 0:
+            print('ERROR: already liked')
+            return None
+
         like = Like.objects.create(type="like", post=post, comment=None)
     else:
         print('ERROR: object does not exist')
@@ -226,6 +322,10 @@ def parse_inbox_follow_request(data : dict, user: Author):
     except Exception as e:
         print("INBOX FOLLOW REQUEST BROKEN!")
         print(e)
+        return None
+    
+    if Follow.objects.all().filter(follower_url=actor_id, object=user).exists():
+        print("FOLLOW REQUEST ALREADY EXISTS!")
         return None
 
     obj = Follow.objects.create(object=user,follower_url=actor_id,accepted=False,summary=summary)

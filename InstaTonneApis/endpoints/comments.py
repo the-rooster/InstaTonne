@@ -3,6 +3,7 @@ import json
 from ..models import Post, PostSerializer, Comment, Author, CommentSerializer, CommentsResponseSerializer, CommentResponseSerializer
 from django.core.paginator import Paginator
 from .utils import make_comment_url, make_comments_url, get_one_url, make_author_url, send_to_single_inbox, check_authenticated, check_auth_header, isaURL, get_auth_headers
+from ..adapters.adapters import adapter_inbox_comment, adapter_get_comments
 import requests
 import re
 from InstaTonne.settings import HOSTNAME
@@ -176,10 +177,19 @@ def single_post_comments_get_remote(request: HttpRequest, author_id: str, post_i
     if query: query = '?' + query
     url = post_id + '/comments' + query
     response: requests.Response = requests.get(url, headers=get_auth_headers(url))
+
+    try:
+        content = json.loads(response.content.decode('utf-8'))
+    except Exception as e:
+        print("BAD COMMENTS RESPONSE. NOT JSON")
+        return HttpResponse(status=500)
+    
+
+    content = adapter_get_comments(content, post_id)
     return HttpResponse(
         status=response.status_code,
         content_type=response.headers['Content-Type'],
-        content=response.content.decode('utf-8')
+        content=json.dumps(content)
     )
 
 
@@ -202,6 +212,8 @@ def single_post_comments_post_remote(request: HttpRequest, author_id : str, post
             "author" : author.id_url,
             "post" : post_id
         }
+
+        comment = adapter_inbox_comment(comment,post_id)
 
         status_code = send_to_single_inbox(post_id.split('/posts')[0], comment)
 
@@ -237,6 +249,8 @@ def single_post_comments_post(request: HttpRequest, author_id: str, post_id: str
         }
 
         author_inbox_url = make_author_url(HOSTNAME, author_id)
+
+        comment = adapter_inbox_comment(comment,post_id)
 
         status_code = send_to_single_inbox(author_inbox_url, comment)
 

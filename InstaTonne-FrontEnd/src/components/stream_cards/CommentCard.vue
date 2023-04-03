@@ -56,6 +56,8 @@ async function likeComment() {
     .post("")
     .then((resp) => {
       likedComment.value = true;
+      likeCount.value++;
+      this.$forceUpdate();
       return;
     });
 }
