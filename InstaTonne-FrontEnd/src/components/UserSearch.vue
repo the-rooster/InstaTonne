@@ -104,19 +104,17 @@ function nextPage() {
 }
 
 function previousPage() {
+
   if (pageNum.page > 1) {
     pageNum.page--;
 
-    if (pageNum.page > 1) {
-      pageNum.page--;
-
-      if (servershown.value.host == "local") {
-        fetchAuthors();
-        return;
-      }
-      fetchRemoteAuthors(servershown.value.api);
+    if (servershown.value.host == "local") {
+      fetchAuthors();
+      return;
     }
+    fetchRemoteAuthors(servershown.value.api);
   }
+  
 }
 
 async function getAllServers() {
