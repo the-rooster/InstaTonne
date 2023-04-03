@@ -1,0 +1,7 @@
+{
+    "data": {
+        "profileImage": "profileImage",
+        "displayName": "authorName",
+        "github": "authorGithub"   
+    }
+}

@@ -70,6 +70,4 @@ function createFormBody(credentials: any[]) {
   return formBody.join("&");
 }
 
-const USER_AUTHOR_ID_COOKIE = "InstatonneAuthorId";
-
-export { createHTTP, createFormBody, USER_AUTHOR_ID_COOKIE };
+export { createHTTP, createFormBody };

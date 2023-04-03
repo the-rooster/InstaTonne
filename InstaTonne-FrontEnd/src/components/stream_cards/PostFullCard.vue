@@ -71,7 +71,7 @@
 
     <v-card class="mx-4 rounded-xl" min-height="30vh">
       <v-list-item-title
-        ><h3>{{ props.postData.title }}</h3></v-list-item-title
+        ><h3 id="TitleText">{{ props.postData.title }}</h3></v-list-item-title
       >
       <v-img
         v-if="isImage && props.postData.content"
@@ -152,7 +152,8 @@ import DOMPurify from "dompurify";
 
 // defineProps<{ msg: string }>()
 
-import { USER_AUTHOR_ID_COOKIE, createHTTP } from "../../axiosCalls";
+import { createHTTP } from "../../axiosCalls";
+import { USER_AUTHOR_ID_COOKIE } from "../../constants";
 import { vModelCheckbox } from "vue";
 import { onMounted } from "vue";
 

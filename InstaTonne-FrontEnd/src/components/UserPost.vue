@@ -18,7 +18,7 @@
   import Cookies from "js-cookie";
   // defineProps<{ msg: string }>()
   
-  import { USER_AUTHOR_ID_COOKIE, createHTTP } from "../axiosCalls";
+  import { createHTTP } from "../axiosCalls";
   
   let post = ref({});
 

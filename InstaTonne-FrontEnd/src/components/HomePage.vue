@@ -14,7 +14,9 @@
         height="6vh"
         width="12vw"
       >
-        <h2>Your Stream</h2>
+        <h2 id="homeHeader">
+          Your Stream
+        </h2>
         <br>
       </v-card>
     </div>  
@@ -36,7 +38,7 @@
           v-if="item.type == 'like'"
           :like-data="item"
         />
-        <GithubCard v-if="(item.type != 'like' && item.type != 'post' && item.type != 'comment') && item.type" :github-data="item" />
+        <GithubCard v-if="(item.type.toLowerCase() != 'like' && item.type.toLowerCase() != 'post' && item.type.toLowerCase() != 'comment' && item.type.toLowerCase() != 'follow') && item.type" :github-data="item" />
       </div>
     </div>
     <ConfirmationModal
@@ -88,9 +90,8 @@ import LikeCommentCard from "./stream_cards/InboxLikeCard.vue";
 import ConfirmationModal from "./ConfirmationModal.vue"
 import GithubCard from "./stream_cards/GithubCard.vue";
 import Cookies from "js-cookie";
-// defineProps<{ msg: string }>()
-
-import { USER_AUTHOR_ID_COOKIE, createHTTP } from "../axiosCalls";
+import { createHTTP } from "../axiosCalls";
+import { USER_AUTHOR_ID_COOKIE } from "../constants";
 
 let posts = ref({});
 

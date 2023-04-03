@@ -16,6 +16,7 @@
           Cancel
         </v-btn>
         <v-btn
+          class="confirmButton"
           @click="sendUpdate(true)"
         >
           Confirm
