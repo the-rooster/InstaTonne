@@ -3,9 +3,10 @@
     class="mx-auto my-5 rounded-xl"
     color="#E3F2FD"
     theme="light"
-    max-width="100%"
+    width="20vw"
+    height="20vw"
   >
-    <v-card class="mx-4 my-4 rounded-xl" min-height="30vh">
+    <v-card class="mx-4 my-4 rounded-xl" style="height:80%">
       <v-list-item-title
         ><h2 class="my-4">{{ props.postData.title }}</h2></v-list-item-title
       >
