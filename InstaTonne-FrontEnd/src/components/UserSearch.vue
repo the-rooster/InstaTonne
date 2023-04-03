@@ -91,7 +91,7 @@ type ConnectedServer = {
 };
 
 const servers: any = ref([]);
-const servershown: any = ref({});
+const servershown: any = ref({host : "local", api : ""});
 
 function nextPage() {
   pageNum.page++;
