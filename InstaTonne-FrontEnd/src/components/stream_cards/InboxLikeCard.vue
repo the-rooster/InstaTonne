@@ -60,7 +60,7 @@ onBeforeMount(() => {
   let postId: string = props.likeData.object;
 
   let groups = postId.match(
-    /http:\/\/(.*)\/authors\/(?<authorId>.*)\/posts\//
+    /(.*)\/authors\/(?<authorId>.*)\/posts\//
   )?.groups;
 
   let authorId = "";
